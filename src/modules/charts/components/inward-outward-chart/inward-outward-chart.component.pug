@@ -1,0 +1,63 @@
+.d-flex.flex-container(style='gap: 30px')
+    sbpro-card(*ngIf='!loadingFigures && !connectedBanking')
+        .card-header.text-white(style='background:#F2C619;font-size: 18px') Total Escrow Balance
+        .card-body.d-flex.align-items-center.p-0(
+            style='background: #FFFBF4;'
+        )
+            h4(style='margin-left: 20px;color:#417505;font-weight: 530;') {{ totalEscrowBalance }}
+    .dashboard-card.w-100(*ngIf='loadingFigures && !connectedBanking')
+        ngx-skeleton-loader(count='1', [theme]='{ height: "20px", width: "180px" }')
+        ngx-skeleton-loader(count='1', [theme]='{ height: "20px" }')
+    sbpro-card(*ngIf='connectedBanking && !isAdmin')
+        .card-header.text-white(style='background:#F2C619;font-size: 18px') Total Account Balance
+        .card-body.d-flex.align-items-center.p-0(
+            style='background: #FFFBF4;'
+        )
+            h4(style='margin-left: 20px;color:#417505;font-weight: 530;') {{ totalAccountBalance? totalAccountBalance:"--" }}
+    .dashboard-card.w-100(*ngIf='loadingFigures')
+        ngx-skeleton-loader(count='1', [theme]='{ height: "20px", width: "180px" }')
+        ngx-skeleton-loader(count='1', [theme]='{ height: "20px" }')
+
+    sbpro-card(color='text-white', *ngIf='!loadingFigures && !connectedBanking')
+        .card-header.text-white(style='background: #FFB318') Total amount of Pending Transfers
+        .card-body.d-flex.align-items-center.p-0(
+            style='background: #FFFBF4;'
+        )
+            h4(style='margin-left: 20px;color:#417505;font-weight: 530;') {{ pendingTransferAmount }}
+    sbpro-card(color='text-white', *ngIf='!loadingFigures && connectedBanking && !isAdmin')
+        .card-header.text-white(style='background: #FFB318') Total amount of Pending Transfers
+        .card-body.d-flex.align-items-center.p-0(
+            style='background: #FFFBF4;'
+        )
+            h4(style='margin-left: 20px;color:#417505;font-weight: 530;') {{ pendingBalance? pendingBalance : "--" }}
+
+    .dashboard-card.w-100(*ngIf='loadingFigures')
+        ngx-skeleton-loader(count='1', [theme]='{ height: "20px", width: "180px" }')
+        ngx-skeleton-loader(count='1', [theme]='{ height: "20px" }')
+
+    sbpro-card(color='text-white', *ngIf='!loadingFigures && !connectedBanking')
+        .card-header.text-white(style='background: #D7A131', *ngIf='isAdmin') Effective Escrow Balance
+        .card-header.text-white(style='background: #D7A131', *ngIf='!isAdmin') Total no of Pending Transfers
+        .card-body.d-flex.align-items-center.p-0(
+            style='background: #FFFBF4;'
+        )
+            h4(
+                style='margin-left: 20px;color:#417505;font-weight: 530;',
+                *ngIf='isAdmin'
+            ) {{ effectiveEscrowBalance }}
+            h4(
+                style='margin-left: 20px;color:#417505;font-weight: 530;',
+                *ngIf='!isAdmin'
+            ) {{ numPendingTransfers }}
+    .dashboard-card.w-100(*ngIf='loadingFigures && !connectedBanking')
+        ngx-skeleton-loader(count='1', [theme]='{ height: "20px", width: "180px" }')
+        ngx-skeleton-loader(count='1', [theme]='{ height: "20px" }')
+
+    sbpro-card(color='text-white', *ngIf='connectedBanking')
+        .card-header.text-white(style='background: #D7A131') Effective Account Balance
+        .card-body.d-flex.align-items-center.pt-3.pb-2.p-0(
+            style='background: #FFFBF4;'
+        )
+            h4(
+                style='margin-left: 20px;color:#417505;font-weight: 530;'
+            ) {{ effectiveCastlerBalance < 0 ? "--" : (effectiveCastlerBalance || 0) }}

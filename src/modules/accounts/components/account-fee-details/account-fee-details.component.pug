@@ -1,0 +1,53 @@
+
+div
+  form([formGroup]='feeDetailForm', autocomplete='off')
+    div
+      h4 Fee Details
+      hr
+
+    div(*ngIf='errors.length > 0')
+      sbpro-alert(classes='alert-danger', [dismissable]='true')
+        | {{ errors[0] }}
+
+    .form-group
+      label(for='transaction-fee')
+        | Transaction Fee
+      .row
+        .col-sm-12.col-md-3.col-lg-3
+          select#transaction-fee.form-control.form-control-sm(
+            formControlName='transactionFeeSetting',
+            required
+          )
+            option(value='fixed-amount') Fixed Amount
+            option(value='percentage') Percentage(%)
+        .col-sm-12.col-md-3.col-lg-3
+          .input-group.input-group-joined
+            .input-group-prepend
+              span.input-group-text.form-control-sm
+                | ₹
+            input#transaction-fee.form-control.form-control-sm(
+              type='number',
+              formControlName='transactionFee',
+              required
+            )
+
+    .form-group
+      label(for='monthly-fee')
+        | Monthly Fee
+      .row
+        .col-sm-12.col-md-3.col-lg-3
+          .input-group.input-group-joined
+            .input-group-prepend
+              span.input-group-text.form-control-sm
+                | ₹
+            input#monthly-fee.form-control.form-control-sm(
+              type='number',
+              formControlName='monthlyFee',
+              required
+            )
+    br
+    .form-group
+      .row
+        .col-sm-6.col-md-4
+          button.btn.castlerButtonColor((click)='onSubmit()')
+            span Update

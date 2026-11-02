@@ -1,0 +1,50 @@
+li.nav-item.dropdown.no-caret.mr-3.dropdown-user(
+  ngbDropdown,
+  [placement]='placement',
+  display='dynamic'
+)
+  a#navbarDropdownUserImage.btn.btn-transparent-dark.dropdown-toggle.p-0(
+    ngbDropdownToggle,
+    data-cy='userMenu',
+    role='button',
+    aria-haspopup='true',
+    aria-expanded='false'
+  )
+    img([src]='imageUri', height='50', width='50')
+
+  .dropdown-menu.border-0.shadow.animated--fade-in-up(
+    ngbDropdownMenu,
+    aria-labelledby='dropdownUser'
+  )
+    h6.dropdown-header.d-flex.align-items-center
+      img.dropdown-user-img([src]='imageUri', height='30', width='70')
+      .dropdown-user-details
+        .dropdown-user-details-name {{ fullName }}
+        .dropdown-user-details-email {{ email }}
+        br
+        .dropdown-user-details-email Merchant Id: {{ merchantId }}
+        .dropdown-user-details-email Role: {{ role }}
+    .dropdown-divider
+    //- a.dropdown-item(routerLink='/profile')
+    //-   .dropdown-item-icon
+    //-     i-feather(name='settings')
+    //-   span
+    //-   | Business Profile
+    span.dropdown-item((click)='handleLogoutClick()')
+      .dropdown-item-icon
+        i-feather(name='log-out')
+      span 
+      | Logout
+
+ng-template(#idleModal)
+  .modal-body
+    center
+      span.timerLabel Logout In
+      br
+      span.timer {{ timer - count }}
+      br
+      span.timerLabel Seconds
+
+  .modal-footer
+    .row
+      button.btn.btn-primary(type='button', (click)='onClose()') STOP

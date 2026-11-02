@@ -1,0 +1,35 @@
+.flex-container
+	sbpro-layout-dashboard([light]='true')
+		router-outlet
+			sbpro-dashboard-head(
+				icon='book',
+				title='User Details',
+				description='User Details.'
+			)
+			.container-fluid.mt-n10.responsiveForm
+				sbpro-card-navigation(
+					sbproTocItem='Tabs',
+					[navNames]='["User Details", "Lock Logs", "Merchant User Details"]',
+					[templates]='[basic, logs, merchantUserDetails]',
+					[headerButtons]='[2]',
+					(eventEmitterRefresh)='refresh($event)',
+					(eventEmitterToggle)='toggle($event)'
+				)
+					ng-template(#basic)
+						sbpro-user-basic-details(
+							[userId]='userId',
+							[editMode]='false',
+							[readOnly]='readOnly',
+						)
+					ng-template(#logs)
+						sbpro-user-logs(
+							[userId]='userId',
+							[editMode]='false',
+							[readOnly]='readOnly'
+						)
+					ng-template(#merchantUserDetails)
+						sbpro-merchant-user-details(
+							[userId]='userId',
+							[editMode]='false',
+							[readOnly]='readOnly'
+						)

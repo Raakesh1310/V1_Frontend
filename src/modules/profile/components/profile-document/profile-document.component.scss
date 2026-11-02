@@ -1,0 +1,19 @@
+@import 'styles/variables.scss';
+sbpro-alert {
+  p {
+    margin-bottom: 0rem;
+  }
+}
+
+#dummy {
+  p {
+    width: auto;
+    margin-bottom: 0.5rem;
+    margin-top: 0rem;
+    padding: 0rem 0.5rem;
+  }
+}
+
+label:not(.custom-file-label) {
+  font-weight: bold;
+}

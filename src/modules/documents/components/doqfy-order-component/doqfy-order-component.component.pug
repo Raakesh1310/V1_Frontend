@@ -1,0 +1,284 @@
+sbpro-card([headerActions]='true')
+  .card-header(class='logoColor')
+    | Order Details
+  .card-body
+    .alert.alert-primary.alert-dismissible.fade.show(role='alert',*ngIf='errors.length > 0')
+      | {{errors[0] }}
+      button.close(type='button', (click)='errors=[]', data-dismiss='alert', aria-label='Close')
+          span(aria-hidden='true') ×
+
+    .row
+      .col-sm-12.col-md-6
+        .form-group 
+          label
+            b Agreement Name 
+          br
+          span {{order.orderName}}
+      .col-sm-12.col-md-6
+        .form-group
+          a.btn.text-white(
+            class='castlerButtonColor',
+            *ngIf='order.document'
+            href='{{ generateFileLink(order.document.type) + order.document.hash }}',
+            target='_blank'
+          ) Download Agreement
+
+
+    .row
+      .col-sm-12.col-md-6
+        .form-group
+          label 
+            b Document ID:
+          br
+          span {{ order.documentId }}
+      .col-sm-12.col-md-6
+        .form-group
+          label
+            b Status
+          br
+          h4 
+            sbpro-app-button(
+              (click)='refreshOrder()',
+              [loading]='refreshing',
+              [text]='order.status ? order.status : "Pending"',
+              loadingText='Updating',
+              [btnClass]='{ "btn-sm": true, "btn-block": false, "btn-primary":  true }'
+            )
+
+    .row
+      .col-sm-12.col-md-6
+        .form-group
+          label 
+            b Order UUID:
+          br
+          span {{ order.orderUuid }}
+      .col-sm-12.col-md-6
+        .form-group
+          label 
+            b Audit Trail
+          br
+          button.btn.btn-link.btn-sm.mr-2.ws-wrap.ml-auto(
+            printSectionId='printSection',
+            ngxPrint,
+            [useExistingCss]='true',
+            *ngIf='!refreshing'
+          )
+            b Report
+      
+    hr
+    div(*ngIf=' order.estamp && order.estamp.is_required')
+      h3 E-Stamp
+
+      .row 
+        .col-sm-12.col-md-6
+          label
+            b Certificate Number
+          p(*ngIf='order.estamp.certificateNumber') {{ order.estamp.certificateNumber }}
+          p(*ngIf='!order.estamp.certificateNumber') --
+        .col-sm-12.col-md-6
+          label
+            b Reference Number
+          p(*ngIf='order.estamp.referenceNumber') {{ order.estamp.referenceNumber }}
+          p(*ngIf='!order.estamp.referenceNumber') --
+        
+      .row 
+        .col-sm-12.col-md-6
+          label
+            b Stamp Duty Value
+          p(*ngIf='order.estamp.stampDutyValue') {{ order.estamp.stampDutyValue }}
+          p(*ngIf='!order.estamp.stampDutyValue') --
+        .col-sm-12.col-md-6
+          label
+            b Issue Date
+          p(*ngIf='order.estamp.completedAt') {{ order.estamp.completedAt * 1000 | date:'dd MMM yyyy' }}
+          p(*ngIf='!order.estamp.completedAt') --
+        
+      hr
+    h3 E-sign
+
+    .row 
+      .col-sm-12.col-md-6 
+        label
+          b Document UUID
+        p {{ order.documentUuid }}
+
+      .col-sm-12.col-md-6 
+        label
+          b Created At:
+        p {{ order.createdAt | date:'dd MMM yyyy' }}
+    br
+    .row 
+      .col-12
+        h5 Signing Status:
+        .table-responsive.pp-table-container.table-responsive-sm
+          table.table
+            thead
+              tr
+                th Name
+                th Email
+                th Type
+                th Sign Status
+                th Sign Date
+
+            tbody(*ngFor='let signer of order.signingParties')
+              tr
+                td
+                  span(*ngIf='signer.name') {{ signer.name }}
+                  span(*ngIf='!signer.name') --
+                td
+                  span(*ngIf='signer.email') {{ signer.email }}
+                  span(*ngIf='!signer.email') --
+                td
+                  span(*ngIf='signer.signing_type') {{ signer.signing_type }}
+                  span(*ngIf='!signer.signing_type') --
+                td
+                  span(*ngIf='signer.signStatus') {{ signer.signStatus }}
+                  span(*ngIf='!signer.signStatus') --
+                td
+                  span(*ngIf='signer.signDate') {{ signer.signDate  | date:'dd MMM yyyy' }}
+                  span(*ngIf='!signer.signDate') --
+
+    .row(*ngIf='link')
+      br
+      .col-12
+        p
+          b File Link:
+        a([href]='link') {{ link }}
+
+    br
+
+    button.btn.btn-light((click)='goBack()') Go Back
+    | &nbsp;&nbsp;
+    sbpro-app-button(
+      (click)='genLink()',
+      *ngIf='order.status === "COMPLETED"',
+      [loading]='generating',
+      text='Generate File',
+      loadingText='Generating',
+      [btnClass]='{ "btn-block": false, "btn-primary": true }'
+    )
+
+
+div#printSection.hidden 
+  br
+  br
+  center
+    img.logoImage(
+      src='/assets/img/Castler_logo.png',
+      width='100',
+      height='50'
+    )
+  br
+  br
+  br
+  div.p-5
+    h3 Order Details 
+    br
+    br
+    .row
+      .col-sm-12.col-md-6
+        .form-group 
+          label 
+            b Agreement Name 
+          br
+          span(*ngIf='order.orderName') {{order.orderName}}
+          span(*ngIf='!order.orderName') {{order.documentId}}
+    .row
+      .col-sm-12.col-md-6
+        .form-group
+          label 
+            b Order UUID:
+          br
+          span {{ order.orderUuid }}
+          
+      .col-sm-12.col-md-6
+        .form-group
+          label
+            b Status
+          br
+          h4 
+            sbpro-app-button(
+              (click)='refreshOrder()',
+              [loading]='refreshing',
+              [text]='order.status ? order.status : "Pending"',
+              loadingText='Updating',
+              [btnClass]='{ "btn-sm": true, "btn-block": false, "btn-link": true }'
+            )
+    hr
+    div(*ngIf='order.estamp.is_required')
+      h3 E-Stamp
+
+      .row 
+        .col-sm-12.col-md-6
+          label
+            b Certificate Number
+          p(*ngIf='order.estamp.certificateNumber') {{ order.estamp.certificateNumber }}
+          p(*ngIf='!order.estamp.certificateNumber') --
+        .col-sm-12.col-md-6
+          label
+            b Issue Date
+          p(*ngIf='order.estamp.completedAt') {{ order.estamp.completedAt * 1000 | date:'dd MMM yyyy' }}
+          p(*ngIf='!order.estamp.completedAt') --
+      .row 
+        .col-sm-12.col-md-6
+          label
+            b Stamp Duty Value
+          p(*ngIf='order.estamp.stampDutyValue') {{ order.estamp.stampDutyValue }}
+          p(*ngIf='!order.estamp.stampDutyValue') --
+      .row 
+        .col-sm-12.col-md-6
+          label
+            b Reference Number
+          p(*ngIf='order.estamp.referenceNumber') {{ order.estamp.referenceNumber }}
+          p(*ngIf='!order.estamp.referenceNumber') --
+      hr
+    h3 E-sign
+
+    .row 
+      .col-sm-12.col-md-6 
+        label
+          b Document UUID
+        p {{ order.documentUuid }}
+
+      .col-sm-12.col-md-6 
+        label
+          b Created At:
+        p {{ order.createdAt | date:'dd MMM yyyy' }}
+    br
+    .row 
+      .col-12
+        h5 Signing Status:
+        .table-responsive.pp-table-container.table-responsive-sm
+          table.table
+            thead
+              tr
+                th Name
+                th Email
+                th Type
+                th Sign Status
+                th Sign Date
+
+            tbody(*ngFor='let signer of order.signingParties')
+              tr
+                td
+                  span(*ngIf='signer.name') {{ signer.name }}
+                  span(*ngIf='!signer.name') --
+                td
+                  span(*ngIf='signer.email') {{ signer.email }}
+                  span(*ngIf='!signer.email') --
+                td
+                  span(*ngIf='signer.signing_type') {{ signer.signing_type }}
+                  span(*ngIf='!signer.signing_type') --
+                td
+                  span(*ngIf='signer.signStatus') {{ signer.signStatus }}
+                  span(*ngIf='!signer.signStatus') --
+                td
+                  span(*ngIf='signer.signDate') {{ signer.signDate * 1000 | date:'dd MMM yyyy' }}
+                  span(*ngIf='!signer.signDate') --
+
+    .row(*ngIf='link')
+      br
+      .col-12
+        p
+          b File Link:
+        a([href]='link') {{ link }}

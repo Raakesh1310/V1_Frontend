@@ -1,0 +1,118 @@
+sbpro-card([headerActions]='true')
+  .card-header(class='logoColor')
+    | All Mails
+    div
+      span.mr-2
+        .spinner-border.spinner-border-sm.text-primary.mr-1(
+          role='status',
+          aria-hidden='true',
+          *ngIf='loadingList$ | async'
+        )
+        button.btn.btn-icon.btn-xs(
+          class='castlerButtonColor',
+          *ngIf='!(loadingList$ | async)',
+          (click)='loadData()'
+        )
+          i-feather(name='refresh-cw')
+      button.btn.btn-icon.btn-xs((click)='toggleFilters()', class='castlerButtonColor')
+        i-feather(name='filter')
+  .card-body.flex-container.align-self-stretch
+    div
+      form.pb-2(*ngIf='filtersVisible')
+        .d-flex.mb-2
+          input#wildSearch.mt-1.form-control.w-100.mr-2(
+            type='text',
+            name='s',
+            placement='top',
+            ngbPopover='Search by Subject',
+            placeholder='Search by Subject',
+            [(ngModel)]='mailService.searchTerm',
+            autocomplete='off'
+          )
+          input#start-date.mt-1.form-control.w-25.mr-2(
+            type='text',
+            name='sd',
+            placeholder='Start Date',
+            autocomplete='off',
+            ngbDatepicker,
+            outsideDays='hidden',
+            #sd='ngbDatepicker',
+            (click)='sd.toggle()',
+            [(ngModel)]='mailService.dateFrom',
+            [minDate]='mailService.dateFromMin',
+            [maxDate]='mailService.dateFromMax'
+          )
+          input#end-date.mt-1.form-control.w-25.mr-2(
+            type='text',
+            name='ed',
+            placeholder='End Date',
+            autocomplete='off',
+            ngbDatepicker,
+            outsideDays='hidden',
+            #ed='ngbDatepicker',
+            (click)='ed.toggle()',
+            [(ngModel)]='mailService.dateTo',
+            [minDate]='mailService.dateToMin',
+            [maxDate]='mailService.dateToMax'
+          )
+
+          button.btn.mr-2.ws-nowrap.mt-1(
+            class='castlerButtonColor',
+            type='submit',
+            (click)='submitSearchForm()'
+          )
+            fa-icon.d-flex.flex-row.align-items-center.mr-2(
+              [icon]='["fas", "search"]'
+            )
+          button.btn.btn-link.mr-2(type='button', (click)='clearForm()', class='logoColor') Clear
+        .d-flex(*ngIf='(mails$ | async)?.length > 0') 
+          .flex-row
+            small.mb-2.mt-2 Showing {{ (mailService.page - 1) * 10 + 1 }} to {{ (mailService.page - 1) * 10 + (mails$ | async)?.length }} of {{ total$ | async }}
+
+    .table-responsive.pp-table-container.align-self-stretch.flex-grow-1.flex-stretch-1.table-striped
+      table.table
+        thead
+          tr
+            th.th-sticky-top(
+              scope='col',
+              sbSortable='event',
+              (sort)='onSort($event)'
+            )
+              span.ws-nowrap Date
+            th.th-sticky-top(scope='col', sbSortable='time', (sort)='onSort($event)')
+              span.ws-nowrap Subject
+            th.th-sticky-top(scope='col', sbSortable='time', (sort)='onSort($event)')
+              span.ws-nowrap Message
+
+        tbody(*ngIf='(mails$ | async)?.length > 0 && !(loadingList$ | async)')
+          tr(*ngFor='let mail of mails$ | async; index as i')
+            td
+              ngb-highlight.ws-nowrap(
+                [result]='mail.createdAt | date: "d MMM yyyy" || "--"',
+                [term]='mailService.searchTerm'
+              )
+            td
+              ngb-highlight(
+                [result]='mail.subject',
+                [term]='mailService.searchTerm'
+              )
+            td
+              button.btn.btn-sm((click)='openDetails(mail)', class='castlerButtonColor') View Message
+
+    .flex-container.flex-row(
+      *ngIf='(mails$ | async)?.length <= 0 && !(loadingList$ | async)'
+    )
+      .align-self-center No Data available
+    .flex-container.flex-row(*ngIf='!!(loadingList$ | async)')
+      .align-self-center Please wait...
+    .d-flex.justify-content-between.pt-2.align-self-end(
+      *ngIf='(mails$ | async)?.length > 0 && !(loadingList$ | async)'
+    )
+      ngb-pagination(
+        [collectionSize]='total$ | async',
+        [(page)]='mailService.page',
+        [maxSize]='5',
+        [rotate]='true',
+        [ellipses]='false',
+        [boundaryLinks]='true'
+      )

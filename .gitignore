@@ -1,0 +1,12 @@
+node_modules
+.idea/
+dist
+e2e-report
+dist_temp
+.env
+out-tsc
+coverage
+debug.log
+**/*.html
+*.html
+.angular

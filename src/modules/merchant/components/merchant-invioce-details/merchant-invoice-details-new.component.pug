@@ -1,0 +1,618 @@
+div
+  h4 Fee Details
+  hr
+  div
+    label(for='virtual-acc-fee')
+      | Select Fees
+    .row
+      .col-sm-12.col-md-3.col-lg-3
+        select#virtual-acc-fee.form-control.form-control-sm(
+          [ngModel]='feeType',
+          (ngModelChange)='openFeeModal($event)'
+        )
+          option(value='') Select Fee Type
+          option(value='setUpFee', *ngIf='showSetupFee') One Time Set-Up Fee
+          option(value='virtualAccount') Escrow Fee
+          option(value='transaction') Transaction Fee
+          option(value='monthly') Monthly Fee
+          option(*ngIf='showKYC', value='kycIndividual') KYC Individual Fee
+          option(*ngIf='showKYC', value='kycBusiness') KYC Business Fee
+          option(*ngIf='showIMPS', value='imps') IMPS Fee
+          option(*ngIf='showPennyTest', value='pennyTestFee') Penny Test Fee
+          option(value='miscellaneousFee') Miscellaneous Fee
+          option(*ngIf='escrowPagePG', value='escrowPage') Escrow Page Fee
+          option(value='depositFee') Deposit Fee
+          option(*ngIf='showUpiPayoutFees', value='upiPayout') UPI Payout
+
+    .mt-3.table-responsive.pp-table-container.align-self-stretch.flex-grow-1.flex-stretch-1.table-striped
+      table.table
+        thead
+          tr
+            th.th-sticky-top Fee Type
+            th.th-sticky-top Frequency
+            th.th-sticky-top Amount
+            th.th-sticky-top Last Updated
+            th.th-sticky-top Updated By
+            th.th-sticky-top Status
+            th.th-sticky-top Action
+        tbody(*ngIf='!fees.length')
+          .mt-2
+            span(style='font-style: italic;') No Entries Found
+
+        tbody(*ngIf='fees.length')
+          tr(*ngFor='let fee of fees; index as i')
+            td 
+              span {{ fee.feeType }}
+              br
+              span(
+                *ngIf='fee.feeType === "Miscellaneous Fees"',
+                style='color: grey; font-weight: bold'
+              ) {{ fee.details && fee.details.feeName }}
+            td {{ fee.frequency }}
+            td(
+              *ngIf='fee.feeType === "Deposit Fee" || fee.feeType === "Escrow Page" || fee.feeType === "UPI Payout"'
+            )
+              span(
+                role='button',
+                style='color: blue; text-decoration: underline; cursor: pointer;',
+                (click)='showFeeDetails(fee)'
+              ) View Details
+            td(
+              *ngIf='fee.feeType !== "Deposit Fee" && fee.feeType !== "Escrow Page" && fee.feeType !== "UPI Payout"'
+            ) {{ fee.amount }}
+            td {{ formatUpdatedAtString(fee.updatedAt) }}
+            td {{ fee.updatedBy === "" ? "--" : fee.updatedBy }}
+            td {{ fee.active ? "Active" : "Inactive" }}
+            td(*ngIf='fee.feeType !== "Setup Fee" && fee.active')
+              button.btn.btn-sm.mr-2((click)='editFee(fee)', title='Edit Fee')
+                i-feather(name='edit-3')
+
+              button.btn.btn-sm.mr-2(
+                [ngClass]='fee.markedForDeletion && "bg-danger text-white"',
+                (click)='toggleDeletion(fee.id)',
+                title='Delete Fee'
+              )
+                i-feather(name='trash-2')
+            td(*ngIf='fee.feeType === "Setup Fee" || !fee.active') --
+    //- span {{page}} {{pageSize}} {{totalCount}}
+    //- ngb-pagination(
+    //-   [(page)]='page'
+    //-   [pageSize]='pageSize'
+    //-   [collectionSize]='totalCount',
+    //-   [maxSize]='5',
+    //-   [rotate]='true',
+    //-   [ellipses]='false',
+    //-   [boundaryLinks]='true'
+    //- )
+
+    button.btn.castlerButtonColor((click)='updateFeeDetails()') Update Fee
+
+ng-template(#AddSingleFeeModal)
+  .modal-header(style='flex: display; justify-content: center')
+    h4 {{ "Add " }}{{ getFeeTitle(feeType) }}
+
+  .modal-body
+    div(*ngIf='errors.length > 0')
+      sbpro-alert(classes='alert-danger', [dismissable]='true')
+        | {{ errors[0] }}
+
+    .row
+      .col-sm-12
+        .form-group 
+          label Enter Fee Amount*
+          input.form-control.form-control-sm(
+            type='text',
+            placeholder='Fee Amount',
+            appTwoDigitDecimalNumber,
+            [(ngModel)]='feeAmount'
+          ) 
+    .row
+      .col-sm-12
+        .form-group
+          button.btn.castlerButtonColor((click)='addNewFee()') Add Fee
+
+ng-template(#MiscellaneousFeeModal)
+  .modal-header(style='flex: display; justify-content: center')
+    h4 {{ "Add " }}{{ getFeeTitle(feeType) }}
+
+  .modal-body
+    div(*ngIf='errors.length > 0')
+      sbpro-alert(classes='alert-danger', [dismissable]='true')
+        | {{ errors[0] }}
+
+    .row 
+      .col-sm-12
+        form([formGroup]='miscellaneousFeeForm')
+          .form-group 
+            label Fee Name*
+            input.form-control.form-control-sm(
+              type='text',
+              placeholder='Fee Name',
+              formControlName='feeName'
+            ) 
+
+          .form-group 
+            label Frequency*
+            select.form-control.form-control-sm(formControlName='frequency')
+              option(value='one-time') One Time
+              option(value='weekly') Weekly
+              option(value='monthly') Monthly
+              option(value='quarterly') Quarterly
+              option(value='half-yearly') Half Yearly
+              option(value='yearly') Yearly
+
+          .form-group
+            label Amount*
+            input.form-control.form-control-sm(
+              type='text',
+              placeholder='Amount',
+              appTwoDigitDecimalNumber,
+              formControlName='amount'
+            ) 
+
+            .form-group
+              label Effective Date*
+              input.form-control.form-control-sm(
+                type='text',
+                placeholder='Start Date',
+                autocomplete='off',
+                ngbDatepicker,
+                outsideDays='hidden',
+                #effDate='ngbDatepicker',
+                (click)='effDate.toggle()',
+                formControlName='effectiveDate',
+                [minDate]='startDateMin || miscellaneousFeeForm.controls.effectiveDate.value'
+              )
+
+    .row
+      .col-sm-12
+        .form-group
+          button.btn.castlerButtonColor((click)='addNewFee()') Add Fee
+
+ng-template(#VirtualAccountOrTransactionFeeModal)
+  .modal-header(style='flex: display; justify-content: center')
+    h4 {{ "Add " }}{{ getFeeTitle(feeType) }}
+
+  .modal-body
+    div(*ngIf='errors.length > 0')
+      sbpro-alert(classes='alert-danger')
+        | {{ errors[0] }}
+
+    .row
+      .col-sm-12
+        form([formGroup]='virtualOrTransactionFeeForm')
+          .form-group
+            label Fee Setting*
+            select.form-control.form-control-sm(
+              formControlName='feeSetting',
+              *ngIf='feeType === "virtualAccount"',
+              placeholder='Select Fee Type'
+            )
+              option(value='one-time') One Time
+              option(value='pay-as-you-go') Pay As You Go
+
+            select.form-control.form-control-sm(
+              formControlName='feeSetting',
+              *ngIf='feeType === "transaction"',
+              placeholder='Select Fee Type'
+            )
+              option(value='fixed-amount') Fixed Amount
+              option(value='percentage') Percentage (%)
+
+          .form-group
+            label Fee Amount*
+            input.form-control.form-control-sm(
+              type='text',
+              placeholder='Amount',
+              appTwoDigitDecimalNumber,
+              formControlName='feeAmount'
+            ) 
+
+    .row
+      .col-sm-12
+        .form-group
+          button.btn.castlerButtonColor((click)='addNewFee()') Add Fee
+
+ng-template(#EscrowPageFeeModal)
+  .modal-header(style='flex: display; justify-content: center')
+    h4 Add Escrow Page Fees
+
+  .modal-body
+    div(*ngIf='errors.length > 0')
+      sbpro-alert(classes='alert-danger')
+        | {{ errors[0] }}
+
+    .row
+      .col-lg-12
+        form([formGroup]='escrowPageFeeForm')
+          .row
+            .col-sm-12.col-md-3.col-lg-3
+              .custom-control.custom-checkbox
+                input#escrowFeePerPage.custom-control-input(
+                  type='checkbox',
+                  formControlName='perPage'
+                )
+                label.custom-control-label(for='escrowFeePerPage') Fee per page
+            .col-sm-9.col-md-9.col-lg-9
+              .input-group.input-group-joined
+                .input-group-prepend
+                  span.input-group-text.form-control-sm
+                    | ₹
+                input#escrowFeePerPageFee.form-control.form-control-sm(
+                  type='number',
+                  formControlName='perPageAmount',
+                  appTwoDigitDecimalNumber,
+                  required,
+                  [attr.disabled]='readOnly || !escrowPageFeeForm.controls.perPage.value ? true : null'
+                )
+          br
+          .row.mb-3
+            .col-sm-12.col-md-12.col-lg-12
+              .custom-control.custom-checkbox
+                input#escrowFeePerTransaction.custom-control-input(
+                  type='checkbox',
+                  formControlName='perTransaction'
+                )
+                label.custom-control-label(for='escrowFeePerTransaction') Fee per transaction
+          div(style='width=100%;')
+            fieldset.row.pl-3.pb-2(
+              *ngIf='escrowPageFeeForm.controls.perTransaction.value'
+            )
+              .col-sm-12.col-md-4.col-lg-4
+                label(for='escrowFeePerTransaction') UPI
+              .col-sm-12.col-md-4.col-lg-4
+                select#transaction-fee.form-control.form-control-sm(
+                  formControlName='upiFeeSetting',
+                  required
+                )
+                  option(value='') Select Fee Setting
+                  option(value='fixed-amount') Fixed Amount
+                  option(value='percentage') Percentage(%)
+              .col-sm-12.col-md-4.col-lg-4
+                .input-group.input-group-joined
+                  //- .input-group-prepend(*ngIf='upiFeeSettingFixedAmount')
+                  //-   span.input-group-text.form-control-sm
+                  //-     | ₹
+                  input#escrowFeePerTransactionFee.form-control.form-control-sm(
+                    *ngIf='escrowPageFeeForm.controls.upiFeeSetting.value === "percentage"',
+                    type='text',
+                    formControlName='upiFeeAmount',
+                    required,
+                    appTwoDigitDecimalNumber,
+                    percentValidate,
+                    [attr.disabled]='readOnly || !escrowPageFeeForm.controls.perTransaction.value ? true : null'
+                  )
+                  input#escrowFeePerTransactionFee.form-control.form-control-sm(
+                    *ngIf='escrowPageFeeForm.controls.upiFeeSetting.value === "fixed-amount" || escrowPageFeeForm.controls.upiFeeSetting.value === "" || escrowPageFeeForm.controls.upiFeeSetting.value === null',
+                    type='text',
+                    formControlName='upiFeeAmount',
+                    required,
+                    appTwoDigitDecimalNumber,
+                    [attr.disabled]='readOnly || !escrowPageFeeForm.controls.perTransaction.value ? true : null'
+                  )
+
+            fieldset.row.pl-3.pb-2(
+              *ngIf='escrowPageFeeForm.controls.perTransaction.value'
+            ) 
+              .col-sm-12.col-md-4.col-lg-4
+                label(for='escrowFeePerTransaction') Net Banking
+              .col-sm-12.col-md-4.col-lg-4
+                select#transaction-fee.form-control.form-control-sm(
+                  formControlName='nbFeeSetting',
+                  required
+                )
+                  option(value='') Select Fee Setting
+                  option(value='fixed-amount') Fixed Amount
+                  option(value='percentage') Percentage(%)
+              .col-sm-12.col-md-4.col-lg-4
+                .input-group.input-group-joined
+                  //- .input-group-prepend(*ngIf='nbFeeSettingFixedAmount')
+                  //-   span.input-group-text.form-control-sm
+                  //-     | ₹
+                  input#escrowFeePerTransactionFee.form-control.form-control-sm(
+                    *ngIf='escrowPageFeeForm.controls.nbFeeSetting.value === "percentage"',
+                    type='text',
+                    formControlName='nbFeeAmount',
+                    required,
+                    appTwoDigitDecimalNumber,
+                    percentValidate,
+                    [attr.disabled]='readOnly || !escrowPageFeeForm.controls.perTransaction.value ? true : null'
+                  )
+                  input#escrowFeePerTransactionFee.form-control.form-control-sm(
+                    *ngIf='escrowPageFeeForm.controls.nbFeeSetting.value === "fixed-amount" || escrowPageFeeForm.controls.nbFeeSetting.value === "" || escrowPageFeeForm.controls.nbFeeSetting.value === null',
+                    type='text',
+                    formControlName='nbFeeAmount',
+                    required,
+                    appTwoDigitDecimalNumber,
+                    [attr.disabled]='readOnly || !escrowPageFeeForm.controls.perTransaction.value ? true : null'
+                  )
+
+            fieldset.row.pl-3.pb-2(
+              *ngIf='escrowPageFeeForm.controls.perTransaction.value'
+            ) 
+              .col-sm-12.col-md-4.col-lg-4
+                label(for='escrowFeePerTransaction') Debit Card
+              .col-sm-12.col-md-4.col-lg-4
+                select#transaction-fee.form-control.form-control-sm(
+                  formControlName='dbFeeSetting',
+                  (change)='onDBFeeSettingChange()',
+                  required
+                )
+                  option(value='') Select Fee Setting
+                  option(value='fixed-amount') Fixed Amount
+                  option(value='percentage') Percentage(%)
+              .col-sm-12.col-md-4.col-lg-4
+                .input-group.input-group-joined
+                  //- .input-group-prepend(*ngIf='dbFeeSettingFixedAmount')
+                  //-   span.input-group-text.form-control-sm
+                  //-     | ₹
+                  input#escrowFeePerTransactionFee.form-control.form-control-sm(
+                    *ngIf='escrowPageFeeForm.controls.dbFeeSetting.value === "percentage"',
+                    type='text',
+                    formControlName='dbFeeAmount',
+                    required,
+                    appTwoDigitDecimalNumber,
+                    percentValidate,
+                    [attr.disabled]='readOnly || !escrowPageFeeForm.controls.perTransaction.value ? true : null'
+                  )
+                  input#escrowFeePerTransactionFee.form-control.form-control-sm(
+                    *ngIf='escrowPageFeeForm.controls.dbFeeSetting.value === "fixed-amount" || escrowPageFeeForm.controls.dbFeeSetting.value === "" || escrowPageFeeForm.controls.dbFeeSetting.value === null',
+                    type='text',
+                    formControlName='dbFeeAmount',
+                    required,
+                    appTwoDigitDecimalNumber,
+                    [attr.disabled]='readOnly || !escrowPageFeeForm.controls.perTransaction.value ? true : null'
+                  )
+    .row
+      .col-sm-12
+        .form-group
+          button.btn.castlerButtonColor((click)='addNewFee()') Add Fee
+
+ng-template(#DepositFeeModal)
+  .modal-header(style='flex: display; justify-content: center')
+    h4 Add Deposit Fee
+
+  .modal-body
+    div(*ngIf='errors.length > 0')
+      sbpro-alert(classes='alert-danger')
+        | {{ errors[0] }}
+
+    form([formGroup]='depositFees')
+      ng-container(formArrayName='depositFeeEntries')
+        div(*ngFor='let entry of depositFeeEntries.controls; let i = index')
+          .row([formGroupName]='i')
+            .col-sm-4
+              .form-group
+                label Amount (in INR) - From
+                input#authoriser-name.form-control.form-control-sm(
+                  type='text',
+                  placeholder='From',
+                  formControlName='startRange',
+                  appTwoDigitDecimalNumber,
+                  required,
+                  [attr.disabled]='readOnly ? true : null'
+                )
+
+            .col-sm-4
+              .form-group
+                label Amount (in INR) - To
+                input#authoriser-name.form-control.form-control-sm(
+                  type='text',
+                  placeholder='To',
+                  formControlName='endRange',
+                  appTwoDigitDecimalNumber,
+                  required,
+                  [attr.disabled]='readOnly ? true : null'
+                )
+
+            .col-sm-2
+              .form-group
+                label Fee(in %)
+                input#authoriser-mobile.form-control.form-control-sm(
+                  type='text',
+                  formControlName='percentage',
+                  placeholder='Percentage',
+                  percentValidate,
+                  appTwoDigitDecimalNumber,
+                  required,
+                  [attr.disabled]='readOnly ? true : null'
+                )
+
+            .col-ms-2(*ngIf='!readOnly')
+              button.btn.flex.justify-content-center.align-items-center(
+                (click)='removeDepositFeeEntry(i)',
+                style='height: 100%;'
+              ) 
+                i-feather(name='trash-2') 
+        //- for above row
+      .row
+        .col-sm-4
+          span Above
+
+        .col-sm-4
+          .form-group
+            label Amount (in INR)
+            input#authoriser-name.form-control.form-control-sm(
+              type='text',
+              placeholder='To',
+              formControlName='aboveAmount',
+              appTwoDigitDecimalNumber,
+              required,
+              [attr.disabled]='true'
+            )
+
+        .col-sm-2
+          .form-group
+            label Fee(in %)
+            input#authoriser-mobile.form-control.form-control-sm(
+              type='text',
+              formControlName='abovePercentage',
+              placeholder='Percentage',
+              percentValidate,
+              appTwoDigitDecimalNumber,
+              required,
+              [attr.disabled]='readOnly ? true : null'
+            )
+
+    button.btn((click)='addDepositFeeEntry()') + Add new entry
+
+    .row.mt-3
+      .col-sm-12
+        .form-group
+          button.btn.castlerButtonColor((click)='addNewFee()') Add Fee
+
+ng-template(#EscrowPageFeeDetails)
+  .modal-header(style='flex: display; justify-content: center')
+    h4 Escrow Page Fee Details
+
+  .modal-body
+    .row(*ngIf='feeDetails.perPage')
+      .col-lg-6 
+        span Per Page Amount
+      .col-lg-6
+        span {{ feeDetails.perPageAmount }}
+
+    ng-container(*ngIf='feeDetails.perTransaction')
+      .row.mt-3(*ngIf='feeDetails.perTransactionFeeDetails.upi.feeAmount') 
+        .col-lg-12
+          h5 UPI
+      .row(*ngIf='feeDetails.perTransactionFeeDetails.upi')
+        .col-lg-6
+          span {{ feeDetails.perTransactionFeeDetails.upi.feeSetting }}
+        .col-lg-6
+          span {{ feeDetails.perTransactionFeeDetails.upi.feeAmount }}
+
+      .row.mt-3(*ngIf='feeDetails.perTransactionFeeDetails.netBanking.feeAmount') 
+        .col-lg-12
+          h5 Net Banking
+      .row(*ngIf='feeDetails.perTransactionFeeDetails.netBanking')
+        .col-lg-6
+          span {{ feeDetails.perTransactionFeeDetails.netBanking.feeSetting }}
+        .col-lg-6
+          span {{ feeDetails.perTransactionFeeDetails.netBanking.feeAmount }}
+
+      .row.mt-3(*ngIf='feeDetails.perTransactionFeeDetails.debitCard.feeAmount') 
+        .col-lg-12
+          h5 Debit Card
+      .row(*ngIf='feeDetails.perTransactionFeeDetails.debitCard')
+        .col-lg-6
+          span {{ feeDetails.perTransactionFeeDetails.debitCard.feeSetting }}
+        .col-lg-6
+          span {{ feeDetails.perTransactionFeeDetails.debitCard.feeAmount }}
+
+ng-template(#DepositFeeDetails)
+  .modal-header(style='flex: display; justify-content: center')
+    h4 Deposit Fee Details
+
+  .modal-body
+    .row
+      .col-lg-12
+        ul
+          li.row(*ngFor='let entry of feeDetails; let i = index')
+            .col-lg-8(*ngIf='i !== feeDetails.length - 1')
+              span From {{ entry.startRange }} to {{ entry.endRange }}
+            .col-lg-8(*ngIf='i === feeDetails.length - 1')
+              span Above {{ entry.startRange }}
+            .col-lg-4 
+              span {{ entry.percentage }}%
+
+ng-template(#UPIPayoutFeesModal)
+  .modal-header(style='flex: display; justify-content: center')
+    h4 UPI payout
+
+  .modal-body
+    div(*ngIf='errors.length > 0')
+      sbpro-alert(classes='alert-danger')
+        | {{ errors[0] }}
+
+    form([formGroup]='upiPayoutFees')
+      ng-container(formArrayName='upiPayoutFeeEntries')
+        div(*ngFor='let entry of upiPayoutFeeEntries.controls; let i = index')
+          .row([formGroupName]='i')
+            .col-sm-4
+              .form-group
+                label Amount (in INR) - From
+                input#authoriser-name.form-control.form-control-sm(
+                  type='text',
+                  placeholder='From',
+                  formControlName='startRange',
+                  appTwoDigitDecimalNumber,
+                  required,
+                  [attr.disabled]='true'
+                )
+
+            .col-sm-4
+              .form-group
+                label Amount (in INR) - To
+                input#authoriser-name.form-control.form-control-sm(
+                  type='text',
+                  placeholder='To',
+                  formControlName='endRange',
+                  appTwoDigitDecimalNumber,
+                  required,
+                  [attr.disabled]='true'
+                )
+
+            .col-sm-4
+              .form-group
+                label Fee(in INR)
+                input#authoriser-mobile.form-control.form-control-sm(
+                  type='text',
+                  formControlName='amount',
+                  placeholder='Amount',
+                  percentValidate,
+                  appTwoDigitDecimalNumber,
+                  required,
+                  [attr.disabled]='readOnly ? true : null'
+                )
+
+          //- for above row
+      .row
+        .col-sm-4
+          span Above
+
+        .col-sm-4
+          .form-group
+            label Amount (in INR)
+            input#authoriser-name.form-control.form-control-sm(
+              type='text',
+              placeholder='To',
+              formControlName='aboveAmount',
+              appTwoDigitDecimalNumber,
+              required,
+              [attr.disabled]='true'
+            )
+
+        .col-sm-4
+          .form-group
+            label Fee (in INR)
+            input#authoriser-mobile.form-control.form-control-sm(
+              type='text',
+              formControlName='aboveAmountFee',
+              placeholder='Amount',
+              percentValidate,
+              appTwoDigitDecimalNumber,
+              required,
+              [attr.disabled]='readOnly ? true : null'
+            )
+
+      .row.mt-3
+        .col-sm-12
+          .form-group
+            button.btn.castlerButtonColor((click)='addNewFee()') Add Fee
+
+ng-template(#UPIPayoutFeeDetails)
+  .modal-header(style='flex: display; justify-content: center')
+    h4 UPI Payout Fee Details
+
+  .modal-body
+    .row
+      .col-lg-12
+        ul
+          li.row(*ngFor='let entry of feeDetails; let i = index')
+            .col-lg-8(*ngIf='i !== feeDetails.length - 1')
+              span From {{ entry.startRange }} to {{ entry.endRange }}
+            .col-lg-8(*ngIf='i === feeDetails.length - 1')
+              span Above {{ entry.startRange }}
+            .col-lg-4 
+              span Rs. {{ entry.amount }}

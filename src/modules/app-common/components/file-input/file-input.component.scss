@@ -1,0 +1,16 @@
+@import 'styles/variables.scss';
+
+.file-input-remove:after {
+  content: 'Remove';
+}
+.file-input-button {
+  // background: green;
+  max-width: 150px;
+  width: 40%;
+  height: 100%;
+  display: block;
+  position: absolute;
+  right: 0;
+  top: 0;
+  z-index: 5;
+}

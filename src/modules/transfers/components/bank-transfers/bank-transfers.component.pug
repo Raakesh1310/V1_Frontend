@@ -1,0 +1,526 @@
+div
+    div(*ngIf='errors.length > 0')
+        sbpro-alert(classes='alert-danger', [dismissable]='true', (click)='errors = []')
+            | {{ errors[0] }}
+    div
+        form.pb-2(*ngIf='filtersVisible')
+            .d-flex.mb-2
+                input#wildSearch.mt-1.form-control.w-100.mr-2(
+                    placement='top',
+                    ngbPopover='Search by Business Name, Bank Account, Payment ID, Beneficiary Name'
+                    type='text',
+                    name='s',
+                    autocomplete='off',
+                    placeholder='Search by Business Name, Bank Account, Payment ID, Beneficiary Name',
+                    [(ngModel)]='transferService.searchTerm'
+                )
+
+                input#start-date.mt-1.form-control.w-25.mr-2(
+                    type='text',
+                    name='sd',
+                    placeholder='Start Date',
+                    autocomplete='off',
+                    ngbDatepicker,
+                    outsideDays='hidden',
+                    #sd='ngbDatepicker',
+                    (click)='sd.toggle()',
+                    [(ngModel)]='transferService.dateFrom',
+                    [minDate]='transferService.dateFromMin',
+                    [maxDate]='transferService.dateFromMax'
+                )
+                input#end-date.mt-1.form-control.w-25.mr-2(
+                    type='text',
+                    name='ed',
+                    placeholder='End Date',
+                    autocomplete='off',
+                    ngbDatepicker,
+                    outsideDays='hidden',
+                    #ed='ngbDatepicker',
+                    (click)='ed.toggle()',
+                    [(ngModel)]='transferService.dateTo',
+                    [minDate]='transferService.dateToMin',
+                    [maxDate]='transferService.dateToMax'
+                )
+                select#statusList.mt-1.form-control.w-25.mr-2(
+                    name='status',
+                    [(ngModel)]='transferService.status'
+                )
+                    option(value='') Status
+                    option(*ngFor='let st of statusList', [ngValue]='st') {{ st }}
+
+
+                button.btn.ws-nowrap.mt-1.mb-1.pt-2(
+                    type='submit',
+                    class= 'castlerButtonColor',
+                    (click)='submitSearchForm()'
+                )
+                    fa-icon.d-flex.flex-row.align-items-center(
+                        [icon]='["fas", "search"]'
+                    )
+
+                button.btn.btn-link.mt-1(type='button', (click)='clearForm()' class='logoColor') Clear
+
+                .justify-content-end
+                    a.btn.mt-1.mb-1.btn-success.ws-nowrap.btn-icon(
+                        type='button',
+                        target='_blank',
+                        [href]='transferService.bankTransferDownloadLink$ | async'
+                    )
+                        fa-icon.d-flex.flex-row.align-items-center(
+                            [icon]='["fas", "arrow-down"]'
+                        )
+
+            .d-flex(*ngIf='(transfers$ | async)?.length > 0')
+                .flex-row
+                    small.mb-2.mt-2 Showing {{  (page - 1)  * 10 + 1 }} to {{ (page - 1)  * 10 +  (transfers$ | async)?.length  }} of {{total$ | async}}
+
+    .table-responsive.pp-table-container.align-self-stretch.flex-grow-1.flex-stretch-1.table-striped(
+        *ngIf='(transfers$ | async)?.length > 0 && !(loadingList$ | async)'
+    )
+        table.table
+            thead
+                tr
+                    th.th-sticky-top(
+                        scope='col',
+                        sbSortable='event',
+                        (sort)='onSort($event)'
+                    )
+                        span.ws-nowrap Business name
+                    th.th-sticky-top(
+                        scope='col',
+                        sbSortable='event',
+                        (sort)='onSort($event)'
+                    )
+                        span.ws-nowrap Payment ID
+                    th.th-sticky-top(scope='col' sbSortable='time', (sort)='onSort($event)')
+                        span.ws-nowrap Request Date
+                    th.th-sticky-top(scope='col' sbSortable='time', (sort)='onSort($event)')
+                        span.ws-nowrap Last Updation Date
+                    th.th-sticky-top(scope='col' sbSortable='time', (sort)='onSort($event)')
+                        span.ws-nowrap From Bank Account
+                    th.th-sticky-top(scope='col' sbSortable='time', (sort)='onSort($event)')
+                        span.ws-nowrap Beneficiary Name
+                    th.th-sticky-top(scope='col' sbSortable='time', (sort)='onSort($event)')
+                        span.ws-nowrap Beneficiary Bank
+                    th.th-sticky-top(scope='col' sbSortable='time', (sort)='onSort($event)')
+                        span.ws-nowrap Beneficiary A/C
+                    th.th-sticky-top(scope='col' sbSortable='time', (sort)='onSort($event)')
+                        span Amount
+                    th.th-sticky-top(scope='col' sbSortable='time', (sort)='onSort($event)')
+                        span UTR
+                    th.th-sticky-top(scope='col' sbSortable='time', (sort)='onSort($event)')
+                        span Status
+                    th.th-sticky-top(scope='col' sbSortable='time', (sort)='onSort($event)')
+                        span Remark
+                    th.th-sticky-top(scope='col' sbSortable='time', (sort)='onSort($event)', *ngIf='!readOnly')
+                        span Action
+            tbody                
+                tr
+                    td(
+                        *ngIf='!(transferService.loading$ | async) && (transfers$ | async)?.length == 0'
+                    ) No Entries Found
+                    td.spinner(*ngIf='transferService.loading$ | async')
+                        .spinner-border.text-primary(role='status')
+                        span.sr-only Loading...
+                tr(*ngFor='let transfer of transfers$ | async; index as i')
+                    td
+                        a.nav-link.p-0(
+                            class='tableClickEntryColor',
+                            href='javascript:void(0);',
+                            (click)='openMerchantDetails(transfer.merchantId)'
+                        )
+                            ngb-highlight(
+                                [result]='transfer.merchantTitle',
+                                [term]='transferService.searchTerm',
+                            )
+                    td
+                        a.nav-link.p-0(
+                            class='tableClickEntryColor',
+                            href='javascript:void(0);',
+                            (click)='openTransferDetails(transfer.transferId)'
+                        )
+                            ngb-highlight(
+                                [result]='transfer.transferId',
+                                [term]='transferService.searchTerm'
+                            )
+                    td
+                        ngb-highlight.ws-nowrap(
+                            [result]='transfer.createdAt | date: "d MMM yyyy" || "--"',
+                            [term]='transferService.searchTerm'
+                        )
+                    td
+                        ngb-highlight(
+                            [result]='transfer.updatedAt | date: "d MMM yyyy" || "--"',
+                            [term]='transferService.searchTerm'
+                        )
+                    td
+                        a.nav-link.p-0(
+                            class='tableClickEntryColor',
+                            href='javascript:void(0);',
+                            (click)='getStatement(transfer.bankAccountNumber)'
+                        )
+                            ngb-highlight(
+                                [result]='transfer.bankAccountNumber',
+                                [term]='transferService.searchTerm'
+                            )
+                    td
+                        ngb-highlight(
+                            [result]='transfer.beneficiaryName',
+                            [term]='transferService.searchTerm'
+                        )
+                    td
+                        ngb-highlight(
+                            [result]='transfer.beneficiaryBankName || "--"',
+                            [term]='transferService.searchTerm'
+                        )
+                    td
+                        ngb-highlight(
+                            [result]='transfer.beneficiaryAccNumber || transfer.vpa',
+                            [term]='transferService.searchTerm'
+                        )
+                    td
+                        ngb-highlight(
+                            [result]='toINR(transfer.amount?.toFixed(2))',
+                            [term]='transferService.searchTerm'
+                        )
+                    td
+                        span(
+                            *ngIf='!transfer.utr && !(enableEdit && enableEditIndex == i)'
+                        ) --
+                        ngb-highlight(
+                            [result]='transfer.utr',
+                            [term]='transferService.searchTerm',
+                            *ngIf='!enableEdit'
+                        )
+                        input#utr.min-w-150px.mt-1.form-control.form-control-sm.w-100(
+                            type='text',
+                            [(ngModel)]='transfer.utr',
+                            name='utr',
+                            *ngIf='enableEdit && enableEditIndex == i'
+                        )
+                    td(*ngIf = 'isTrustee')
+                        ngb-highlight(
+                            style='font-weight: bold',
+                            [style.color]='setColor(transfer.status)',
+                            [result]='transfer.status',
+                            [term]='transferService.searchTerm'
+                        )
+                    td(*ngIf = 'transfer.status == "Pending for Authorization" && !isTrustee')
+                        ngb-highlight.myanchor(
+                            style='color: #F5A500; font-weight: bold',
+                            [result]='transfer.status',
+                            [term]='transferService.searchTerm',
+                            (click)='selectedTransfer = transfer; openMap(statusMap)',
+                            *ngIf='!enableEdit'
+                        )
+                        select#statusListInline.min-w-150px.mt-1.form-control.form-control-sm.w-100(
+                            *ngIf='enableEdit && enableEditIndex == i && !isAdmin',
+                            name='status',
+                            [(ngModel)]='transfer.status'
+                        )
+                            option(value='') Select Status
+                            option(*ngFor='let st of statusList', [ngValue]='st') {{ st }}
+                        select#statusListInline.min-w-150px.mt-1.form-control.form-control-sm.w-100(
+                            *ngIf='enableEdit && enableEditIndex == i && isAdmin',
+                            name='status',
+                            [(ngModel)]='transfer.status'
+                        )
+                            option(value='') Select Status
+                            option(*ngFor='let st of adminStatusList', [ngValue]='st') {{ st }}
+                    td(*ngIf = 'transfer.status == "Sent for Processing" && !isTrustee')
+                        ngb-highlight.myanchor(
+                            style='color: #329ca8; font-weight: bold',
+                            [result]='transfer.status',
+                            [term]='transferService.searchTerm',
+                            (click)='selectedTransfer = transfer; openMap(statusMap)',
+                            *ngIf='!enableEdit'
+                        )
+                        select#statusListInline.min-w-150px.mt-1.form-control.form-control-sm.w-100(
+                            *ngIf='enableEdit && enableEditIndex == i && !isAdmin',
+                            name='status',
+                            [(ngModel)]='transfer.status'
+                        )
+                            option(value='') Select Status
+                            option(*ngFor='let st of statusList', [ngValue]='st') {{ st }}
+                        select#statusListInline.min-w-150px.mt-1.form-control.form-control-sm.w-100(
+                            *ngIf='enableEdit && enableEditIndex == i && isAdmin',
+                            name='status',
+                            [(ngModel)]='transfer.status'
+                        )
+                            option(value='') Select Status
+                            option(*ngFor='let st of adminStatusList', [ngValue]='st') {{ st }}
+                    td(*ngIf = 'transfer.status == "Failed" && !isTrustee')
+                        ngb-highlight.myanchor(
+                            style='color: #FF0000; font-weight: bold',
+                            [result]='transfer.status',
+                            [term]='transferService.searchTerm',
+                            (click)='selectedTransfer = transfer; openMap(statusMap)',
+                            *ngIf='!enableEdit'
+                        )
+                        select#statusListInline.min-w-150px.mt-1.form-control.form-control-sm.w-100(
+                            *ngIf='enableEdit && enableEditIndex == i && !isAdmin',
+                            name='status',
+                            [(ngModel)]='transfer.status'
+                        )
+                            option(value='') Select Status
+                            option(*ngFor='let st of statusList', [ngValue]='st') {{ st }}
+
+                        select#statusListInline.min-w-150px.mt-1.form-control.form-control-sm.w-100(
+                            *ngIf='enableEdit && enableEditIndex == i && isAdmin',
+                            name='status',
+                            [(ngModel)]='transfer.status'
+                        )
+                            option(value='') Select Status
+                            option(*ngFor='let st of adminStatusList', [ngValue]='st') {{ st }}
+                    td(*ngIf = 'transfer.status == "Success" && !isTrustee')
+                        ngb-highlight.myanchor(
+                            style='color: #18B81F; font-weight: bold',
+                            [result]='transfer.status',
+                            [term]='transferService.searchTerm',
+                            (click)='selectedTransfer = transfer; openMap(statusMap)',
+                            *ngIf='!enableEdit'
+                        )
+                        select#statusListInline.min-w-150px.mt-1.form-control.form-control-sm.w-100(
+                            *ngIf='enableEdit && enableEditIndex == i && !isAdmin',
+                            name='status',
+                            [(ngModel)]='transfer.status'
+                        )
+                            option(value='') Select Status
+                            option(*ngFor='let st of statusList', [ngValue]='st') {{ st }}
+
+                        select#statusListInline.min-w-150px.mt-1.form-control.form-control-sm.w-100(
+                            *ngIf='enableEdit && enableEditIndex == i && isAdmin',
+                            name='status',
+                            [(ngModel)]='transfer.status'
+                        )
+                            option(value='') Select Status
+                            option(*ngFor='let st of adminStatusList', [ngValue]='st') {{ st }}
+                    td(*ngIf = 'transfer.status == "success" && !isTrustee')
+                        ngb-highlight.myanchor(
+                            style='color: #18B81F; font-weight: bold',
+                            [result]='transfer.status',
+                            [term]='transferService.searchTerm',
+                            (click)='selectedTransfer = transfer; openMap(statusMap)',
+                            *ngIf='!enableEdit'
+                        )
+                        select#statusListInline.min-w-150px.mt-1.form-control.form-control-sm.w-100(
+                            *ngIf='enableEdit && enableEditIndex == i && isAdmin',
+                            name='status',
+                            [(ngModel)]='transfer.status'
+                        )
+                            option(value='') Select Status
+                            option(*ngFor='let st of statusList', [ngValue]='st') {{ st }}
+
+                        select#statusListInline.min-w-150px.mt-1.form-control.form-control-sm.w-100(
+                            *ngIf='enableEdit && enableEditIndex == i && isAdmin',
+                            name='status',
+                            [(ngModel)]='transfer.status'
+                        )
+                            option(value='') Select Status
+                            option(*ngFor='let st of adminStatusList', [ngValue]='st') {{ st }}
+                    td(*ngIf = 'transfer.status == "Send for Trustee Approval" && !isTrustee')
+                        ngb-highlight.myanchor(
+                            style='color: #FF0000; font-weight: bold',
+                            [result]='transferStatus.PENDING',
+                            [term]='transferService.searchTerm',
+                            (click)='selectedTransfer = transfer; openMap(statusMap)',
+                            *ngIf='!enableEdit'
+                        )
+                        select#statusListInline.min-w-150px.mt-1.form-control.form-control-sm.w-100(
+                            *ngIf='enableEdit && enableEditIndex == i && !isAdmin',
+                            name='status',
+                            [(ngModel)]='transfer.status'
+                        )
+                            option(value='') Select Status
+                            option(*ngFor='let st of statusList', [ngValue]='st') {{ st }}
+
+                        select#statusListInline.min-w-150px.mt-1.form-control.form-control-sm.w-100(
+                            *ngIf='enableEdit && enableEditIndex == i && isAdmin',
+                            name='status',
+                            [(ngModel)]='transfer.status'
+                        )
+                            option(value='') Select Status
+                            option(*ngFor='let st of adminStatusList', [ngValue]='st') {{ st }}
+                    td(*ngIf = 'transfer.status == "failed" && !isTrustee')
+                        ngb-highlight.myanchor(
+                            style='color: #FF0000; font-weight: bold',
+                            [result]='transfer.status',
+                            [term]='transferService.searchTerm',
+                            (click)='selectedTransfer = transfer; openMap(statusMap)',
+                            *ngIf='!enableEdit'
+                        )
+                        select#statusListInline.min-w-150px.mt-1.form-control.form-control-sm.w-100(
+                            *ngIf='enableEdit && enableEditIndex == i && !isAdmin',
+                            name='status',
+                            [(ngModel)]='transfer.status'
+                        )
+                            option(value='') Select Status
+                            option(*ngFor='let st of statusList', [ngValue]='st') {{ st }}
+
+                        select#statusListInline.min-w-150px.mt-1.form-control.form-control-sm.w-100(
+                            *ngIf='enableEdit && enableEditIndex == i && isAdmin',
+                            name='status',
+                            [(ngModel)]='transfer.status'
+                        )
+                            option(value='') Select Status
+                            option(*ngFor='let st of adminStatusList', [ngValue]='st') {{ st }}
+                    td(*ngIf = 'transfer.status == "pending" && !isTrustee')
+                        ngb-highlight.myanchor(
+                            style='color: #F5A500; font-weight: bold',
+                            [result]='transfer.status',
+                            [term]='transferService.searchTerm',
+                            (click)='selectedTransfer = transfer; openMap(statusMap)',
+                            *ngIf='!enableEdit'
+                        )
+                        select#statusListInline.min-w-150px.mt-1.form-control.form-control-sm.w-100(
+                            *ngIf='enableEdit && enableEditIndex == i  && !isAdmin',
+                            name='status',
+                            [(ngModel)]='transfer.status'
+                        )
+                            option(value='') Select Status
+                            option(*ngFor='let st of statusList', [ngValue]='st') {{ st }}
+
+                        select#statusListInline.min-w-150px.mt-1.form-control.form-control-sm.w-100(
+                            *ngIf='enableEdit && enableEditIndex == i && isAdmin',
+                            name='status',
+                            [(ngModel)]='transfer.status'
+                        )
+                            option(value='') Select Status
+                            option(*ngFor='let st of adminStatusList', [ngValue]='st') {{ st }}
+                    td
+                        ngb-highlight(
+                            [result]='transfer.remarks || "--"',
+                            [term]='transferService.searchTerm',
+                            *ngIf='!enableEdit'
+                        )
+                        input#remarks.min-w-150px.mt-1.form-control.form-control-sm.w-100(
+                            type='text',
+                            [(ngModel)]='transfer.remarks',
+                            name='remarks',
+                            *ngIf='enableEdit && enableEditIndex == i'
+                        )
+                    td(*ngIf='!readOnly')
+                        button.btn.btn-success.btn-xs.mr-2.font-weight-700.ws-nowrap(
+                            *ngIf='enableEdit && enableEditIndex == i',
+                            (click)='updateRow(transfer)'
+                        ) Save
+                        button.btn.btn-danger.btn-xs.mr-2.font-weight-700.ws-nowrap(
+                            *ngIf='enableEdit && enableEditIndex == i',
+                            (click)='enableEdit = false'
+                        ) Cancel
+                        button.btn.btn-danger.btn-xs.mr-2.font-weight-700.ws-nowrap(
+                            *ngIf='!enableEdit && (transfer.status === "Pending" || transfer.status === "pending" || transfer.status === "" || transfer.status === "Pending for Authorization" || transfer.status === "Sent for Processing")',
+                            (click)='enableEditMethod($event, i)'
+                        ) Edit
+    .flex-container.flex-row(
+        *ngIf='(transfers$ | async)?.length <= 0 && !(loadingList$ | async)'
+    )
+        .align-self-center No Data available
+    .flex-container.flex-row(*ngIf='(loadingList$ | async)')
+        .align-self-center Please wait...
+    .d-flex.justify-content-between.pt-2.align-self-end(
+        *ngIf='(transfers$ | async)?.length > 0 && !(loadingList$ | async)'
+    )
+        ngb-pagination(
+            [collectionSize]='total$ | async',
+            [(page)]='page',
+            [maxSize]='5',
+            [pageSize]='pageSize',
+            [rotate]='true',
+            [ellipses]='false',
+            (pageChange)='pageChange($event)',
+            [boundaryLinks]='true'
+        )
+
+
+ng-template(#statusMap)
+    .modal-header(class='logoColor') Transfer Status
+    .isDataLoading(*ngIf="isLoadingAuthorization")
+        .spinner-border.text-primary(role='status')
+            span.sr-only Loading...
+    .modal-body(*ngIf='!oldMap && !isLoadingAuthorization')
+        .container.mt-5.mb-5
+            .row
+                .col
+                    h4 Fund Transfer
+                    ul.timeline
+                        li.green
+                            h3
+                                b Initiated
+                            p
+                                i {{ selectedTransfer.createdBy }}
+                            i {{ selectedTransfer.createdAt | date:'medium'}}
+                        div.p-0.m-0(*ngFor='let auth of authorizers | keyvalue')
+                            div.p-0.m-0(*ngFor='let level of authorizers[auth.key] | keyvalue')
+                                div.p-0.m-0(*ngFor='let authorizer of authorizers[auth.key][level.key]["authorizers"]')
+                                    li(*ngIf='authorizer.verified', [ngClass]='!authorizer.verified? "white" : authorizer.verified && !authorizer.data.approved ? "red" : "green"')    
+                                        h3
+                                            span(*ngIf='authorizer.verified && authorizer.data.approved')
+                                                p
+                                                    b Approved
+                                                    small(*ngIf='auth.key !== "4trustee" && auth.key !== "3admin"') (Level {{authorizer.data.level}} {{authorizer.data.type.split(' ')[0]}})
+                                            span(*ngIf='authorizer.verified && !authorizer.data.approved')
+                                                p
+                                                    b Rejected 
+                                                    small(*ngIf='auth.key !== "4trustee" && auth.key !== "3admin"') (Level {{authorizer.data.level}} {{authorizer.data.type.split(' ')[0]}})
+                                        i(*ngIf='authorizer.email === selectedTransfer.createdBy')
+                                            b(style="font-size:  0.9rem;") Auto Approved
+                                        p
+                                            i {{authorizer.email}}
+                                        i {{ authorizer.verifiedAt | date:'medium' }}
+                                li.white(*ngIf='selectedTransfer.status !== "Failed" && !authorizers[auth.key][level.key]["isApproved"]')    
+                                    h3
+                                        p(*ngIf='!auth.verified')
+                                            b Pending for approval
+                                    p
+                                        i(*ngIf='auth.key !== "4trustee" && auth.key !== "3admin"') Level {{level.key}} {{ authorizers[auth.key][level.key].type }} ({{authorizers[auth.key][level.key].minApprovalsNeeded}})
+                                        i(*ngIf='auth.key === "4trustee"', style="width: fit-content; max-width: 20ch; overflow-wrap: break-word;") {{ trusteeEmails }}
+                                        i(*ngIf='auth.key === "3admin"', style="width: fit-content; max-width: 20ch; overflow-wrap: break-word;")  {{ authorizers[auth.key][level.key]["authorizers"][0].email }}
+                        li.green(*ngIf='selectedTransfer.status !== "Failed" && selectedTransfer.status ==="Sent for Processing" || selectedTransfer.status ==="failed" || selectedTransfer.status === "success"')
+                            h3
+                                b Sent for processing
+                            i {{ selectedTransfer.updatedAt | date:'medium'}}
+                        li(*ngIf='selectedTransfer.status ==="Failed" || selectedTransfer.status === "Success"',[ngClass]='selectedTransfer.status ==="Failed" ? "red" : "green"')
+                            h3
+                                b {{selectedTransfer.status}}
+                            i {{ selectedTransfer.updatedAt | date:'medium'}}
+    .modal-body(*ngIf='oldMap && !isLoadingAuthorization')
+        div(*ngIf='selectedTransfer.authorization.length === 0')
+            p No approvals found for this transaction.
+        div(*ngIf='selectedTransfer.authorization.length > 0')
+            .container.mt-5.mb-5
+                .row
+                    .col
+                        h4 Fund Transfer
+                        ul.timeline
+                            li.green
+                                h3
+                                    b Initiated
+                                p
+                                    i {{ selectedTransfer.createdBy }}
+                                i {{ selectedTransfer.createdAt | date:'medium'}}
+                            li(*ngFor='let auth of selectedTransfer.authorization', [ngClass]='!auth.verified? "white" : auth.verified && !auth.data.approved ? "red" : "green"')
+                                h3
+                                    p(*ngIf='!auth.verified')
+                                        b Pending for approval
+                                    span(*ngIf='auth.verified && auth.data.approved')
+                                        p
+                                            b Approved
+                                    span(*ngIf='auth.verified && !auth.data.approved')
+                                        p
+                                            b Rejected
+                                p
+                                    i {{auth.email}}
+                                i {{ auth.verifiedAt | date:'medium' }}
+                            li.green(*ngIf='selectedTransfer.status ==="Sent for Processing" || selectedTransfer.status ==="failed" || selectedTransfer.status === "success"')
+                                h3
+                                    b Sent for processing
+                                i {{ selectedTransfer.updatedAt | date:'medium'}}
+                            li(*ngIf='selectedTransfer.status ==="Failed" || selectedTransfer.status === "Success"',[ngClass]='selectedTransfer.status ==="Failed" ? "red" : "green"')
+                                h3
+                                    b {{selectedTransfer.status}}
+                                i {{ selectedTransfer.updatedAt | date:'medium'}}
+
+    .modal-footer
+        button.btn.btn-sm((click)='closeModal()' class='castlerButtonColor') Close
+

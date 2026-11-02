@@ -1,0 +1,28 @@
+h4 Notification Settings
+hr
+table.table
+  .row
+    .col-sm-6.col-md-6.col-lg-4
+      b Email Address
+    .col-sm-6.col-md-6.col-lg-4 
+      span {{ email }}
+
+  .row
+    .col-sm-6.col-md-6.col-lg-4
+      b Mobile Number
+    .col-sm-6.col-md-6.col-lg-4
+      span {{ mobile }} &nbsp;&nbsp;
+        i-feather.linker(name='edit', (click)='openMobileEditor()')
+
+  .row(*ngIf='whatsappEnabled')
+    .col-sm-6.col-md-6.col-lg-4
+      b WhatsApp Notifications
+    .col-sm-6.col-md-6.col-lg-4
+      label.switch
+        input(
+          type='checkbox',
+          #whatsappCheckbox,
+          [checked]='whatsapp',
+          (click)='updateWhatsappSetting(whatsappCheckbox)'
+        )
+        span.slider.round

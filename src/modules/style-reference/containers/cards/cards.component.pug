@@ -1,0 +1,34 @@
+sbpro-dashboard-head(
+    icon='layers',
+    title='Cards',
+    description='Extended card components for displaying content within your application'
+)
+.container-fluid.mt-n10
+    .row
+        .col-lg-9
+            sbpro-cards-basic(
+                sbproTocItem='Basic'
+            )
+            sbpro-cards-advanced(
+                sbproTocItem='Advanced'
+            )
+            sbpro-cards-collapsable(
+                sbproTocItem='Collapsable'
+            )
+            sbpro-cards-navigation(
+                sbproTocItem='Navigation'
+            )
+            sbpro-cards-scrollable(
+                sbproTocItem='Scrollable'
+            )
+            sbpro-cards-images(
+                sbproTocItem='Images'
+            )
+            sbpro-cards-icons(
+                sbproTocItem='Icons'
+            )
+            sbpro-cards-colors(
+                sbproTocItem='Colors'
+            )
+        .col-lg-3
+            sbpro-toc-nav([tocIndex]='tocIndex')

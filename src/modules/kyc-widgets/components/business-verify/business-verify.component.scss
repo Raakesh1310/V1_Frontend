@@ -1,0 +1,88 @@
+.background-color {
+  background-color: #FFFAF2;
+}
+
+.headingText {
+  font-family: Poppins, sans-serif;
+  font-style: normal;
+  font-weight: 600;
+  font-size: clamp(18px, 32px, 28px);
+  line-height: 1.2em;
+  letter-spacing: 0.02em;
+  color: #3E2808;
+}
+
+.gettingStartedText {
+  font-family: Poppins, sans-serif;
+  font-style: normal;
+  font-weight: 500;
+  font-size: 34px;
+  line-height: 56px;
+  letter-spacing: 0.02em;
+  color: #3E2808;
+}
+
+.basicDetailsText {
+  font-family: Poppins, sans-serif;
+  font-style: normal;
+  font-weight: normal;
+  font-size: 21px;
+  line-height: 31px;
+  letter-spacing: 0.02em;
+  color: #3E2808;
+}
+
+.spinnerStyle {
+  color: orange;
+  top: 50%;
+  position: relative;
+  -ms-transform: translateY(-50%);
+  transform: translateY(-50%);
+}
+
+.optionDivStyling1 {
+  background: rgba(196, 196, 196, 0.18);
+  height: 45px;
+}
+
+.optionDivStyling2 {
+  height: 45px;
+}
+
+
+.optionsColor {
+  font-family: Poppins, sans-serif;
+  font-style: normal;
+  font-weight: normal;
+  font-size: 18px;
+  line-height: 20px;
+  display: flex;
+  align-items: center;
+  letter-spacing: 0.035em;
+  color: #000000;
+}
+
+.optionNumberColor1 {
+  color: orange;
+  font-weight: bold;
+  background: white;
+  font-size: 22px;
+  width: 30px;
+  height: 30px;
+  text-align: center;
+}
+
+.optionNumberColor2 {
+  color: orange;
+  font-weight: bold;
+  background: #F4F4F4;
+  font-size: 22px;
+  width: 30px;
+  height: 30px;
+  text-align: center;
+}
+
+.flex-display {
+  display: flex;
+  flex-direction: row;
+}

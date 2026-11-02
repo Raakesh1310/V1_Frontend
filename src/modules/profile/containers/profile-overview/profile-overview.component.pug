@@ -1,0 +1,52 @@
+sbpro-dashboard-head(
+  icon='user',
+  title='Business Profile',
+  description='Basic Information of User'
+)
+.container-fluid.mt-n10.responsiveForm
+  div(*ngIf='!isMerchantVerified')
+    div(
+      *ngIf='!bankAccountVerified || !profileVerified || !allDocumentsUploaded'
+    )
+      sbpro-alert(classes='alert-success')
+        | Activate your account - Complete your KYC to start using our products.
+    div(*ngIf='readyToSubmit')
+      sbpro-alert(classes='alert-success')
+        span
+          | E-KYC is completed, Your account is ready to be activated
+          | &nbsp;&nbsp;&nbsp;&nbsp;&emsp;
+        button.btn.btn-blue.btn-sm(type='button', (click)='handleSubmission()')
+          .spinner-border.spinner-border-sm.text-light.mr-1(
+            role='status',
+            aria-hidden='true',
+            *ngIf='loading$ | async'
+          )
+          i-feather.mr-2(name='arrow-right-circle', *ngIf='!(loading$ | async)')
+          span(*ngIf='!(loading$ | async)') Activate Now
+          span(*ngIf='loading$ | async') Please wait...
+
+  sbpro-card-navigation(
+    sbproTocItem='Tabs',
+    [navNames]='["Profile", "Documents"]',
+    [navNamesDisabled]='disabledTabs',
+    [templates]='[profile, docs, bankdetails]'
+  )
+    ng-template(#profile)
+      //.card-body
+      sbpro-profile-basic-details(
+        (setProfileVerified)='setProfileVerified($event)',
+        (emitBusinessType)='setBusinessType($event)',
+        [businessType]='businessType'
+      )
+    ng-template(#docs)
+      //.card-body
+      sbpro-profile-document(
+        (emitAllDocumentsUploaded)='setAllDocumentsUploaded($event)',
+        [businessType]='businessType'
+      )
+    //ng-template(#bankdetails)
+    //  //.card-body
+    //  sbpro-profile-bank-details(
+    //    (setBankAccountVerified)='setBankAccountVerified($event)',
+    //    [profileVerified]='profileVerified'
+    //  )

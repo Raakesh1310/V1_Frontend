@@ -1,0 +1,230 @@
+// Global resets
+
+html,
+body {
+  height: 100%;
+  zoom: 100%;
+}
+
+body {
+  overflow-x: hidden;
+  //-moz-transform: scale(0.9);
+  //zoom: 90%;
+}
+
+// Set spacing on containers for page symmetry
+
+.container,
+.container-fluid {
+  padding-left: $grid-gutter-width;
+  padding-right: $grid-gutter-width;
+}
+
+// Bring in custom font for global use
+
+@font-face {
+  font-family: 'Metropolis';
+  src: url('/assets/fonts/metropolis/Metropolis-Thin.otf');
+  font-weight: 100;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Metropolis';
+  src: url('/assets/fonts/metropolis/Metropolis-ThinItalic.otf');
+  font-weight: 100;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: 'Metropolis';
+  src: url('/assets/fonts/metropolis/Metropolis-ExtraLight.otf');
+  font-weight: 200;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Metropolis';
+  src: url('/assets/fonts/metropolis/Metropolis-ExtraLightItalic.otf');
+  font-weight: 200;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: 'Metropolis';
+  src: url('/assets/fonts/metropolis/Metropolis-Light.otf');
+  font-weight: 300;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Metropolis';
+  src: url('/assets/fonts/metropolis/Metropolis-LightItalic.otf');
+  font-weight: 300;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: 'Metropolis';
+  src: url('/assets/fonts/metropolis/Metropolis-Regular.otf');
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Metropolis';
+  src: url('/assets/fonts/metropolis/Metropolis-RegularItalic.otf');
+  font-weight: 400;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: 'Metropolis';
+  src: url('/assets/fonts/metropolis/Metropolis-Medium.otf');
+  font-weight: 500;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Metropolis';
+  src: url('/assets/fonts/metropolis/Metropolis-MediumItalic.otf');
+  font-weight: 500;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: 'Metropolis';
+  src: url('/assets/fonts/metropolis/Metropolis-SemiBold.otf');
+  font-weight: 600;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Metropolis';
+  src: url('/assets/fonts/metropolis/Metropolis-SemiBoldItalic.otf');
+  font-weight: 600;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: 'Metropolis';
+  src: url('/assets/fonts/metropolis/Metropolis-Bold.otf');
+  font-weight: 700;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Metropolis';
+  src: url('/assets/fonts/metropolis/Metropolis-BoldItalic.otf');
+  font-weight: 700;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: 'Metropolis';
+  src: url('/assets/fonts/metropolis/Metropolis-ExtraBold.otf');
+  font-weight: 800;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Metropolis';
+  src: url('/assets/fonts/metropolis/Metropolis-ExtraBoldItalic.otf');
+  font-weight: 800;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: 'Metropolis';
+  src: url('/assets/fonts/metropolis/Metropolis-Black.otf');
+  font-weight: 800;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Metropolis';
+  src: url('/assets/fonts/metropolis/Metropolis-BlackItalic.otf');
+  font-weight: 800;
+  font-style: italic;
+}
+
+.flex-container {
+  height: 100%;
+  width: 100%;
+  @extend .d-flex;
+  @extend .flex-column;
+}
+
+sbpro-dashboard-head {
+  display: block;
+}
+
+// Activities Table for Castler
+.pp-table-container {
+  font-size: 0.85rem;
+  overflow: auto;
+  min-height: 80px;
+}
+
+.absolute-stretched {
+  position: absolute;
+  bottom: 0;
+  top: 0;
+  left: 0;
+  right: 0;
+}
+
+.dropdown-menu {
+  z-index: 10000;
+}
+
+ol,
+ul,
+dl {
+  margin-bottom: 0;
+}
+
+//.pp-table-container table {
+//}
+
+.card-body {
+  position: relative;
+}
+
+.card-body-height-fixed {
+  height: calc(100vh - 25rem);
+}
+
+thead th {
+  background: #fff;
+  border-top: 7px solid #e3e6ec;
+}
+
+thead:first-child {
+  //box-shadow: 2px 2px 20px #0000001f;
+}
+
+.th-sticky-top {
+  top: -1px;
+  @extend .sticky-top;
+}
+
+.th-sticky-top:before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: #687281;
+}
+
+.th-sticky-top:after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: #687281;
+}

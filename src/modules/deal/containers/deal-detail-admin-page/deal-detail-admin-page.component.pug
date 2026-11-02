@@ -1,0 +1,61 @@
+sbpro-dashboard-head(icon='package', title='Deal Details', description='Deal Details')
+.container-fluid.mt-n10.responsiveForm
+  sbpro-card-navigation(
+    sbproTocItem='Tabs',
+    [navNames]='navNames',
+    [selectedIndex]='tabCount',
+    [selectedIndexForFade]='tabCount',
+    [templates]='[basic, tenant, property, details]'
+  )
+    ng-template(#basic)
+      sbpro-deal-basic-detail(
+        [viewMode]='true',
+        [dealDocument]='dealDocument'
+        [myRole]='myRole',
+        (emitMyRole)='setMyRole($event)',
+        [tabCount]='tabCount',
+        (emitNextTab)='nextTab($event)',
+        [currentTab]='0',
+        [deal]='dealForm',
+        (emitPatchDeal)='patchDeal($event)',
+        [dealParty1]='dealparty1Form',
+        (emitPatchDealParty1)='patchDealParty1($event)'
+      )
+
+    ng-template(#tenant)
+      sbpro-deal-party-detail(
+        [viewMode]='true',
+        [tabCount]='tabCount',
+        (emitNextTab)='nextTab($event)',
+        [currentTab]='1',
+        [deal] ='dealForm',
+        [dealParty1]='dealparty1Form',
+        (emitPatchDealParty1)='patchDealParty1($event)',
+        [dealParty2]='dealparty2Form',
+        (emitPatchDealParty2)='patchDealParty2($event)'
+      )
+    ng-template(#property)
+      sbpro-deal-property-detail(
+        [viewMode]='true',
+        [tabCount]='tabCount',
+        (emitNextTab)='nextTab($event)',
+        [currentTab]='2',
+        [dealData]='dealDataForm',
+        (emitPatchDealData)='patchDealData($event)'
+      )
+    ng-template(#details)
+      sbpro-deal-form(
+        [viewMode]='true',
+        [errors]='errors',
+        [currentTab]='3',
+        [deal]='dealForm',
+        (emitPatchDeal)='patchDeal($event)',
+        [dealParty1]='dealparty1Form',
+        (emitPatchDealParty1)='patchDealParty1($event)',
+        [dealParty2]='dealparty2Form',
+        (emitPatchDealParty2)='patchDealParty2($event)',
+        [dealData]='dealDataForm',
+        (emitPatchDealData)='patchDealData($event)',
+        (emitSubmitDeal)='submitDeal($event)',
+        [loading]='loading'
+      )

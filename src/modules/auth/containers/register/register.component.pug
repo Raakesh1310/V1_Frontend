@@ -1,0 +1,252 @@
+sb-layout-auth
+  .container(*ngIf='!showRegister')
+    .row.justify-content-center
+      .col-lg-7
+        .card.shadow-lg.border-0.rounded-lg.mt-5
+          .card-header.justify-content-center
+            img.logoImage(
+              src='/assets/img/Castler_logo.png',
+              width='100',
+              height='50'
+            )
+
+          .card-body
+            .after-registration
+              img.svgIcon(
+                src='data:image/png;base64,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'
+              )
+              h3.font-weight-light.my-4 Escrow Created
+              hr
+            .after-registration
+              span Mail verification link has been sent to your mail ID "{{ registerForm.get("email")?.value }}".
+                br
+                | Kindly verify your e-mail to login.
+                br
+                span
+                  small
+                    small Didn't receive email verification link?
+                      button.btn.btn-link.btn-sm((click)='resendLink()') Resend
+              hr
+              button.btn.btn-link((click)='loginRedirect()') Go back to login
+
+  .container(*ngIf='showRegister')
+    .row.justify-content-center
+      .col-lg-7
+        .card.shadow-lg.border-0.rounded-lg.mt-5
+          .card-header.justify-content-center
+            img.logoImage(
+              src='/assets/img/Castler_logo.png',
+              width='100',
+              height='50'
+            )
+          .card-body
+            div(*ngIf='errors?.length > 0')
+              sbpro-alert(classes='alert-danger', [dismissable]='true')
+                | {{ errors[0] }}
+            form(
+              [formGroup]='registerForm',
+              autocomplete='off',
+              (ngSubmit)='onSubmit()'
+            )
+              .form-row
+                .col-md-6
+                  .form-group
+                    label.small.mb-1(for='inputFirstName') First Name
+                    input#inputFirstName.form-control.py-4(
+                      data-cy='firstNameInput',
+                      type='text',
+                      placeholder='Enter first name',
+                      formControlName='firstName',
+                      [class.is-valid]='firstNameControlValid',
+                      [class.is-invalid]='firstNameControlInvalid',
+                      autocomplete='new-firstName'
+                    )
+                    .valid-feedback
+                    .invalid-feedback(
+                      *ngIf='firstNameControl.hasError("required")'
+                    )
+                      | First name required.
+
+                .col-md-6
+                  .form-group
+                    label.small.mb-1(for='inputLastName') Last Name
+                    input#inputLastName.form-control.py-4(
+                      data-cy='lastNameInput',
+                      type='text',
+                      placeholder='Enter last name',
+                      formControlName='lastName',
+                      [class.is-valid]='lastNameControlValid',
+                      [class.is-invalid]='lastNameControlInvalid',
+                      autocomplete='new-lastName'
+                    )
+                    .valid-feedback
+                    .invalid-feedback(
+                      *ngIf='lastNameControl.hasError("required")'
+                    )
+                      | Last name required.
+
+              .form-group(*ngIf='urlMode === "enterprise"')
+                label.small.mb-1(for='businessName') Business Name
+                input#businessName.form-control.py-4(
+                  data-cy='businessNameInput',
+                  type='text',
+                  placeholder='Enter Business name',
+                  formControlName='businessName',
+                  [class.is-valid]='businessNameControlValid',
+                  [class.is-invalid]='businessNameControlInvalid',
+                  autocomplete='new-businessName'
+                )
+                .valid-feedback
+                .invalid-feedback(
+                  *ngIf='businessNameControl.hasError("required")'
+                )
+                  | Business name required.
+
+              .form-group
+                label.small.mb-1(for='inputEmailAddress') Email
+                input#inputEmailAddress.form-control.py-4(
+                  data-cy='emailInput',
+                  type='email',
+                  placeholder='Enter email address',
+                  aria-describedby='emailHelp',
+                  formControlName='email',
+                  [class.is-valid]='emailControlValid',
+                  [class.is-invalid]='emailControlInvalid'
+                )
+                .valid-feedback
+                .invalid-feedback(*ngIf='emailControl.hasError("required")')
+                  | Email required.
+                .invalid-feedback(*ngIf='emailControl.hasError("email")')
+                  | Email is not valid.
+
+              .form-row
+                .col-md-6
+                  .form-group
+                    label.small.mb-1(for='inputPassword') Password
+                    input#inputPassword.form-control.py-4(
+                      data-cy='passwordInput',
+                      type='password',
+                      placeholder='Enter password',
+                      formControlName='password',
+                      [class.is-valid]='passwordControlValid',
+                      [class.is-invalid]='passwordControlInvalid'
+                    )
+                    .valid-feedback
+                    .invalid-feedback(
+                      *ngIf='passwordControl.hasError("required")'
+                    )
+                      | Password required.
+                    .invalid-feedback(
+                      *ngIf='passwordControl.hasError("minlength")'
+                    )
+                      | Password must be at least 8 characters.
+
+                .col-md-6
+                  .form-group
+                    label.small.mb-1(for='inputConfirmPassword') Confirm Password
+                    input#inputConfirmPassword.form-control.py-4(
+                      data-cy='confirmPasswordInput',
+                      type='password',
+                      placeholder='Confirm password',
+                      formControlName='confirmPassword',
+                      [class.is-valid]='confirmPasswordControlValid',
+                      [class.is-invalid]='confirmPasswordControlInvalid'
+                    )
+                    .valid-feedback
+                    .invalid-feedback(
+                      *ngIf='confirmPasswordControl.hasError("required")'
+                    )
+                      | Confirm Password required.
+                    .invalid-feedback(
+                      *ngIf='registerForm.hasError("passwordMismatch")'
+                    )
+                      | Passwords do not match.
+
+              .form-group
+                label.small.mb-1(for='inputEmailAddress') Mobile
+                .row
+                  .col-md-9
+                    input#mobile.form-control.py-4(
+                      data-cy='mobileInput',
+                      type='number',
+                      placeholder='Enter mobile number',
+                      aria-describedby='mobilehelp',
+                      formControlName='mobile',
+                      [class.is-valid]='mobileControlValid',
+                      [class.is-invalid]='mobileControlInvalid'
+                    )
+                    .valid-feedback
+                    .invalid-feedback(*ngIf='mobileControl.hasError("required")')
+                      | Mobile required.
+                    .invalid-feedback(*ngIf='mobileControl.hasError("mobile")')
+                      | Mobile is not valid.
+                  .col-md-3
+                    span.btn.form-control.py-4(
+                      (click)='sendOTP()',
+                      style='background: #417505;color: white'
+                    ) {{ !showOTPInput ? "Send OTP" : "Resend OTP" }}
+
+              .form-group
+                label.small.mb-1(for='otp') OTP
+                input#otp.form-control.py-4(
+                  data-cy='otp',
+                  type='number',
+                  placeholder='Enter OTP recieved',
+                  aria-describedby='otpHelp',
+                  formControlName='otp',
+                  [class.is-valid]='otpControlValid',
+                  [class.is-invalid]='otpControlInvalid'
+                )
+                .valid-feedback
+                .invalid-feedback(*ngIf='otpControl.hasError("required")')
+                  | OTP required.
+
+              .form-group.mt-4.mb-0
+                label
+                  input(type='checkbox', formControlName='cb')
+                  | &nbsp; By signing up, you agree to our &nbsp;
+                  a(href='{{ tncLink() }}', target='_blank', style="color: #417505;font-weight: 500;")
+                    | Terms and Conditions.
+
+              .form-group.mt-4.mb-0(*ngIf='enableWHATSAPP')
+                label
+                  input(type='checkbox', formControlName='whatsapp')
+                  | &nbsp; Send WhatsApp notifications on the registered mobile number
+
+              .form-group.mt-4.mb-0
+                sbpro-app-button(
+                  routerLink='/auth/register',
+                  (click)='onSubmit()',
+                  text='Create Escrow',
+                  [loading]='loading$ | async',
+                  loadingText='Please wait..',
+                  [btnClass]='{ "btn-block": true, "btn-primary": true }',
+                  [disabled]='registerForm.invalid'
+                )
+
+          .card-footer.text-center
+            .small
+              a(routerLink='/auth/login', style="color: #417505;font-weight: 500") Have an account? Go to login
+
+ng-template(#confirmationModal, let-modal)
+  .modal-header
+    h5.modal-title Create Escrow Form Data
+    button.close(
+      type='button',
+      aria-label='Close',
+      (click)='modal.dismiss("Cross click")'
+    )
+      span(aria-hidden='true') ×
+  .modal-body.
+    Wired up and ready to go. Just add a backend.
+    <br><br>
+    firstName: <code>{{registerForm.value.firstName}}</code>
+    <br>
+    lastName: <code>{{registerForm.value.lastName}}</code>
+    <br>
+    email: <code>{{registerForm.value.email}}</code>
+    <br>
+    password: <code>{{registerForm.value.password}}</code>
+  .modal-footer
+    button.btn.btn-secondary(type='button', (click)='modal.close()') Close
+    button.btn.btn-primary(type='button', (click)='modal.close("DASHBOARD")') Proceed back to Dashboard

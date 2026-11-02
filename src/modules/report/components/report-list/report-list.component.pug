@@ -1,0 +1,511 @@
+sbpro-card([headerActions]='true')
+    .card-header.logoColor
+        | Reports Section
+    .card-body
+        .form-group
+            label.mr-2 Report Type
+            .d-flex.align-items-center
+                select.form-control.mr-2.select-custom-width([(ngModel)]="selectedReport",placeholder = 'Select a Report')
+                    option(value='') Please Select a Report 
+                    option(value="Accounts") Account 
+                    option(value="Payee") Payee
+                    option(value="Deposit") Deposits 
+                    option(value="Transfers") Transfers 
+                    option(value="Statement") Statement
+                button.form-control.btn.btn-success.btn-custom-width((click)="openModal(selectedReport)",[disabled]='selectedReport===""') Generate Report
+        p.text-muted This report provides a list of transfers for the selected date range
+        .d-flex.mb-2(*ngIf="(reportTable$ | async)?.length> 0")
+            .flex-row
+            small.mb-2.mt-2 Showing {{ (reportService.page - 1) * 10 + 1 }} to {{ (reportService.page - 1) * 10 + (reportTable$ | async)?.length }} of {{ totalItems$ | async }}
+        table.table.table-striped
+            thead.thead-light
+                tr
+                    th.th-sticky-top Requested Date
+                    th.th-sticky-top Report Type
+                    th.th-sticky-top Start Date
+                    th.th-sticky-top End Date
+                    th.th-sticky-top Status
+            tbody.table-bordered(*ngIf= "(reportTable$ | async)?.length> 0")
+                tr(*ngFor="let report of (reportTable$ | async)")
+                    td {{ toLocalTime(report.createdAt) }}
+                    td {{ report.type }} - {{report?.connectedBanking ? "Connected Banking" : "Digital Escrow"}}
+                    td {{ toLocalTime(report.params.startDate) }}
+                    td {{ toLocalTime(report.params.endDate) }}
+                    td
+                        button.btn.btn-success(*ngIf="report.status === 'Completed'",(click)="downloadReport(report.id,report.type)") Download
+                        span.text-warning(*ngIf="report.status !== 'Completed'") {{ report.status }}
+            tbody(*ngIf= "(reportTable$| async)?.length === 0")
+                tr
+                    td(colspan="5" class="text-center") No data available
+
+            tbody(*ngIf="loading$| async")
+                tr
+                    td(colspan="5" class="text-center") Loading...
+        .d-flex.justify-content-between.pt-2.align-self-end(
+        *ngIf='(reportTable$ | async)?.length > 0 && !(loading$ | async)'
+        )
+            ngb-pagination.pagination(
+                [collectionSize]='totalItems$ | async',
+                [(page)]='reportService.page',
+                [maxSize]='5',
+                [rotate]='true',
+                [ellipses]='false',
+                [boundaryLinks]='true',
+                (pageChange)="getReportList()"
+            )
+        p.text-muted
+            | * Report generation might take some time depending upon data volume
+
+ng-template(#accounts)
+    sbpro-card([headerActions]='true')
+        .card-header.logoColor
+            | Account Reports 
+        .card-body 
+            div 
+                .alert.alert-danger.alert-dismissible.fade.show(
+                *ngIf="formErrors && formErrors.length > 0",
+                role="alert"
+                )
+                    ul
+                        li(*ngFor="let error of formErrors")
+                            p.redDot {{ error }}
+                    button.close(
+                    type="button",
+                    data-dismiss="alert",
+                    aria-label="Close",
+                    (click)="formErrors = []"
+                    )
+                        span(aria-hidden="true") &times;
+            .row.mb-3.pb-1(*ngIf='connBankingWithDigiEscrow || connectedBanking ')
+                .col-sm-4(*ngIf='connBankingWithDigiEscrow')
+                    label
+                    input.mr-3(
+                        type='radio',
+                        (change) = 'updateSelection(TYPE_OF_ACCOUNT.escrowAccounts)',
+                        [(ngModel)]='selectedTypeOfAccount',
+                        [value]='TYPE_OF_ACCOUNT.escrowAccounts'
+                    )
+                    | Escrow Accounts 
+                .col-sm-4(*ngIf='connectedBanking')
+                    label 
+                    input.mr-3(
+                        type='radio',
+                        (change) = 'updateSelection(TYPE_OF_ACCOUNT.bankAccounts)',
+                        [(ngModel)]='selectedTypeOfAccount',
+                        [value]='TYPE_OF_ACCOUNT.bankAccounts'
+                    )
+                    | Bank Accounts 
+                .col-sm-4(*ngIf='connectedBanking')
+                    label 
+                    input.mr-3(
+                        type='radio',
+                        (change) = 'updateSelection(TYPE_OF_ACCOUNT.escrowOnBankAccount)',
+                        [(ngModel)]='selectedTypeOfAccount',
+                        [value]='TYPE_OF_ACCOUNT.escrowOnBankAccount'
+                    )
+                    | Bank Account with VA 
+            form(autocomplete='off', [formGroup]='reportForm')
+                .form-group(*ngIf='isAdmin')
+                    label(for='payee') Merchant
+                    span.text-danger *
+                    br
+                    ng-select(
+                        [items]='merchants',
+                        bindLabel='title',
+                        [(ngModel)]='selectedMerchant',
+                        [ngModelOptions]='{ standalone: true }',
+                        loadingText='Loading...',
+                        placeholder='Select Merchant',
+                        (search)='getMerchants($event.term)',
+                        name='merchant',
+                        (change) = 'onMerchantSelect()'
+                    )
+                        ng-template(ng-label-tmp='' let-item='item')
+                            span(*ngIf='selectedMerchant') {{ item.title }}
+                        ng-template(
+                            ng-option-tmp='',
+                            let-item='item',
+                            let-search='searchTerm',
+                            let-index='index'
+                        )
+                            span.sup-option {{ item.title }}
+                            br
+                            span.sub-option {{ item.merchantId }} | {{ item.email }}
+                .form-group
+                    label(for ='bank') Bank
+                    span.text-danger * 
+                    br
+                    ng-select(
+                        placeholder = 'Select a Bank',
+                        [(ngModel)]='selectedBank',
+                        (change)='updateBank()',
+                        [ngModelOptions]='{ standalone: true }',
+                        formControlName='bank'
+                    )
+                        ng-option(*ngFor='let st of banks', [value]='st') {{ st }}
+
+                .row.mb-3.pb-1(*ngIf='selectedTypeOfAccount === TYPE_OF_ACCOUNT.escrowAccounts')
+                    .col-lg-6
+                        label
+                        input.mr-3(
+                            type='radio',
+                            (change) = 'updateAccountSection(ESCROW_ACCOUNT_TYPE.ALL)',
+                            [(ngModel)]='typeOfEscrowAccount',
+                            [value]='ESCROW_ACCOUNT_TYPE.ALL',
+                            [ngModelOptions]='{standalone: true}'
+                        )
+                        | All Accounts 
+                    .col-lg-6
+                        label 
+                        input.mr-3(
+                            type='radio',
+                            (change) = 'updateAccountSection(ESCROW_ACCOUNT_TYPE.AUTO_TRANSFER)',
+                            [(ngModel)]='typeOfEscrowAccount',
+                            [value]='ESCROW_ACCOUNT_TYPE.AUTO_TRANSFER',
+                            [ngModelOptions]='{standalone: true}'
+                        )
+                        | Only Auto Transfer Accounts 
+
+                .form-group(*ngIf='selectedTypeOfAccount === TYPE_OF_ACCOUNT.escrowOnBankAccount')
+                    label(for='bankAccount') Bank Account
+                    span.text-danger *
+                    ng-select(
+                        [items]='bankAccounts',
+                        bindLabel='name',
+                        [(ngModel)]='selectedBankAccount',
+                        formControlName='bankAccount',
+                        loadingText='Loading...',
+                        placeholder='Select Account',
+                        name='bankAccount',
+                        (change)='getEscrowOnHardAccount()'
+
+                    )
+                        ng-template(ng-label-tmp='' let-item='item')
+                            span(*ngIf='selectedBankAccount') {{ utilService.firstCapitalize(item.accountName) }} &nbsp;
+                                span.fader - {{ item.bankAccountNo }}
+                        ng-template(
+                            ng-option-tmp='',
+                            let-item='item',
+                            let-search='searchTerm',
+                            let-index='index'
+                        )
+                            span.sup-option {{ utilService.firstCapitalize(item.accountName) }}
+                            br
+                            span.sub-option {{ item.bankAccountNo }}
+                .form-group
+                    div
+                        label(for="status") Status
+                        span.text-danger *  
+                    div.checkbox-group.ml-2
+                        label
+                            input.mr-2(type="checkbox", (change)="updateStatus(ACCOUNT_STATUS.ACTIVE, $event)")
+                            | Active 
+                        label
+                            input.mr-2(type="checkbox", (change)="updateStatus(ACCOUNT_STATUS.INACTIVE, $event)")
+                            | Inactive
+                    
+                sbpro-date-range((dateChange)="onDateChange($event)",(error)="onError($event)")
+
+        .card-footer 
+            span 
+                button.btn.btn-sm.btn-success.float-right((click)='generateReport()',[disabled]='reportForm?.invalid') Generate Report 
+                span.float-right &nbsp;&nbsp;
+                button.btn.btn-sm.btn-danger.float-right.ml-0((click)='closeModal()') Close
+                span.float-right &nbsp;&nbsp;
+
+ng-template(#payee)
+    sbpro-card([headerActions]='true')
+        .card-header.logoColor
+            | Payee Reports 
+        .card-body 
+            div 
+                .alert.alert-danger.alert-dismissible.fade.show(
+                *ngIf="formErrors && formErrors.length > 0",
+                role="alert"
+                )
+                    ul
+                        li(*ngFor="let error of formErrors")
+                            p.redDot {{ error }}
+                    button.close(
+                    type="button",
+                    data-dismiss="alert",
+                    aria-label="Close",
+                    (click)="formErrors = []"
+                    )
+                        span(aria-hidden="true") &times;
+            .form-group(*ngIf='isAdmin')
+                label(for='payee') Merchant
+                span.text-danger *
+                br
+                ng-select(
+                    [items]='merchants',
+                    bindLabel='title',
+                    [(ngModel)]='selectedMerchant',
+                    [ngModelOptions]='{ standalone: true }',
+                    loadingText='Loading...',
+                    placeholder='Select Merchant',
+                    (search)='getMerchants($event.term)',
+                    name='merchant',
+                    (change) = 'onMerchantSelect()'
+                )
+                    ng-template(ng-label-tmp='' let-item='item')
+                        span(*ngIf='selectedMerchant') {{ item.title }}
+                    ng-template(
+                        ng-option-tmp='',
+                        let-item='item',
+                        let-search='searchTerm',
+                        let-index='index'
+                    )
+                        span.sup-option {{ item.title }}
+                        br
+                        span.sub-option {{ item.merchantId }} | {{ item.email }}
+            .form-group
+                div
+                    label(for="status") Status
+                    span.text-danger *  
+                div.checkbox-group.ml-2
+                    label
+                        input.mr-2(type="checkbox", (change)="updateStatus(PAYEE_STATUS.ACTIVE, $event)")
+                        | Active 
+                    label
+                        input.mr-2(type="checkbox", (change)="updateStatus(PAYEE_STATUS.INACTIVE, $event)")
+                        | Inactive    
+                    label
+                        input.mr-2(type="checkbox", (change)="updateStatus(PAYEE_STATUS.PENDING_FOR_APPROVAL, $event)")
+                        | Pending for Approval 
+            
+            sbpro-date-range((dateChange)="onDateChange($event)",(error)="onError($event)")
+
+        .card-footer 
+            span 
+                button.btn.btn-sm.btn-success.float-right((click)='generateReport()') Generate Report 
+                span.float-right &nbsp;&nbsp;
+                button.btn.btn-sm.btn-danger.float-right.ml-0((click)='closeModal()') Close
+                span.float-right &nbsp;&nbsp;
+
+ng-template(#deposit)
+    sbpro-card([headerActions]='true')
+        .card-header.logoColor
+            | {{selectedReport}} Reports 
+        .card-body
+            div 
+                .alert.alert-danger.alert-dismissible.fade.show(
+                *ngIf="formErrors && formErrors.length > 0",
+                role="alert"
+                )
+                    ul
+                        li(*ngFor="let error of formErrors")
+                            p.redDot {{ error }}
+                    button.close(
+                    type="button",
+                    data-dismiss="alert",
+                    aria-label="Close",
+                    (click)="formErrors = []"
+                    )
+                        span(aria-hidden="true") &times;
+            .row.mb-3.pb-1(*ngIf='connBankingWithDigiEscrow || connectedBanking ')
+                .col-sm-4(*ngIf='connBankingWithDigiEscrow')
+                    label
+                    input.mr-3(
+                        type='radio',
+                        (change) = 'updateSelection(TYPE_OF_ACCOUNT.escrowAccounts)',
+                        [(ngModel)]='selectedTypeOfAccount',
+                        [value]='TYPE_OF_ACCOUNT.escrowAccounts'
+                    )
+                    | Escrow Accounts 
+                .col-sm-4(*ngIf='connectedBanking')
+                    label 
+                    input.mr-3(
+                        type='radio',
+                        (change) = 'updateSelection(TYPE_OF_ACCOUNT.bankAccounts)',
+                        [(ngModel)]='selectedTypeOfAccount',
+                        [value]='TYPE_OF_ACCOUNT.bankAccounts'
+                    )
+                    | Bank Accounts 
+                .col-sm-4(*ngIf='connectedBanking')
+                    label 
+                    input.mr-3(
+                        type='radio',
+                        (change) = 'updateSelection(TYPE_OF_ACCOUNT.escrowOnBankAccount)',
+                        [(ngModel)]='selectedTypeOfAccount',
+                        [value]='TYPE_OF_ACCOUNT.escrowOnBankAccount'
+                    )
+                    | Bank Account with VA   
+    
+            form(autocomplete='off', [formGroup]='reportForm')
+                .form-group(*ngIf='isAdmin')
+                    label(for='payee') Merchant
+                    span.text-danger *
+                    br
+                    ng-select(
+                        [items]='merchants',
+                        bindLabel='title',
+                        [(ngModel)]='selectedMerchant',
+                        [ngModelOptions]='{ standalone: true }',
+                        loadingText='Loading...',
+                        placeholder='Select Merchant',
+                        (search)='getMerchants($event.term)',
+                        name='merchant',
+                        (change) = 'onMerchantSelect()'
+                    )
+                        ng-template(ng-label-tmp='' let-item='item')
+                            span(*ngIf='selectedMerchant') {{ item.title }}
+                        ng-template(
+                            ng-option-tmp='',
+                            let-item='item',
+                            let-search='searchTerm',
+                            let-index='index'
+                        )
+                            span.sup-option {{ item.title }}
+                            br
+                            span.sub-option {{ item.merchantId }} | {{ item.email }}
+                .form-group
+                    label(for ='bank') Bank 
+                    span.text-danger *
+                    br
+                    ng-select(
+                        placeholder = 'Select a Bank',
+                        [(ngModel)]='selectedBank',
+                        (change)='updateBank()',
+                        [ngModelOptions]='{ standalone: true }',
+                        formControlName='bank'
+                    )
+                        ng-option(*ngFor='let st of banks', [value]='st') {{ st }}
+                .form-group(*ngIf='selectedTypeOfAccount === TYPE_OF_ACCOUNT.escrowAccounts')
+                    label(for='account') Escrow
+                    span.text-danger *
+                    ng-select(
+                        [items]='escrowAccounts',
+                        bindLabel='name',
+                        [(ngModel)]='selectedAccount',
+                        formControlName='account',
+                        loadingText='Loading...',
+                        placeholder='Enter Escrow Name',
+                        [disabled]='submitted',
+                        name='account',
+                        (search)='fetchAccount($event)'
+                    )
+                        ng-template(ng-label-tmp='' let-item='item')
+                            span(*ngIf='selectedAccount') {{ utilService.firstCapitalize(item?.name) }} &nbsp;
+                                span.fader - {{ item?.accountId }}
+                        ng-template(
+                            ng-option-tmp='',
+                            let-item='item',
+                            let-search='searchTerm',
+                            let-index='index'
+                        )
+                            span.sup-option {{ utilService.firstCapitalize(item?.name) }}
+                            br
+                            span.sub-option {{ item?.accountId }}
+                .form-group(*ngIf='selectedTypeOfAccount === TYPE_OF_ACCOUNT.bankAccounts')
+                    label(for='bankAccount') Bank Account
+                    span.text-danger *
+                    ng-select(
+                        [items]='bankAccounts',
+                        bindLabel='name',
+                        [(ngModel)]='selectedBankAccount',
+                        formControlName='bankAccount',
+                        loadingText='Loading...',
+                        placeholder='Select Account',
+                        name='bankAccount',
+
+                    )
+                        ng-template(ng-label-tmp='' let-item='item')
+                            span(*ngIf='selectedBankAccount') {{ utilService.firstCapitalize(item.accountName) }} &nbsp;
+                                span.fader - {{ item.bankAccountNo }}
+                        ng-template(
+                            ng-option-tmp='',
+                            let-item='item',
+                            let-search='searchTerm',
+                            let-index='index'
+                        )
+                            span.sup-option {{ utilService.firstCapitalize(item.accountName) }}
+                            br
+                            span.sub-option {{ item.bankAccountNo }}
+
+                .form-group(*ngIf='selectedTypeOfAccount === TYPE_OF_ACCOUNT.escrowOnBankAccount')
+                    label(for='bankAccount') Bank Account
+                    span.text-danger *
+                    ng-select(
+                        [items]='bankAccounts',
+                        bindLabel='name',
+                        [(ngModel)]='selectedBankAccount',
+                        formControlName='bankAccount',
+                        loadingText='Loading...',
+                        placeholder='Select Account',
+                        name='bankAccount',
+                        (change)='getEscrowOnHardAccount()'
+
+                    )
+                        ng-template(ng-label-tmp='' let-item='item')
+                            span(*ngIf='selectedBankAccount') {{ utilService.firstCapitalize(item.accountName) }} &nbsp;
+                                span.fader - {{ item.bankAccountNo }}
+                        ng-template(
+                            ng-option-tmp='',
+                            let-item='item',
+                            let-search='searchTerm',
+                            let-index='index'
+                        )
+                            span.sup-option {{ utilService.firstCapitalize(item.accountName) }}
+                            br
+                            span.sub-option {{ item.bankAccountNo }}
+
+                .form-group(*ngIf='selectedTypeOfAccount === TYPE_OF_ACCOUNT.escrowOnBankAccount')  
+                    label(for='account') Escrow
+                    span.text-danger *
+                    ng-select(
+                        [items]='escrowAccounts',
+                        bindLabel='name',
+                        [(ngModel)]='selectedAccount',
+                        formControlName='account',
+                        loadingText='Loading...',
+                        placeholder='Enter Escrow Name',
+                        [disabled]='submitted',
+                        name='account',
+                        (search)='fetchAccount($event)'
+                    )
+                        ng-template(ng-label-tmp='' let-item='item')
+                            span(*ngIf='selectedAccount') {{ utilService.firstCapitalize(item?.name) }} &nbsp;
+                                span.fader - {{ item?.accountId }}
+                        ng-template(
+                            ng-option-tmp='',
+                            let-item='item',
+                            let-search='searchTerm',
+                            let-index='index'
+                        )
+                            span.sup-option {{ utilService.firstCapitalize(item?.name) }}
+                            br
+                            span.sub-option {{ item?.accountId }}
+
+                .form-group(*ngIf='selectedReport === "Transfers"')
+                    div
+                        label(for="status") Status
+                        span.text-danger * 
+                    div.checkbox-group.ml-2
+                        label
+                            input.mr-2(type="checkbox", (change)="updateStatus(TRANSFER_STATUS.SUCCESS, $event)")
+                            | Success 
+                        label
+                            input.mr-2(type="checkbox", (change)="updateStatus(TRANSFER_STATUS.FAILED, $event)")
+                            | Failed    
+                        label
+                            input.mr-2(type="checkbox", (change)="updateStatus(TRANSFER_STATUS.PROCESSING, $event)")
+                            | Sent For Processing
+                        label
+                            input.mr-2(type="checkbox", (change)="updateStatus(TRANSFER_STATUS.PENDING, $event)")
+                            | Pending For Authorization 
+                sbpro-date-range((dateChange)="onDateChange($event)",(error)="onError($event)",[selectedReport]='selectedReport')
+
+        .card-footer 
+            span 
+                button.btn.btn-sm.btn-success.float-right((click)='generateReport()',[disabled]='reportForm?.invalid') Generate Report 
+                span.float-right &nbsp;&nbsp;
+                button.btn.btn-sm.btn-danger.float-right.ml-0((click)='closeModal()') Close
+                span.float-right &nbsp;&nbsp; 
+    //- div.modal-header
+    //-     h5.modal-title Modal for Value 1
+    //-     button.close(type="button", (click)="closeModal('modal1')") &times;
+    //- div.modal-body
+    //-     p Content for Value 1 modal.
+    //- div.modal-footer
+    //-     button.btn.btn-secondary(type="button", (click)="closeModal('modal1')") Close          

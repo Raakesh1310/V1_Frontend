@@ -1,0 +1,70 @@
+form
+  .form-group.form-inline
+    | Full text search:
+    input.form-control.ml-2(
+      type='text',
+      name='searchTerm',
+      [(ngModel)]='activitiesService.searchTerm'
+    )
+    span.ml-3(*ngIf='activitiesService.loading$ | async') Loading...
+  .table-responsive.pp-table-container
+    table.table
+      thead
+        tr
+          th(scope='col', sbSortable='date', (sort)='onSort($event)')
+            span Date
+            sb-sort-icon(
+              *ngIf='sortedColumn === "date"',
+              [direction]='sortedDirection'
+            )
+          th(scope='col', sbSortable='event', (sort)='onSort($event)')
+            span Event
+            sb-sort-icon(
+              *ngIf='sortedColumn === "event"',
+              [direction]='sortedDirection'
+            )
+          th(scope='col', sbSortable='time', (sort)='onSort($event)')
+            span Time
+            sb-sort-icon(
+              *ngIf='sortedColumn === "time"',
+              [direction]='sortedDirection'
+            )
+      tbody
+        tr(*ngFor='let activity of activities$ | async')
+          td
+            ngb-highlight(
+              [result]='activity.date',
+              [term]='activitiesService.searchTerm'
+            )
+          td
+            .d-inline-flex.align-items-center
+              i-feather.mr-2(
+                [name]='activity.eventIcon',
+                [class]='activity.colorUtility'
+              )
+              ngb-highlight.mr-1(
+                [result]='activity.eventText + " "',
+                [term]='activitiesService.searchTerm'
+              )
+              ng-container(*ngIf='activity.eventLinkUrl')
+                a([routerLink]='') {{ activity.eventLinkText }}
+          td
+            ngb-highlight(
+              [result]='activity.time',
+              [term]='activitiesService.searchTerm'
+            )
+  .d-flex.justify-content-between.p-2
+    ngb-pagination(
+      [collectionSize]='total$ | async',
+      [(page)]='activitiesService.page',
+      [pageSize]='activitiesService.pageSize'
+    )
+
+    select.custom-select(
+      style='width: auto',
+      name='pageSize',
+      [(ngModel)]='activitiesService.pageSize'
+    )
+      option([ngValue]='4') 4 items per page
+      option([ngValue]='8') 8 items per page
+      option([ngValue]='16') 16 items per page

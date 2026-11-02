@@ -1,0 +1,20 @@
+@import 'styles/variables.scss';
+
+.red {
+  color: red;
+}
+.blue {
+  color: blue;
+}
+
+.click {
+  cursor: pointer;
+}
+
+:host ::ng-deep .card-body {
+  padding: 1.35rem !important;
+}
+
+:host ::ng-deep .card.mb-4 {
+  margin-bottom: 1.35rem !important;
+ }

@@ -1,0 +1,16 @@
+@import 'styles/variables.scss';
+
+::ng-deep .my-class .modal-dialog {
+  max-width: 96%;
+  width: 96%;
+  height: 600px;
+}
+.modal-header {
+  color: rgb(2, 98, 242);
+  font-weight: 500;
+}
+
+.linker {
+  color: blue;
+  text-decoration: underline;
+}

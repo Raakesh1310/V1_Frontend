@@ -1,0 +1,38 @@
+@import 'styles/variables.scss';
+
+.btnColorRed {
+    background-color: red;
+    color: white;
+  }
+
+.flex-display {
+display: flex;
+flex-direction: row;
+}
+
+
+.flex-display-column {
+display: flex;
+justify-content: center;
+align-items: center;
+flex-direction: column;
+border: none;
+}
+
+
+#rejection {
+  background: #FFFBF4;
+  color: #687281;
+  font-weight: bold;
+  text-align:center
+}
+
+#rejection:focus {
+  box-shadow: none;
+  outline: none;
+  border-color: transparent;
+}
+
+.ng-invalid {
+    border: 2px red solid !important;
+}

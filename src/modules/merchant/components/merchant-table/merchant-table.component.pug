@@ -1,0 +1,258 @@
+div
+  //- div
+  //-   span.mr-2
+  //-     .spinner-border.spinner-border-sm.mr-1(
+  //-       role='status',
+  //-       aria-hidden='true',
+  //-       *ngIf='loadingList$ | async'
+  //-     )
+  //-     button.btn.btn-icon.btn-xs.castlerButtonColor(
+  //-       *ngIf='!(loadingList$ | async)',
+  //-       (click)='loadData()'
+  //-     )
+  //-       i-feather(name='refresh-cw')
+  //-   button.btn.btn-icon.btn-xs.mr-2.castlerButtonColor(
+  //-     (click)='toggleFilters()'
+  //-   )
+  //-     i-feather(name='filter')
+
+  .div
+    div(*ngIf='filtersVisible')
+      form.pb-2
+        .d-flex.mb-2
+          input#wildSearch.mt-1.form-control.w-100.mr-2.justify-content-end(
+            placement='top',
+            ngbPopover='Search by Business Name, Merchant ID, Owner Name, Email ID',
+            type='text',
+            name='s',
+            autocomplete='off',
+            placeholder='Search by Business Name, Merchant ID, Owner Name, Email ID',
+            [(ngModel)]='merchantService.searchTerm'
+          )
+
+          input#start-date.mt-1.form-control.w-50.mr-2(
+            type='text',
+            name='sd',
+            placeholder='Start Date',
+            autocomplete='off',
+            ngbDatepicker,
+            outsideDays='hidden',
+            #sd='ngbDatepicker',
+            (click)='sd.toggle()',
+            [(ngModel)]='merchantService.dateFrom',
+            [minDate]='merchantService.dateFromMin',
+            [maxDate]='merchantService.dateFromMax'
+          )
+
+          input#end-date.mt-1.form-control.w-50.mr-2(
+            type='text',
+            name='ed',
+            placeholder='End Date',
+            autocomplete='off',
+            ngbDatepicker,
+            outsideDays='hidden',
+            #ed='ngbDatepicker',
+            (click)='ed.toggle()',
+            [(ngModel)]='merchantService.dateTo',
+            [minDate]='merchantService.dateToMin',
+            [maxDate]='merchantService.dateToMax'
+          )
+
+          select#statusList.mt-1.form-control.w-50.mr-2(
+            name='status',
+            [(ngModel)]='merchantService.status'
+          )
+            option(value='') Status
+            option(*ngFor='let status of statusList', [ngValue]='status') {{ status }}
+
+          select.mt-1.form-control.w-50.mr-2(
+            name='linkedBank',
+            [(ngModel)]='merchantService.linkedBank',
+            *ngIf='!isTrustee && !idfc'
+          )
+            option(value='') All Bank
+            option(*ngFor='let bank of _bankTypes', [ngValue]='bank[1]') {{ bank[0] }}
+
+          select.mt-1.form-control.w-50.mr-2(
+            name='isCarLoan',
+            [(ngModel)]='merchantService.isCarLoan',
+            *ngIf='!isTrustee && idfc'
+          )
+            option(value='') All
+            option(value='false') Without Car Loan
+            option(value='true') With Car Loan
+
+          button.btn.mr-2.ws-nowrap.mt-1.mb-1.castlerButtonColor(
+            type='submit',
+            (click)='loadData()'
+          )
+            fa-icon.d-flex.flex-row.align-items-center(
+              [icon]='["fas", "search"]'
+            )
+          button.btn.btn-link.mr-2.logoColor(type='button', (click)='clearForm()') Clear
+          .justify-content-end 
+            a.btn.btn-success.mt-1.mb-1.mr-2.ws-nowrap.btn-icon(
+              type='button',
+              target='_blank',
+              [href]='merchantService.reportDownloadLink$ | async'
+            )
+              fa-icon.d-flex.flex-row.align-items-center(
+                [icon]='["fas", "arrow-down"]'
+              )
+
+        .d-flex(*ngIf='(merchants$ | async)?.length > 0') 
+          .flex-row
+            small.mb-2.mt-2 Showing {{ (merchantService.page - 1) * 10 + 1 }} to {{ (merchantService.page - 1) * 10 + (merchants$ | async)?.length }} of {{ merchantService.total$ | async }}
+
+    .table-responsive.pp-table-container.align-self-stretch.flex-grow-1.flex-stretch-1.table-striped(
+      *ngIf='(merchants$ | async)?.length > 0 && !(loadingList$ | async)'
+    )
+      table.table
+        thead
+          tr
+            th.th-sticky-top
+              span Business Name
+            th.th-sticky-top
+              span.ws-nowrap Merchant ID
+            th.th-sticky-top
+              span.ws-nowrap Creation Date
+            th.th-sticky-top
+              span.ws-nowrap Owner Name
+            th.th-sticky-top
+              span.ws-nowrap Email
+            th.th-sticky-top
+              span.ws-nowrap Mobile
+            th.th-sticky-top
+              span.ws-nowrap Balance (in Rs)
+            th.th-sticky-top
+              span Status
+            th.th-sticky-top(*ngIf='!readOnly')
+              span Actions
+        tbody
+          tr(*ngFor='let merchant of merchants$ | async')
+            td {{ merchant?.title }}
+            td
+              a.nav-link.p-0(
+                href='javascript:void(0);',
+                (click)='openDetails(merchant?.merchantId)',
+                style='color: #417505;font-weight: bold'
+              )
+                span {{ merchant?.merchantId }}
+            td
+              ngb-highlight(
+                [result]='merchant?.createdAt | date: "d MMM yyyy" || "--"'
+              )
+            td {{ getFullName(merchant?.merchantUserOwner?.user) }}
+            td {{ merchant?.merchantUserOwner?.email }}
+            td {{ merchant?.merchantUserOwner?.user?.mobile }}
+            td {{ toINR(merchant?.balance.toFixed(2)) }}
+            td#greenDot.myanchor(
+              *ngIf='merchant?.verified?.toString() == "true"',
+              style='color: #18B81F',
+              (click)='selectedMerchant = merchant; openMap(statusMap)'
+            ) {{ merchant?.status }}
+            td#redDot.myanchor(
+              *ngIf='merchant?.verified?.toString() == "false"',
+              style='color: #FF0000',
+              (click)='selectedMerchant = merchant; openMap(statusMap)'
+            ) {{ merchant?.status }}
+            td(*ngIf='merchant?.verified && !readOnly && merchant?.status !== "Activation Approval Pending"')
+              span.btn.btn-sm(
+                (click)='sendOTP(merchant, merchant?.verified ? "Deactivate" : "Activate")',
+                style='background: #FF0000; color: white'
+              ) {{ merchant?.verified ? "Deactivate" : "Activate" }}
+            td(*ngIf='!merchant?.verified && !readOnly && merchant?.status !== "Activation Approval Pending"')
+              span.btn.btn-sm(
+                (click)='sendOTP(merchant, merchant?.verified ? "Deactivate" : "Activate")',
+                style='background: #417505; color: white'
+              ) {{ merchant?.verified ? "Deactivate" : "Activate" }}
+            td(*ngIf='merchant?.status === "Activation Approval Pending"')
+              span
+    .flex-container.flex-row(
+      *ngIf='(merchants$ | async)?.length <= 0 && !(loadingList$ | async)'
+    )
+      .align-self-center No Data available
+    .flex-container.flex-row(*ngIf='loadingList$ | async')
+      .align-self-center Please wait...
+    .d-flex.justify-content-between.pt-2.align-self-end(
+      *ngIf='(merchants$ | async)?.length > 0 && !(loadingList$ | async)'
+    )
+      ngb-pagination.pagination(
+        [collectionSize]='merchantService.total$ | async',
+        [(page)]='merchantService.page',
+        [maxSize]='5',
+        [rotate]='true',
+        [ellipses]='false',
+        [boundaryLinks]='true'
+      )
+
+ng-template(#warningMessage)
+  .card-header.modal-header.logoColor Warning Message
+  .card-body
+    p Are you sure you want to {{ action }} the merchant account
+  .card-footer
+    button.btn.btn-sm.float-right.castlerButtonColor((click)='closeModal(true)') Yes, {{ action }}
+    span.float-right &nbsp;&nbsp;&nbsp;
+    button.btn.btn-link.btn-sm.float-right.logoColor((click)='closeModal(false)') No, Cancel
+
+ng-template(#statusMap)
+  .modal-header(class='logoColor') Merchant Approval Status
+  .isDataLoading(*ngIf="isLoadingAuthorization")
+      .spinner-border.text-primary(role='status')
+          span.sr-only Loading...
+  .modal-body
+      .container.mt-5.mb-5
+          .row
+              .col
+                  h4 {{selectedMerchant.title}} Status
+                  ul.timeline
+                      li.green
+                          h3
+                              b Initiated
+                          p
+                              i {{ selectedMerchant.createdBy.email }}
+                          i {{ selectedMerchant.createdAt | date:'medium'}}
+                      div.p-0.m-0(*ngFor='let auth of authorizers | keyvalue')
+                          div.p-0.m-0(*ngFor='let level of sortedApprovalKeys')
+                              div.p-0.m-0(*ngFor='let authorizer of authorizers[auth.key][level]["authorizers"]')
+                                  li(*ngIf='authorizer.verified', [ngClass]='!authorizer.verified? "white" : authorizer.verified && !authorizer.approved ? "red" : "green"')    
+                                      h3
+                                          span(*ngIf='authorizer.verified && authorizer.approved')
+                                              p
+                                                  b Approved
+                                                  small (Level {{authorizer.level}} Merchant Authorizer)
+                                          span(*ngIf='authorizer.verified && !authorizer.approved')
+                                              p
+                                                  b Rejected 
+                                                  small (Level {{authorizer.level}} Merchant Authorizer)
+                                      i(*ngIf='authorizer.email === selectedMerchant.createdBy.email')
+                                          b(style="font-size:  0.9rem;") Auto Approved
+                                      p
+                                          i {{authorizer.email}}
+                                      p(*ngIf='authorizer.remarks')
+                                        i Reason: {{authorizer.remarks}}
+                                      i {{ authorizer.verifiedAt | date:'medium' }}
+                              li.green(*ngIf='authorizers[auth.key][level]["isCreator"]') 
+                                h3
+                                  b Initiated   
+                                p 
+                                  i {{authorizers[auth.key][level].authorizers[0].email}}
+                                i {{authorizers[auth.key][level].authorizers[0].createdAt | date:'medium' }}
+                              li.green(*ngIf='authorizers[auth.key][level]["isEditor"]') 
+                                h3
+                                  b Updated : {{merchantEditApprovalValue[authorizers[auth.key][level]["authorizers"][0]["details"]]}}
+                                p 
+                                  i {{authorizers[auth.key][level].authorizers[0].email}}
+                                i {{authorizers[auth.key][level].authorizers[0].createdAt | date:'medium' }}
+                              li.white(*ngIf='selectedMerchant.status !== "Inactive" && !authorizers[auth.key][level]["isApproved"] && authorizers[auth.key][level]["isCurrent"] && !authorizers[auth.key][level]["isRejected"]')    
+                                  h3
+                                      p(*ngIf='!auth.verified')
+                                          b Pending for approval
+                                  p
+                                    i(*ngIf='auth.key !== "4trustee" && auth.key !== "3admin"') (Level {{authorizers[auth.key][level].level}} Merchant Authorizer ({{authorizers[auth.key][level].minApprovalsNeeded}}))
+                      li(*ngIf='selectedMerchant.status ==="Inactive" || selectedMerchant.status === "Active"',[ngClass]='selectedMerchant.status ==="Inactive" ? "red" : "green"')
+                          h3
+                              b {{selectedMerchant.status}}
+                          i {{ selectedMerchant.updatedAt | date:'medium'}}
+  .modal-footer
+      button.btn.btn-sm((click)='closeModal()' class='castlerButtonColor') Close

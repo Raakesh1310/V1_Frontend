@@ -1,0 +1,168 @@
+div
+	div(*ngIf='errors.length > 0')
+		sbpro-alert(classes='alert-danger', [dismissable]='true')
+			| {{ errors[0] }}
+	form([formGroup]='detailForm')
+		.row
+			.col-sm-12.col-md-6.col-lg-6
+				.form-group
+					label(for='inputFirstName') First Name
+					input#inputFirstName.form-control.form-control-sm(
+						formControlName='firstName',
+						type='text',
+						placeholder='Enter first name',
+						autocomplete='new-firstName',
+						[ngClass]='{ "non-editable": readOnly }'
+					)
+					br(*ngIf='updateValues.updatedFirstName')
+					span.update(*ngIf='updateValues.updatedFirstName') Updated Value: {{ updateValues.updatedFirstName }}
+
+			.col-sm-12.col-md-6.col-lg-6
+				.form-group
+					label(for='inputLastName') Last Name
+					input#inputLastName.form-control.form-control-sm(
+						formControlName='lastName',
+						type='text',
+						placeholder='Enter last name',
+						autocomplete='new-lastName',
+						[ngClass]='{ "non-editable": readOnly }'
+					)
+					br(*ngIf='updateValues.updatedLastName')
+					span.update(*ngIf='updateValues.updatedLastName') Updated Value: {{ updateValues.updatedLastName }}
+		.row
+			.col-sm-12.col-md-6.col-lg-6
+				.form-group
+					label(for='businessName') Business Name
+					input#businessName.form-control.form-control-sm(
+						type='text',
+						placeholder='Enter Business Name',
+						formControlName='businessName',
+						name='businessName',
+						[ngClass]='{ "non-editable": readOnly }'
+					)
+					br(*ngIf='updateValues.updatedBusinessName')
+					span.update(*ngIf='updateValues.updatedBusinessName') Updated Value: {{ updateValues.updatedBusinessName }}
+
+			.col-sm-12.col-md-6.col-lg-6(*ngIf='new')
+				.form-group
+					label(for='businessName') Relationship Manager 
+					ng-select(
+						formControlName='relationshipManager',
+						[items]="rm",
+           				[searchable]="true",
+           				[addTag]="true",
+           				[virtualScroll]="true",
+           				placeholder="Select Relationship Manager...",
+           				(change)="onSelectionChange($event)"
+					)
+					//- br(*ngIf='updateValues.updatedBusinessName')
+					//- span.update(*ngIf='updateValues.updatedBusinessName') Updated Value: {{ updateValues.updatedBusinessName }}
+
+			.col-sm-12.col-md-6.col-lg-6(*ngIf='!new')
+				.form-group
+					label(for='status') Status
+					input#status.form-control.form-control-sm(
+						type='text',
+						formControlName='status',
+						name='status',
+						[ngClass]='{ "non-editable": readOnly }',
+						readonly
+					)
+
+		.row
+			.col-sm-8.col-md-6.col-lg-6
+				.form-group
+					label(for='email') Email
+					input#email.form-control.form-control-sm(
+						type='text',
+						placeholder='Enter email',
+						formControlName='email',
+						name='email',
+						[ngClass]='{ "non-editable": readOnly }'
+					)
+					br(*ngIf='updateValues.updatedEmail')
+					span.update(*ngIf='updateValues.updatedEmail') Updated Value: {{ updateValues.updatedEmail }}
+			.col-sm-4.col-md-6.col-lg-6
+				.form-group(*ngIf='new')
+					label.invisible EmailVerified
+					.custom-control.custom-checkbox
+						input#emailVerified.custom-control-input(
+							type='checkbox',
+							formControlName='emailVerified'
+						)
+						label.custom-control-label(for='emailVerified') Email Verified
+				.form-group(*ngIf='!new')
+					label(for='relationshipManager') Relationship Manager 
+					ng-select(
+						formControlName='relationshipManager',
+						[items]="rm",
+           				[searchable]="true",
+           				[addTag]="true",
+           				[virtualScroll]="true",
+           				placeholder="Select Relationship Manager...",
+						readonly,
+						[ngClass]='{ "non-editable": readOnly }',
+					)
+
+		.row
+			.col-sm-8.col-md-6.col-lg-6
+				.form-group
+					label(for='mobile') Mobile
+					input#mobile.form-control.form-control-sm(
+						type='text',
+						placeholder='Enter Mobile',
+						formControlName='mobile',
+						name='mobile',
+						[ngClass]='{ "non-editable": readOnly }',
+					)
+					br(*ngIf='updateValues.updatedEmail')
+					span.update(*ngIf='updateValues.updatedMobile') Updated Value: {{ updateValues.updatedMobile }}
+			.col-sm-4.col-md-6.col-lg-6
+				.form-group
+					label(for='useCase') Use Case
+					ng-select(
+						formControlName='useCase',
+						[items]="uc",
+           				[searchable]="true",
+           				[addTag]="true",
+           				[virtualScroll]="true",
+           				placeholder="Select Use Case...",
+						[readonly] = 'readonly',
+						[ngClass]='{ "non-editable": readOnly }'
+					)
+			.col-sm-4.col-md-6.col-lg-6(*ngIf='!new')
+				.form-group
+					label Creation Date
+					input#mobile.form-control.form-control-sm(
+						type='text',
+						placeholder='Date',
+						formControlName='createdAt',
+						name='creationDate',
+						readonly,
+						[ngClass]='{ "non-editable": readOnly }',
+					)
+
+	button.btn.btn-light(*ngIf='merchantId', (click)='goBack()') Back
+	span &nbsp;&nbsp;
+	button.btn.castlerButtonColor(
+		*ngIf='!readOnly && merchantId && !editMode && !new',
+		(click)='toggleEditMode()'
+	) Edit
+
+	sbpro-app-button(
+		text='Update',
+		*ngIf='merchantId && editMode && !new',
+		loadingtext='Updating',
+		[loading]='updating',
+		(click)='update()',
+		[btnClass]='{ "btn-primary": true }'
+	)
+
+	sbpro-app-button(
+		text='Create Merchant',
+		*ngIf='!merchantId && !submitted && new',
+		loadingtext='Creating',
+		[loading]='loading$ | async',
+		(click)='onSubmit()',
+		[btnClass]='{ "btn-primary": true }'
+	)

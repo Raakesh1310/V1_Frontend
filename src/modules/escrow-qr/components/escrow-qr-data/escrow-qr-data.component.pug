@@ -1,0 +1,153 @@
+sbpro-layout-dashboard([light]='true')
+  router-outlet
+    sbpro-dashboard-head(icon='book', title='Escrow QR Customer Data')
+    .container-fluid.mt-n10.responsiveForm.flex-grow-1
+      .row.h-100
+        .col-lg-12
+          sbpro-card([headerActions]='true')
+            .card-header.logoColor Escrow QR Customer Data
+            .card-body
+              form.pb-2
+                .d-flex.mb-2
+                  input#search-box.mt-1.form-control.w-50.mr-2(
+                    style='max-width:100%',
+                    type='text',
+                    name='s',
+                    placement='top',
+                    ngbPopover='Search',
+                    autocomplete='off',
+                    placeholder='UPI Id, Payment Id, Remitter Name, Remitter UPI, Reference Id, UTR',
+                    [(ngModel)]='searchTerm',
+                    (change)='updateDownloadLink()'
+                  )
+                  input#start-date.mt-1.form-control.w-25.mr-2(
+                    type='text',
+                    name='sd',
+                    placeholder='Start Date',
+                    autocomplete='off',
+                    ngbDatepicker,
+                    outsideDays='hidden',
+                    autoClose='outside',
+                    #sd='ngbDatepicker',
+                    (click)='sd.toggle()',
+                    [(ngModel)]='startDate',
+                    (ngModelChange)='startDateChange()',
+                    [maxDate]='maxDate'
+                  )
+                  input#end-date.mt-1.form-control.w-25.mr-2(
+                    type='text',
+                    name='ed',
+                    placeholder='End Date',
+                    autocomplete='off',
+                    ngbDatepicker,
+                    outsideDays='hidden',
+                    #ed='ngbDatepicker',
+                    (click)='ed.toggle()',
+                    [(ngModel)]='endDate',
+                    (ngModelChange)='endDateChange()',
+                    [maxDate]='maxDate'
+                  )
+
+                  button.btn.ml-3.ws-nowrap.mt-1.mb-2.castlerButtonColor(
+                    type='submit',
+                    (click)='filterData()'
+                  )
+                    fa-icon.d-flex.flex-row.align-items-center(
+                      [icon]='["fas", "search"]'
+                    )
+                  button.btn.btn-link.mt-1.mb-1.mr-2.logoColor(
+                    type='button',
+                    (click)='ngOnInit()'
+                  )
+                    | Clear
+                  .justify-content-end.pl-2.ml-2
+                    a.btn.mt-1.mb-1.btn-success.ws-nowrap.btn-icon(
+                      style='color: white',
+                      type='button',
+                      target='_blank',
+                      [href]='downloadLink'
+                    )
+                      fa-icon.d-flex.flex-row.align-items-center(
+                        [icon]='["fas", "arrow-down"]'
+                      )
+                .d-flex.mb-2(*ngIf='escrowQrData.length > 0')
+                  .flex-row
+                    small.mb-2.mt-2 Showing {{ (page - 1) * 10 + 1 }} to {{ (page - 1) * 10 + escrowQrData.length }} of {{ total }}
+
+              .table-responsive.pp-table-container.table-responsive-sm
+                table.table
+                  thead
+                    tr
+                      th(scope='col', sbSortable='date', (sort)='onSort($event)')
+                        span.ws-nowrap Date
+                        sb-sort-icon(
+                          *ngIf='sortedColumn === "date"',
+                          [direction]='sortedDirection'
+                        )
+                      th(scope='col', sbSortable='event', (sort)='onSort($event)')
+                        span Payment Id
+                        sb-sort-icon(
+                          *ngIf='sortedColumn === "date"',
+                          [direction]='sortedDirection'
+                        )
+                      th(scope='col', sbSortable='event', (sort)='onSort($event)')
+                        span.ws-nowrap Amount
+                        sb-sort-icon(
+                          *ngIf='sortedColumn === "event"',
+                          [direction]='sortedDirection'
+                        )
+                      th(scope='col', sbSortable='time', (sort)='onSort($event)')
+                        span Remitter Name
+                        sb-sort-icon(
+                          *ngIf='sortedColumn === "time"',
+                          [direction]='sortedDirection'
+                        )
+                      th(scope='col', sbSortable='event', (sort)='onSort($event)')
+                        span Remitter UPI Id
+                        sb-sort-icon(
+                          *ngIf='sortedColumn === "date"',
+                          [direction]='sortedDirection'
+                        )
+                      th(scope='col', sbSortable='event', (sort)='onSort($event)')
+                        span Transaction Id
+                        sb-sort-icon(
+                          *ngIf='sortedColumn === "date"',
+                          [direction]='sortedDirection'
+                        )
+                      th(scope='col', sbSortable='event', (sort)='onSort($event)')
+                        span Status
+                        sb-sort-icon(
+                          *ngIf='sortedColumn === "date"',
+                          [direction]='sortedDirection'
+                        )
+                  tbody
+                    tr(*ngFor='let data of escrowQrData')
+                      td
+                        ngb-highlight(
+                          [result]='data.createdAt | date: "d MMM yyyy" || "--"'
+                        )
+                      td {{ data.paymentId }}
+                      td {{ data.amount }}
+                      td {{ data.remitterName }}
+                      td {{ data.remitterUPI }}
+                      td 
+                        a.nav-link.p-0.tableClickEntryColor(
+                          href='javascript:void(0);',
+                          (click)='openDetails(data.transactionId)'
+                        )
+                          ngb-highlight([result]='data.transactionId')
+                      td 
+                        ngb-highlight([result]='data.status')
+              .d-flex.justify-content-between.p-2.float-right
+                ngb-pagination(
+                  [collectionSize]='total',
+                  [maxSize]='5',
+                  [(page)]='page',
+                  [pageSize]='pageSize',
+                  [rotate]='true',
+                  [ellipses]='false',
+                  (pageChange)='pageChange($event)',
+                  [boundaryLinks]='true'
+                )
+              .form-group
+                button.btn.castlerButtonColor((click)='goBack()') Back

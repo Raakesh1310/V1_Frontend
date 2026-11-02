@@ -1,0 +1,21 @@
+@import 'styles/variables.scss';
+
+sbpro-alert {
+  p {
+    margin-bottom: 0rem;
+  }
+}
+
+.disable {
+  pointer-events: none;
+}
+
+.after-registration {
+  text-align: center;
+  margin: 0%;
+  display: block;
+  font-size: large;
+}
+.svgIcon {
+  width: 40%;
+}

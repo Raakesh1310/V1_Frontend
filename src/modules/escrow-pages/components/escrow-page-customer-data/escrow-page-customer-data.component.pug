@@ -1,0 +1,208 @@
+sbpro-card([headerActions]='true')
+	.card-header.logoColor
+		span Customer Details
+		div
+			span.mr-2
+				.spinner-border.spinner-border-sm.text-primary.mr-1(
+					role='status',
+					aria-hidden='true',
+					*ngIf='loadingList$ | async'
+				)
+				button.btn.btn-icon.btn-xs.mr-2.castlerButtonColor(
+					*ngIf='!(loadingList$ | async)',
+					(click)='refreshData()'
+				)
+					i-feather(name='refresh-cw')
+				a.btn.btn-xs.mr-2.ws-nowrap.ml-auto.btn-icon.castlerButtonColor(
+					type='button',
+					target='_blank',
+					[href]='escrowPageService.reportDownloadLink$ | async'
+				)
+					fa-icon.d-flex.flex-row.align-items-center(
+						[icon]='["fas", "arrow-down"]'
+					)
+			//- button.btn.btn-blue.btn-icon.btn-xs((click)='toggleFilters()')
+			//-   i-feather(name='filter')
+	.card-body.card-body-height-fixed.flex-container.align-self-stretch
+		form.pb-2 
+			.d-flex
+				input#search-box.mt-1.form-control.form-control-sm.w-100.mr-2(
+					type='text',
+					name='s',
+					placeholder='Search by Order Id, Transaction Id',
+					[(ngModel)]='escrowPageService.searchTerm'
+				)
+				input#start-date.mt-1.form-control.form-control-sm.w-50.mr-2(
+					type='text',
+					name='sd',
+					placeholder='Start Date',
+					autocomplete='off',
+					ngbDatepicker,
+					outsideDays='hidden',
+					#sd='ngbDatepicker',
+					(click)='sd.toggle()',
+					[(ngModel)]='escrowPageService.dateFrom',
+					[minDate]='escrowPageService.dateFromMin',
+					[maxDate]='escrowPageService.dateFromMax'
+				)
+				input#end-date.mt-1.form-control.form-control-sm.w-50.mr-2(
+					type='text',
+					name='ed',
+					placeholder='End Date',
+					autocomplete='off',
+					ngbDatepicker,
+					outsideDays='hidden',
+					#ed='ngbDatepicker',
+					(click)='ed.toggle()',
+					[(ngModel)]='escrowPageService.dateTo',
+					[minDate]='escrowPageService.dateToMin',
+					[maxDate]='escrowPageService.dateToMax'
+				)
+				button.btn.btn-sm.mr-2.ws-nowrap.mt-1.mb-1.castlerButtonColor(
+					type='submit',
+					(click)='loadData()'
+				)
+					fa-icon.d-flex.flex-row.align-items-center.mr-1(
+						[icon]='["fas", "search"]'
+					)
+				button.btn.btn-link.btn-sm.mr-2.mt-1.mb-1.logoColor(
+					type='button',
+					(click)='clearSearchForm()'
+				) Clear
+		.table-responsive.pp-table-container.align-self-stretch.flex-grow-1.flex-stretch-1.table-striped
+			table.table
+				thead
+					tr
+						th.th-sticky-top(scope='col' sbSortable='date', (sort)='onSort($event)')
+							span.ws-nowrap Creation Date
+							sb-sort-icon(
+								*ngIf='sortedColumn === "date"',
+								[direction]='sortedDirection'
+							)
+						th.th-sticky-top(scope='col' sbSortable='date', (sort)='onSort($event)')
+							span.ws-nowrap Order Id
+							sb-sort-icon(
+								*ngIf='sortedColumn === "date"',
+								[direction]='sortedDirection'
+							)
+						th.th-sticky-top(scope='col' sbSortable='date', (sort)='onSort($event)')
+							span.ws-nowrap Escrow ID
+							sb-sort-icon(
+								*ngIf='sortedColumn === "date"',
+								[direction]='sortedDirection'
+							)
+						th.th-sticky-top(
+							scope='col',
+							sbSortable='date',
+							(sort)='onSort($event)',
+							*ngFor='let field of tableHeaders'
+						)
+							span.ws-nowrap {{ field }}
+							sb-sort-icon(
+								*ngIf='sortedColumn === "date"',
+								[direction]='sortedDirection'
+							)
+						th.th-sticky-top(scope='col' sbSortable='date', (sort)='onSort($event)')
+							span.ws-nowrap Transaction Id
+							sb-sort-icon(
+								*ngIf='sortedColumn === "date"',
+								[direction]='sortedDirection'
+							)
+						th.th-sticky-top(scope='col' sbSortable='date', (sort)='onSort($event)')
+							span.ws-nowrap Payment Status
+							sb-sort-icon(
+								*ngIf='sortedColumn === "date"',
+								[direction]='sortedDirection'
+							)
+						
+						//- th.th-sticky-top(scope='col' sbSortable='date', (sort)='onSort($event)')
+						//-   span.ws-nowrap Settlement
+						//-   sb-sort-icon(
+						//-     *ngIf='sortedColumn === "date"',
+						//-     [direction]='sortedDirection'
+						//-   )
+				tbody(
+					*ngIf='(customerData$ | async)?.length > 0 && !(loadingList$ | async)'
+				)
+					tr(
+						*ngFor='let entry of customerData$ | async; let i = index',
+						(mouseover)='selectedToolTipData = entry'
+					)
+						td
+							ngb-highlight(
+								[result]='entry.createdAt | date: "d MMM yyyy" || "--"'
+							)
+						td
+							ngb-highlight([result]='entry.orderId')
+						td
+							a.nav-link.p-0.tableClickEntryColor(
+								href='javascript:void(0);',
+								(click)='viewAccountDetails(entry?.escrowpageorders?.accountId)'
+							)
+								ngb-highlight([result]='entry?.escrowpageorders?.accountId')
+						td(*ngFor='let field of entry.fields.slice(1)')
+							span(*ngIf='field.fieldId !== "dealname0"') {{ field.value }}
+						td(*ngIf='entry.transactionId')
+							a.nav-link.p-0.tableClickEntryColor(
+								href='javascript:void(0);',
+								(click)='viewTransactionDetails(entry.transactionId)'
+							)
+								ngb-highlight([result]='entry.transactionId')
+						td(*ngIf='!entry.transactionId')
+							ngb-highlight(
+								[result]='"--"'
+							)
+						td(*ngIf='!entry.escrowPageTransactionId')
+							| --
+						td(
+							*ngIf='entry.status === "sent-to-pg"',
+							style='cursor: pointer; white-space: pre-line',
+							triggers='mouseenter:mouseleave'
+						)
+							span.tableClickEntryColor PENDING
+						td(
+							*ngIf='entry.status === "success"',
+							style='cursor: pointer; white-space: pre-line',
+							triggers='mouseenter:mouseleave'
+						) 
+							span.tableClickEntryColor SUCCESS
+						td(
+							*ngIf='entry.status === "initiated"',
+							style='cursor: pointer; white-space: pre-line',
+							triggers='mouseenter:mouseleave'
+						)
+							span.tableClickEntryColor INITIATED
+						td(
+							*ngIf='entry.status === "fail"',
+							style='cursor: pointer; white-space: pre-line',
+							triggers='mouseenter:mouseleave'
+						)
+							span.tableClickEntryColor FAIL
+						td(
+							*ngIf='entry.status === "settled"',
+							style='cursor: pointer; white-space: pre-line',
+							triggers='mouseenter:mouseleave'
+						)
+							span.tableClickEntryColor SETTLED
+		.flex-container.flex-row(
+			*ngIf='(customerData$ | async)?.length <= 0 && !(loadingList$ | async)'
+		)
+			.align-self-center No Data available
+		.flex-container.flex-row(*ngIf='loadingList$ | async')
+			.align-self-center Please wait...
+		.d-flex.justify-content-between.pt-2.align-self-end(
+			*ngIf='(customerData$ | async)?.length > 0 && !(loadingList$ | async)'
+		)
+			ngb-pagination(
+				[collectionSize]='total$ | async',
+				[(page)]='escrowPageService.page',
+				[maxSize]='5',
+				[rotate]='true',
+				[ellipses]='false',
+				[boundaryLinks]='true'
+			)
+		.form-group
+			button.btn.castlerButtonColor((click)='goBack()') Back
+
+ng-template(#ToolTip)
+	.leftAlign {{ getStatusDescription(getStatus(selectedToolTipData)) }}

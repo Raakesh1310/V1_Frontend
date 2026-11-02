@@ -1,0 +1,32 @@
+sbpro-dashboard-head(
+  icon="send",
+  title="Bulk Transfer",
+  description="Create a new Bulk Transfer Entry"
+)
+.container-fluid.mt-n10.responsiveForm
+  .row
+    .col-lg-12
+      sbpro-card([headerActions]="true")
+        .card-header.d-flex.justify-content-between.logoColor
+          | Bulk Transfer
+          sbpro-dropdown(
+            placement="bottom",
+            animation="animated--fade-in-up",
+            [classes]="['no-caret']"
+          )
+            .dropdown-trigger(style="")
+              img(
+                src="assets/img/verticalDots.png",
+                style="width: 18px; height: 20px"
+              )
+              //svg.bi.bi-three-dots-vertical(xmlns='http://www.w3.org/2000/svg', width="20", height="20", fill='currentColor', viewbox='0 0 16 16')
+              //  path(d='M9.5 13a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z')
+            .dropdown-items
+              //a.dropdown-item(routerLink='/dashboard') Dashboard
+              .dropdown-item.re_upload_style((click)="moveToUpload()") Restart
+              //a.dropdown-item((click)='anotherAction()') Another Action
+        .card-body
+          sbpro-bulk-transfer(
+            [parentSubject]="parentSubject",
+            [connectedBanking]="false"
+          )

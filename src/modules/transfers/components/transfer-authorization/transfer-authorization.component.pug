@@ -1,0 +1,275 @@
+div
+  .card-body
+    img(height='100px', width='150px', src='assets/img/Castler_logo.png')
+    br
+    br
+    center
+      h2 
+        b.text-black Transfer Details
+      br
+
+    .table-responsive.pp-table-container
+      table.table.text-black(*ngIf='transferId')
+        tr
+          th
+            span Business Name
+          td
+            span(*ngIf='transfer') {{ transfer.merchantTitle }}
+            span(*ngIf='!transfer') --
+        tr
+          th
+            span Amount
+          td
+            span(*ngIf='transfer') {{ transfer.amount }}
+            span(*ngIf='!transfer') --
+        tr
+          th
+            span Beneficiary Name
+          td
+            span(*ngIf='transfer') {{ transfer.beneficiaryName }}
+            span(*ngIf='!transfer') --
+        tr
+          th
+            span Beneficiary Bank A/c
+          td
+            span(*ngIf='transfer') {{ transfer.beneficiaryAccNumber }}
+            span(*ngIf='!transfer') --
+        tr
+          th
+            span Beneficiary IFSC
+          td
+            span(*ngIf='transfer') {{ transfer.beneficiaryIFSC }}
+            span(*ngIf='!transfer') --
+        tr
+          th
+            span From Virtual ID
+          td
+            span(*ngIf='transfer') {{ transfer.accountId }}
+            span(*ngIf='!transfer') --
+        tr
+          th
+            span Purpose
+          td
+            span(*ngIf='transfer') {{ transfer.purpose }}
+            span(*ngIf='!transfer') --
+        tr
+          th
+            span Created By
+          td
+            span(*ngIf='transfer') {{ transfer.createdBy }}
+            span(*ngIf='!transfer') --
+        tr
+          th
+            span Creation Date &amp; time
+          td
+            ngb-highlight(
+              *ngIf='transfer',
+              [result]='transfer.createdAt | date: "medium" || "--"'
+            )
+            span(*ngIf='!transfer') --
+      table.table.text-black(*ngIf='batchId')
+        tr
+          th
+            span Business Name
+          td
+            span(*ngIf='bulkTransfer') {{ bulkTransfer.merchantTitle }}
+            span(*ngIf='!bulkTransfer') --
+        tr
+          th
+            span Batch Name
+          td
+            span(*ngIf='bulkTransfer') {{ bulkTransfer.batchName }}
+            span(*ngIf='!bulkTransfer') --
+        tr
+          th
+            span Batch Id
+          td
+            span(*ngIf='bulkTransfer') {{ bulkTransfer.batchId }}
+            span(*ngIf='!bulkTransfer') --
+        tr
+          th
+            span Amount
+          td(*ngIf='bulkTransfer')
+            span(*ngIf='bulkTransfer') ₹ {{ bulkTransfer.totalAmount }}
+            span(*ngIf='!bulkTransfer') --
+        tr
+          th
+            span From Virtual ID
+          td
+            span(*ngIf='bulkTransfer') {{ bulkTransfer.accountId }}
+            span(*ngIf='!bulkTransfer') --
+        tr
+          th
+            span Created By
+          td
+            span(*ngIf='bulkTransfer') {{ bulkTransfer.createdBy }}
+            span(*ngIf='!bulkTransfer') --
+        tr
+          th
+            span Creation Date &amp; time
+          td
+            ngb-highlight(
+              *ngIf='bulkTransfer',
+              [result]='bulkTransfer.createdAt | date: "medium" || "--"'
+            )
+            span(*ngIf='!bulkTransfer') --
+
+      div(*ngIf='transfer && transfer.document && transfer.document.length > 0')
+        center
+          h2 
+            b.text-black Documents
+        br
+        .table-responsive.pp-table-container
+          table.table.text-black
+            tr(*ngFor='let doc of transfer.document')
+              th
+                span {{ doc.docType }}
+              td
+                span
+                  a(
+                    href='{{ docUrlPrefix+doc.hash }}',
+                    target='_blank',
+                    *ngIf='doc.hash'
+                  ) {{ doc.name }}
+      div(*ngIf='batchId')
+        center
+          h2 
+            b.text-black Bulk Transfer List
+        br
+        .table-responsive.pp-table-container
+          table.table.text-black
+            tr(*ngIf='batchId')
+              th
+                span Transfers List
+              td
+                span
+                  button.btn.btn-link.pl-5.ml-5((click)='downloadExcel()')
+                    small 
+                      small {{ batchId }}.csv
+
+      div(
+        *ngIf='bulkTransfer && bulkTransfer.document && bulkTransfer.document.length > 0'
+      )
+        center
+          h2 
+            b.text-black Documents
+        br
+        .table-responsive.pp-table-container
+          table.table.text-black
+            tr(*ngFor='let doc of bulkTransfer.document')
+              th
+                span {{ doc.docType }}
+              td
+                span
+                  a(
+                    href='{{ docUrlPrefix+doc.hash }}',
+                    target='_blank',
+                    *ngIf='doc.hash'
+                  ) {{ doc.name }}
+
+      center
+        h2 
+          b.text-black Approvals
+      br
+      .table-responsive.pp-table-container
+        table.table.text-black(*ngIf='transfer')
+          tr(*ngFor='let auth of transfer.authorization')
+            th
+              span {{ auth.email }}
+            td(*ngIf='auth.verified') 
+              span(*ngIf='auth.data.approved') Approved on&nbsp;
+              span(*ngIf='auth.data.approved') 
+                ngb-highlight(
+                  *ngIf='transfer',
+                  [result]='auth.verifiedAt | date: "medium" || "--"'
+                )
+              span(*ngIf='!auth.data.approved') Rejected on&nbsp;
+              span(*ngIf='!auth.data.approved') 
+                ngb-highlight(
+                  *ngIf='transfer',
+                  [result]='auth.verifiedAt | date: "medium" || "--"'
+                )
+            td(*ngIf='!auth.verified') 
+              span Yet to approve
+        table.table.text-black(*ngIf='bulkTransfer')
+          tr(*ngFor='let auth of bulkTransfer.authorization')
+            th
+              span {{ auth.email }}
+            td(*ngIf='auth.verified') 
+              span(*ngIf='auth.data.approved') Approved on&nbsp;
+              span(*ngIf='auth.data.approved') 
+                ngb-highlight(
+                  *ngIf='bulkTransfer',
+                  [result]='auth.verifiedAt | date: "medium" || "--"'
+                )
+              span(*ngIf='!auth.data.approved') Rejected on&nbsp;
+              span(*ngIf='!auth.data.approved') 
+                ngb-highlight(
+                  *ngIf='bulkTransfer',
+                  [result]='auth.verifiedAt | date: "medium" || "--"'
+                )
+            td(*ngIf='!auth.verified') 
+              span Yet to approve
+      center(*ngIf='error') 
+        span.text-danger {{ error }}
+      center(*ngIf='success')
+        h2([ngClass]='rejected ? "text-danger" : "text-success"') {{ success }}
+  div(*ngIf='!authorized && !approved && !rejected')
+    //button.btn.btn-red(type='button', style='height: 30px; width: 150px') Red
+    sbpro-app-button.ml-auto(
+      (click)='openModal(rejectWarningMessage)',
+      [loading]='rejecting',
+      [buttonStyle] = `880808`,
+      text='Reject',
+      loadingText='Rejecting',
+      [btnClass]='{ "btn-block": false, "btn-danger": true, "custom-button": true, "btn-sm": true }'
+    )
+    span &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    //- button.btn.btn-success.ml-auto((click)='approve()') Approve
+    sbpro-app-button.ml-auto(
+      (click)='openModal(approveWarningMessage)',
+      [loading]='approving',
+      [buttonStyle] = `417505`,
+      text='Approve',
+      loadingText='Approving',
+      [btnClass]='{ "btn-block": false, "btn-success": true, "custom-button": true, "btn-sm": true }'
+    )
+    //- button.btn.btn-danger((click)='reject()') Reject
+
+ng-template(#approveWarningMessage)
+  .card-header.modal-header.logoColor Warning Message
+  .card-body
+    p Are you sure you want to approve this transaction?
+  .card-footer
+    button.btn.btn-sm.float-right.castlerButtonColor(
+      (click)='approve(); closeModal()'
+    ) Yes, Approve
+    span.float-right &nbsp;&nbsp;&nbsp;
+    button.btn.btn-link.btn-sm.float-right.castlerButtonColor1(
+      (click)='closeModal()'
+    ) No, Cancel
+
+ng-template(#rejectWarningMessage)
+  .card-header.modal-header.logoColor Warning Message
+  .card-body
+    form(ngNativeValidate)
+      p Are you sure you want to reject this transaction?
+      .form-group
+        label 
+          b Reason for rejection
+        input.form-control.form-control-sm(
+          type='text',
+          placeholder='Enter a reason to reject',
+          required,
+          autocomplete='off',
+          [(ngModel)]='rejectMessage',
+          [ngModelOptions]='{ standalone: true }'
+        )
+  .card-footer
+    button.btn.btn-sm.float-right.castlerButtonColor(
+      (click)='reject(); closeModal()'
+    ) Yes, Reject
+    span.float-right &nbsp;&nbsp;&nbsp;
+    button.btn.btn-link.btn-sm.float-right.castlerButtonColor1(
+      (click)='closeModal()'
+    ) No, Cancel

@@ -1,0 +1,86 @@
+
+div(*ngIf='!viewMode')
+  div(*ngIf='errors.length > 0')
+    .alert.alert-danger.alert-dismissible.fade.show(
+      role='alert',
+      *ngIf='errors.length > 0'
+    )
+      | {{ errors[0] }}
+      button.close(
+        (click)='errors = []',
+        type='button',
+        data-dismiss='alert',
+        aria-label='Close'
+      )
+        span(aria-hidden='true') ×
+
+  form([formGroup]='dealparty2Form')
+    .form-group
+      label Name
+      span.text-danger *
+      input.form-control(type='text', formControlName='name')
+      span(*ngIf='name.invalid && (name.dirty || name.touched)')
+        span.text-danger(*ngIf='name.errors.required') Name is required.
+    .form-group
+      label Email
+      span.text-danger *
+      input.form-control(type='text', formControlName='email')
+      span(*ngIf='email.invalid && (email.dirty || email.touched)')
+        span.text-danger(*ngIf='email.errors.required') Email is required.
+        span.text-danger(*ngIf='email.dirty') Email format is not correct
+    .form-group
+      label Mobile
+      span.text-danger *
+      input.form-control(type='number', formControlName='mobile')
+      span(*ngIf='mobile.invalid && (mobile.dirty || mobile.touched)')
+        span.text-danger(*ngIf='mobile.errors.required') Mobile is required.
+        span.text-danger(*ngIf='mobile.dirty') Mobile number should have 10 digits
+
+  .form-group(*ngIf='!viewMode') 
+    button.btn((click)='submitTenantDetail()', class='castlerButtonColor') {{ tabCount === 1 && !isEditDeal ? "Next" : "Update" }}
+
+div(*ngIf='viewMode')
+  .row 
+    .col-sm-12.col-md-6(*ngFor='let party of deal.dealParties')
+      h4 {{ party.role }} Details
+      hr
+
+      .form-group 
+        label Name
+        span.form-control.no-border.pl-0
+          b(*ngIf='party.name') {{ party.name }}
+          b(*ngIf='!party.name') --
+
+      .form-group 
+        label Email
+        span.form-control.no-border.pl-0
+          b(*ngIf='party.email') {{ party.email }}
+          b(*ngIf='!party.email') --
+
+      .form-group 
+        label Mobile
+        span.form-control.no-border.pl-0
+          b(*ngIf='party.mobile') {{ party.mobile }}
+          b(*ngIf='!party.mobile') --
+
+      div 
+        .form-group 
+          label Bank Escrow ID
+          span.form-control.no-border.pl-0
+            b(*ngIf='party.accountNo') {{ party.accountNo }}
+            b(*ngIf='!party.accountNo') --
+        .form-group 
+          label Bank IFSC
+          span.form-control.no-border.pl-0
+            b(*ngIf='party.ifsc') {{ party.ifsc }}
+            b(*ngIf='!party.ifsc') --
+        .form-group 
+          label Bank Name
+          span.form-control.no-border.pl-0
+            b(*ngIf='party.bankName') {{ party.bankName }}
+            b(*ngIf='!party.bankName') --
+
+  br 
+
+  .form-group 
+    button.btn((click)='goBack()', class='castlerButtonColor') Back

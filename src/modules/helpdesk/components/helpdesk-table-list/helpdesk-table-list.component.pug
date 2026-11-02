@@ -1,0 +1,162 @@
+#printsection(*ngIf='showDetail')
+  form.details
+    .row
+      .col
+        .form-group
+          label(for='frm-cntrl-name') Query Id
+          p(*ngIf='selectedRequest.queryId') {{ selectedRequest.queryId }}
+          p(*ngIf='!selectedRequest.queryId') {{ selectedRequest.queryId }}
+        .form-group
+          label(for='frm-cntrl-name') Nature of request
+          p(*ngIf='selectedRequest.nature') {{ selectedRequest.nature }}
+          p(*ngIf='!selectedRequest.nature') --
+
+      .col
+        .form-group
+          label(for='frm-cntrl-name') Status
+          p(*ngIf='selectedRequest.status') {{ selectedRequest.status }}
+          p(*ngIf='!selectedRequest.status') --
+        .form-group
+          label(for='frm-cntrl-name') Creation date
+          p(*ngIf='selectedRequest.createdAt') {{ getParsedDate(selectedRequest.createdAt) }}
+          p(*ngIf='!selectedRequest.createdAt') --
+    .row 
+      .col
+        .form-group
+          label(for='frm-cntrl-name') Query
+          p(*ngIf='selectedRequest.message') {{ selectedRequest.message }}
+          p(*ngIf='!selectedRequest.message') --
+    .row
+      .col
+        .form-group
+          label(for='frm-cntrl-name') Remark
+          p(*ngIf='selectedRequest.remarks') {{ selectedRequest.remarks }}
+          p(*ngIf='!selectedRequest.remarks') --
+    .row
+      .col
+        .form-group 
+          label(for='frm-cntrl-name') Resolved date
+          p(*ngIf='selectedRequest.resolvedDate') {{ getParsedDate(selectedRequest.resolvedDate) }}
+          p(*ngIf='!selectedRequest.resolvedDate') --
+
+    .row(*ngIf='selectedRequest.docs')
+      .col
+        .form-group 
+          label(for='frm-cntrl-name') Attachments
+          span(*ngFor='let doc of selectedRequest.docs')
+            p {{ doc.name }}
+
+  div
+    button.btn.btn-primary((click)='goBack()') Back
+div(*ngIf='!showDetail')
+  form
+    .form-group.form-inline.row.align-items-stretch
+      .mt-1.col-xl-3.col-lg-5.col-md-8.col-sm-12
+        .form-check-label
+          | Search
+        input#search-box.mt-1.form-control.form-control-sm.w-100(
+          type='text',
+          name='s',
+          placeholder='Search',
+          [(ngModel)]='helpDeskService.searchTerm'
+        )
+      .mt-1.col-xl-1.col-lg-3.col-md-4.col-sm-12.d-flex.flex-row.align-items-end
+        button.btn.btn-primary.btn-sm.mt-2.mr-2(
+          type='submit',
+          (click)='submitSearchForm()'
+        )
+          | Search
+        button.btn.btn-link.btn-sm.mt-2.mr-2(
+          type='button',
+          (click)='clearSearchForm()'
+        )
+          | Clear
+
+  .table-responsive.pp-table-container.table-responsive-sm
+    table.table
+      thead
+        tr
+          th(scope='col', sbSortable='event', (sort)='onSort($event)')
+            span.ws-nowrap Query ID
+            sb-sort-icon(
+              *ngIf='sortedColumn === "event"',
+              [direction]='sortedDirection'
+            )
+          th(scope='col', sbSortable='time', (sort)='onSort($event)')
+            span Nature of request
+            sb-sort-icon(
+              *ngIf='sortedColumn === "time"',
+              [direction]='sortedDirection'
+            )
+          th(scope='col', sbSortable='time', (sort)='onSort($event)')
+            span.ws-nowrap Request date
+            sb-sort-icon(
+              *ngIf='sortedColumn === "time"',
+              [direction]='sortedDirection'
+            )
+          th(scope='col', sbSortable='time', (sort)='onSort($event)')
+            span.ws-nowrap Status
+            sb-sort-icon(
+              *ngIf='sortedColumn === "time"',
+              [direction]='sortedDirection'
+            )
+          th(scope='col', sbSortable='time', (sort)='onSort($event)')
+            span.ws-nowrap Resolved date
+            sb-sort-icon(
+              *ngIf='sortedColumn === "time"',
+              [direction]='sortedDirection'
+            )
+      tbody(*ngIf='(requests$ | async)?.length == 0')
+        tr
+          td(
+            *ngIf='!(helpDeskService.loading$ | async) && (requests$ | async)?.length == 0'
+          ) No Entries Found
+          td.spinner(*ngIf='helpDeskService.loading$ | async') 
+            .spinner-border.text-primary(role='status')
+              span.sr-only Loading...
+
+      tbody
+        tr(*ngFor='let request of requests$ | async')
+          td
+            span(*ngIf='!request.queryId') --
+            ngb-highlight.myanchor(
+              [result]='request.queryId + " "',
+              [term]='helpDeskService.searchTerm',
+              (click)='selectrequest(request)'
+            )
+
+          td
+            span(*ngIf='!request.nature') --
+            ngb-highlight(
+              *ngIf='request.nature',
+              [result]='request.nature',
+              [term]='helpDeskService.searchTerm'
+            )
+          td
+            span(*ngIf='!request.createdAt') --
+            ngb-highlight.ws-nowrap(
+              [result]='request.createdAt | date: "d MMM yyyy" || "--"',
+              [term]='helpDeskService.searchTerm'
+            )
+          td
+            span(*ngIf='!request.status') --
+            ngb-highlight(
+              [result]='request.status',
+              [term]='helpDeskService.searchTerm'
+            )
+          td
+            span(*ngIf='!request.resolveDate') --
+            ngb-highlight.ws-nowrap(
+              [result]='request.resolveDate | date: "d MMM yyyy" || "--"',
+              [term]='helpDeskService.searchTerm'
+            )
+
+  .d-flex.justify-content-between.p-2
+    ngb-pagination(
+      [collectionSize]='total$ | async',
+      [(page)]='helpDeskService.page',
+      [maxSize]='5',
+      [rotate]='true',
+      [ellipses]='false',
+      [boundaryLinks]='true'
+    )

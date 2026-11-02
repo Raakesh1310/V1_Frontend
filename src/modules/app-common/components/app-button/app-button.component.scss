@@ -1,0 +1,15 @@
+@import 'styles/variables.scss';
+
+//sbpro-app-button{
+//  width: '';
+//}
+
+.custom-button {
+  width: 30%;
+}
+
+@media only screen and (max-width: 648px) {
+  .custom-button {
+    width: 100%;
+  }
+}

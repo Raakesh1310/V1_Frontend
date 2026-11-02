@@ -1,0 +1,34 @@
+sbpro-layout-dashboard([light]='true')
+    sbpro-dashboard-head(icon='bar-chart', title='Charts', description='Charts powered by Chart.js to display data within your app')
+    .container-fluid.mt-n10
+                
+        sbpro-card
+            .card-header Area Chart Example
+            .card-body
+                sb-charts-area
+
+        .row
+            .col-lg-6
+                sbpro-card
+                    .card-header Bar Chart Example
+                    .card-body
+                        sb-charts-bar
+            .col-lg-6
+                sbpro-card
+                    .card-header Pie Chart Example
+                    .card-body
+                        sb-charts-pie
+                    
+        sbpro-card-icon
+            .card-icon
+                i-feather.text-white-50(name='alert-triangle')
+            .card-body
+                h5.card-title Third-Party Documentation Available
+                p.card-text.
+                    Chart.js is a third party plugin that is used to generate the charts in this template.
+                    This template comes with several custom angular component examples for bar, area, and pie charts.
+                    This template also comes with chart service that can provide the chart object to any component.
+                    The charts above have been customized - for further customization options, please visit the official Chart.js documentation.
+                a.btn.btn-primary.btn-sm(href='https://www.chartjs.org/docs/latest/', target='_blank')
+                    i-feather(name='external-link').mr-1
+                    | View Chart.js Docs

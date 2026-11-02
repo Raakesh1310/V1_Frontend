@@ -1,0 +1,12 @@
+@import 'styles/variables.scss';
+
+#selected {
+  td:nth-child(1) {
+    font-weight: bold;
+    width: 25%;
+  }
+}
+
+#myDocs {
+  padding-bottom: 2%;
+}

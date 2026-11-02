@@ -1,0 +1,14 @@
+sbpro-card-navigation(
+    sbproTocItem='Tabs',
+    [navNames]='!isPayeeAuthorizer? ["Transfer Authorizers", "Merchant Authorizers"]: ["Transfer Authorizers", "Merchant Authorizers","Payee Authorizers"]',
+    [templates]='!isPayeeAuthorizer? [transferAuthorizers,merchantAuthorizers]: [transferAuthorizers,merchantAuthorizers,payeeAuthorizers]',
+    [headerButtons]='[4]',
+    (eventEmitterRefresh)='refresh($event)',
+    (eventEmitterToggle)='toggle($event)'
+)
+    ng-template(#transferAuthorizers)
+        sbpro-authorizer-details([merchantId]='merchantId', [readOnly]='readOnly')
+    ng-template(#merchantAuthorizers)
+        sbpro-bank-authorizers([merchantId]='merchantId', [readOnly]='readOnly')
+    ng-template(#payeeAuthorizers)
+        sbpro-payee-authorizers([merchantId]='merchantId', [readOnly]='readOnly')

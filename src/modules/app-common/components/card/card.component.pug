@@ -1,0 +1,6 @@
+.card.flex-container([ngClass]='cardClasses', *ngIf='!showSkeletonLoader')
+  ng-content(select='.card-header')
+  ng-content(select='.card-body')
+  ng-content(select='.card-footer')
+div(*ngIf='showSkeletonLoader')
+  ng-content(select='.card-skeleton')

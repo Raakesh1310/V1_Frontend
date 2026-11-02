@@ -1,0 +1,13 @@
+div.cardContentHeight(style='display: flex; justify-content: center; align-items: center;')
+    div.vertical-center
+        div.flex-display-column.align-items-center.mb-3
+            div.d-flex.justify-content-center.thankYouText Thank you for your Application
+            div.d-flex.justify-content-center.referenceIdText Your application reference ID is
+            div.codeSelectorBox.flex-display.mt-3(style='justify-content: space-evenly; align-items: center; flex-direction: row !important; ')
+                div.codeStyle {{ kycCode }}
+                div.rounded-circle.codeCopyBox.flex-display.justify-content-center((click)='copyCode(kycCode)', style='align-items: center;')
+                    svg(width='26', height='32', viewbox='0 0 26 32', fill='none', xmlns='http://www.w3.org/2000/svg')
+                        path(d='M7.49658 4.66635V21.6664C7.49658 22.4179 7.79509 23.1385 8.32645 23.6699C8.8578 24.2012 9.57848 24.4998 10.3299 24.4998H21.6633C22.4148 24.4998 23.1354 24.2012 23.6668 23.6699C24.1981 23.1385 24.4966 22.4179 24.4966 21.6664V9.2592C24.4966 8.88174 24.4211 8.5081 24.2747 8.16021C24.1282 7.81232 23.9137 7.4972 23.6438 7.23336L18.9475 2.64051C18.4182 2.12294 17.7073 1.8331 16.967 1.83301H10.3299C9.57848 1.83301 8.8578 2.13152 8.32645 2.66287C7.79509 3.19423 7.49658 3.9149 7.49658 4.66635V4.66635Z' stroke='#3E2808' stroke-width='2.83334' stroke-linecap='round' stroke-linejoin='round')
+                        path(d='M18.8301 24.4999V27.3332C18.8301 28.0847 18.5316 28.8054 18.0003 29.3367C17.4689 29.8681 16.7482 30.1666 15.9968 30.1666H4.66342C3.91197 30.1666 3.1913 29.8681 2.65995 29.3367C2.12859 28.8054 1.83008 28.0847 1.83008 27.3332V11.7498C1.83008 10.9984 2.12859 10.2777 2.65995 9.74637C3.1913 9.21502 3.91197 8.9165 4.66342 8.9165H7.49677' stroke='#3E2808' stroke-width='2.83334' stroke-linecap='round' stroke-linejoin='round')
+        div.mt-3.d-flex.justify-content-center.escrowSpecialistText Our Escrow Specialist will get in touch
+        div.d-flex.justify-content-center.escrowSpecialistText with you within 24 hours.

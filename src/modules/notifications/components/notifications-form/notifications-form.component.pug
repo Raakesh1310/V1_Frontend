@@ -1,0 +1,135 @@
+sbpro-dashboard-head(
+  icon='book',
+  title='Create Notification',
+  description='Create a new notification'
+)
+.container-fluid.mt-n10.responsiveForm
+  sbpro-card
+    .card-header.logoColor New Notification
+    .card-body
+      .row
+        .col-lg-12 
+          div(*ngIf='errors.length > 0')
+            sbpro-alert(classes='alert-danger', [dismissable]='true')
+              | {{ errors[0] }}
+
+      .row
+        .col-lg-6
+          form(
+            #form='ngForm',
+            [formGroup]='notificationFormGroup',
+            autocomplete='off',
+            (ngSubmit)='handleSubmit(form)'
+          )
+            .form-group
+              label(for='title')
+                | Title
+              .row
+                .col-lg-12
+                  .input-group.input-group-joined
+                  input#title.form-control.form-control-sm(
+                    formControlName='title',
+                    placeholder='Notification Title'
+                  )
+                  span(
+                    *ngIf='notificationFormGroup.controls.title.invalid && (notificationFormGroup.controls.title.dirty || notificationFormGroup.controls.title.touched)'
+                  )
+                    span.text-danger(
+                      *ngIf='notificationFormGroup.controls.title.errors.required'
+                    ) Title is required
+
+            .form-group
+              label(for='notification-message')
+                | Notification Message
+              editor#notification-message(
+                [init]='editorSettings',
+                formControlName='content'
+              )
+                span(
+                  *ngIf='notificationFormGroup.controls.content.invalid && (notificationFormGroup.controls.content.dirty || notificationFormGroup.controls.content.touched)'
+                )
+                  span.text-danger(
+                    *ngIf='notificationFormGroup.controls.content.errors.required'
+                  ) Content is required
+
+            .form-group
+              label(for='title')
+                | Notification Summary
+              .row
+                .col-lg-12
+                  .input-group.input-group-joined
+                  input#title.form-control.form-control-sm(
+                    formControlName='summary'
+                  )
+                  span(
+                    *ngIf='notificationFormGroup.controls.summary.invalid && (notificationFormGroup.controls.summary.dirty || notificationFormGroup.controls.summary.touched)'
+                  )
+                    span.text-danger(
+                      *ngIf='notificationFormGroup.controls.summary.errors.required'
+                    ) Summary is required
+            .row
+              .col-lg-6
+                .form-group
+                  label(for='startDate')
+                    | Start Date
+                  input#start-date.form-control.mr-2(
+                    type='text',
+                    name='sd',
+                    placeholder='Start Date',
+                    formControlName='startDate',
+                    autocomplete='off',
+                    ngbDatepicker,
+                    outsideDays='hidden',
+                    #sd='ngbDatepicker',
+                    (click)='sd.toggle()',
+                    [minDate]='minDate'
+                  )
+              .col-lg-6
+                .form-group
+                  label(for='endDate')
+                    | End Date
+                  input#end-date.form-control.mr-2(
+                    type='text',
+                    name='ed',
+                    placeholder='End Date',
+                    formControlName='endDate',
+                    autocomplete='off',
+                    ngbDatepicker,
+                    outsideDays='hidden',
+                    #ed='ngbDatepicker',
+                    (click)='ed.toggle()',
+                    [minDate]='minEndDate || minDate'
+                  ) 
+
+            .form-group
+              label(for='send-mail')
+                input#send-mail(
+                  type='checkbox',
+                  formControlName='sendMail',
+                  [checked]='sendMail'
+                )
+                span.ml-2 Send email for this notification to all merchants
+
+            button.btn.castlerButtonColor(type='submit', [disabled]='isSubmitting') 
+              span(*ngIf='!(_loading$ | async)') 
+                span Create Notification
+              span(*ngIf='_loading$ | async')
+                span Submitting....
+
+        .col-lg-6
+          div
+            h4 Notification Preview
+          div(style='height:fit-content')
+            sbpro-card(
+              [headerActions]='true',
+              style='height: fit-content !important;'
+            )
+              .card-header.logoColor
+                div(
+                  style='word-break: break-word;text-align: center;width:100%;'
+                ) 
+                  h2.mb-0.logoColor {{ notificationFormGroup.value.title || "Notification Title" }}
+              .card-body
+                span(
+                  [innerHTML]='editorContent || "Enter content in the notification message box to see changes"'
+                )

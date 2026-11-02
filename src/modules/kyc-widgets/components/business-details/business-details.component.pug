@@ -1,0 +1,96 @@
+div.rightSideWidthHeight(style='margin: auto;')
+    div.d-flex
+        p.kycText.mr-3 KYC
+        p.forText for
+    div(style='border-top: 5px solid green;width: 100px; margin-top: -18px')
+    div.select-options.mt-4
+        div.d-flex.justify-content-center.myanchor.rounded.mb-2(
+                (click)='selectKycType(kycOption[0])',
+                [ngClass]='kycOption[0].isSelected ? "kycOptions2" : "kycOptions1"')
+            svg.ml-2.mr-2([ngClass]='kycOption[0].isSelected ? "whiteBackground" : "orangeBackground"',
+                    width='27', height='28', viewbox='0 0 27 28', fill='none', xmlns='http://www.w3.org/2000/svg')
+                path(d='M7.04378 6.54085C7.04378 10.1131 9.95084 13.0202 13.5231 13.0202C17.0954 13.0202 20.0024 10.1131 20.0024 6.54085C20.0024 2.96858 17.0954 0.0615234 13.5231 0.0615234C9.95084 0.0615234 7.04378 2.96858 7.04378 6.54085ZM25.0419 27.4187H26.4818V25.9788C26.4818 20.4225 21.9592 15.8999 16.4028 15.8999H10.6434C5.08558 15.8999 0.564453 20.4225 0.564453 25.9788V27.4187H25.0419Z')
+            p.kycOptionsText {{ kycOption[0].text }}
+        div.d-flex.justify-content-center.myanchor.rounded.mb-2(
+            (click)='selectKycType(kycOption[1])',
+            [ngClass]='kycOption[1].isSelected ? "kycOptions2" : "kycOptions1"')
+            svg.ml-2.mr-2([ngClass]='kycOption[1].isSelected ? "whiteBackground" : "orangeBackground"',
+                width='33', height='36', viewbox='0 0 33 36', fill='none', xmlns='http://www.w3.org/2000/svg')
+                path(fill-rule='evenodd' clip-rule='evenodd' d='M32.2946 0.884023C32.4531 0.982013 32.5839 1.11885 32.6746 1.28155C32.7653 1.44425 32.813 1.62743 32.8131 1.81373V34.6268C32.8131 34.9169 32.6978 35.1951 32.4927 35.4002C32.2876 35.6053 32.0094 35.7206 31.7193 35.7206H25.1567C24.8666 35.7206 24.5884 35.6053 24.3833 35.4002C24.1782 35.1951 24.0629 34.9169 24.0629 34.6268V31.3455H21.8754V34.6268C21.8754 34.9169 21.7601 35.1951 21.555 35.4002C21.3499 35.6053 21.0717 35.7206 20.7816 35.7206H1.09377C0.803684 35.7206 0.525479 35.6053 0.320358 35.4002C0.115236 35.1951 0 34.9169 0 34.6268V22.5953C0.00017423 22.3659 0.0725127 22.1423 0.206777 21.9562C0.341041 21.7701 0.53043 21.631 0.748138 21.5584L13.1252 17.4328V10.5639C13.1252 10.3609 13.1817 10.162 13.2883 9.98928C13.395 9.81659 13.5475 9.67697 13.729 9.58605L31.2293 0.835897C31.3962 0.752346 31.5818 0.712905 31.7682 0.721329C31.9547 0.729753 32.1359 0.785762 32.2946 0.884023ZM13.1252 19.7384L2.18754 23.3829V33.533H13.1252V19.7384ZM15.3128 33.533H19.6878V30.2517C19.6878 29.9616 19.8031 29.6834 20.0082 29.4783C20.2133 29.2732 20.4915 29.158 20.7816 29.158H25.1567C25.4468 29.158 25.725 29.2732 25.9301 29.4783C26.1352 29.6834 26.2505 29.9616 26.2505 30.2517V33.533H30.6255V3.58345L15.3128 11.2398V33.533Z')
+            p.kycOptionsText {{ kycOption[1].text }}
+        div.d-flex.justify-content-center.myanchor.rounded.mb-2(
+            (click)='selectKycType(kycOption[2])',
+            [ngClass]='kycOption[2].isSelected ? "kycOptions2" : "kycOptions1"')
+            svg.mr-2.ml-2([ngClass]='kycOption[2].isSelected ? "whiteBackground" : "orangeBackground"',
+                width='36', height='23', viewbox='0 0 36 23', fill='none', xmlns='http://www.w3.org/2000/svg')
+                path(d='M29.205 4.38164L26.5275 1.65456C25.9349 1.05633 25.1343 0.720696 24.3 0.720703H11.5425C10.71 0.720703 9.90563 1.05872 9.315 1.65456L6.6375 4.38164H0V19.0311H3.6C4.59 19.0311 5.38875 18.2176 5.39437 17.215H5.90625L10.665 21.5921C12.4031 23.0301 14.8163 23.0645 16.605 21.8098C17.3081 22.4285 18.0675 22.7207 18.9169 22.7207C19.9406 22.7207 20.9025 22.2967 21.6619 21.3457C22.905 21.8441 24.3731 21.4947 25.2619 20.3832L26.7356 18.5327C27.0506 18.1374 27.2475 17.6848 27.3487 17.215H30.6056C30.6112 18.2176 31.4156 19.0311 32.4 19.0311H36V4.38164H29.205ZM2.7 17.1978C2.205 17.1978 1.8 16.7853 1.8 16.2811C1.8 15.777 2.205 15.3645 2.7 15.3645C3.195 15.3645 3.6 15.777 3.6 16.2811C3.6 16.791 3.195 17.1978 2.7 17.1978ZM24.6375 16.8025L23.1694 18.6473C23.0119 18.8421 22.7306 18.8764 22.5338 18.716L21.1894 17.6046L19.5019 19.6957C19.1644 20.1139 18.6581 19.9707 18.4894 19.8332L16.4194 18.0285L15.5419 19.1285C14.76 20.1082 13.3369 20.2572 12.4312 19.5066L6.95812 14.465H5.4V7.12591H7.75687L11.2275 3.59674C11.34 3.55091 11.4356 3.51081 11.5481 3.46497H14.7375L12.5606 5.49883C10.9069 7.03997 10.8112 9.64102 12.3131 11.3025C13.1456 12.2306 15.7556 13.6629 18.0225 11.5546L18.4837 11.1249L24.57 16.1551C24.7612 16.3155 24.7894 16.6077 24.6375 16.8025ZM30.6 14.465H26.7075C26.5781 14.3046 26.4319 14.1556 26.2744 14.0238L20.4975 9.2457L21.2006 8.59258C21.5662 8.24883 21.5944 7.67018 21.2569 7.29779L20.6437 6.62747C20.3062 6.25508 19.7381 6.23216 19.3725 6.57018L16.2675 9.46914C15.7331 9.96758 14.8219 10.0077 14.3212 9.46914C13.7981 8.90195 13.8431 8.03112 14.3888 7.52695L18.0787 4.08372C18.495 3.69414 19.035 3.48216 19.5975 3.48216L24.3056 3.4707C24.4237 3.4707 24.5362 3.51654 24.615 3.60247L28.0856 7.13164H30.6V14.465ZM33.3 17.1978C32.805 17.1978 32.4 16.7853 32.4 16.2811C32.4 15.777 32.805 15.3645 33.3 15.3645C33.795 15.3645 34.2 15.777 34.2 16.2811C34.2 16.791 33.795 17.1978 33.3 17.1978Z')
+            p.kycOptionsText {{ kycOption[2].text }}
+        div.d-flex.justify-content-center.myanchor.rounded(
+            (click)='selectKycType(kycOption[3])',
+            [ngClass]='kycOption[3].isSelected ? "kycOptions2" : "kycOptions1"')
+            svg.ml-2.mr-2([ngClass]='kycOption[3].isSelected ? "whiteBackground" : "orangeBackground"',
+                width='27', height='28', viewbox='0 0 27 28', fill='none', xmlns='http://www.w3.org/2000/svg')
+                path(d='M7.04378 6.54085C7.04378 10.1131 9.95084 13.0202 13.5231 13.0202C17.0954 13.0202 20.0024 10.1131 20.0024 6.54085C20.0024 2.96858 17.0954 0.0615234 13.5231 0.0615234C9.95084 0.0615234 7.04378 2.96858 7.04378 6.54085ZM25.0419 27.4187H26.4818V25.9788C26.4818 20.4225 21.9592 15.8999 16.4028 15.8999H10.6434C5.08558 15.8999 0.564453 20.4225 0.564453 25.9788V27.4187H25.0419Z')
+            p.kycOptionsText {{ kycOption[3].text }}
+        //div.d-flex.justify-content-center.myanchor.mr-3.rounded.mb-2(
+        //    (click)='selectKycType(kycOption[4])',
+        //    [ngClass]='kycOption[4].isSelected ? "kycOptions2" : "kycOptions1"')
+        //    svg.mr-2([ngClass]='kycOption[4].isSelected ? "whiteBackground" : "orangeBackground"',
+        //        width='36' height='34' viewbox='0 0 36 34' fill='none' xmlns='http://www.w3.org/2000/svg')
+        //        path(d='M25.0801 28.6285L24.1201 20.9425C23.984 19.8538 23.455 18.8524 22.6323 18.1264C21.8097 17.4005 20.7502 17.0001 19.6531 17.0005H16.3471C15.2505 17.0008 14.1917 17.4015 13.3697 18.1274C12.5477 18.8533 12.0191 19.8543 11.8831 20.9425L10.9216 28.6285C10.8688 29.0508 10.9065 29.4794 11.0321 29.886C11.1577 30.2926 11.3684 30.6678 11.6502 30.9867C11.9319 31.3057 12.2783 31.561 12.6663 31.7358C13.0543 31.9106 13.475 32.0008 13.9006 32.0005H22.1026C22.528 32.0006 22.9486 31.9102 23.3364 31.7353C23.7242 31.5604 24.0704 31.3051 24.352 30.9862C24.6336 30.6673 24.8442 30.2921 24.9697 29.8857C25.0952 29.4792 25.1328 29.0506 25.0801 28.6285V28.6285Z' stroke-width='3' stroke-linecap='round' stroke-linejoin='round')
+        //        path(d='M18 11.0005C20.4853 11.0005 22.5 8.98577 22.5 6.50049C22.5 4.01521 20.4853 2.00049 18 2.00049C15.5147 2.00049 13.5 4.01521 13.5 6.50049C13.5 8.98577 15.5147 11.0005 18 11.0005Z' stroke-width='3')
+        //        path(d='M5.99805 15.5005C7.6549 15.5005 8.99805 14.1573 8.99805 12.5005C8.99805 10.8436 7.6549 9.50049 5.99805 9.50049C4.34119 9.50049 2.99805 10.8436 2.99805 12.5005C2.99805 14.1573 4.34119 15.5005 5.99805 15.5005Z' stroke-width='3')
+        //        path(d='M30 15.5005C31.6569 15.5005 33 14.1573 33 12.5005C33 10.8436 31.6569 9.50049 30 9.50049C28.3431 9.50049 27 10.8436 27 12.5005C27 14.1573 28.3431 15.5005 30 15.5005Z' stroke-width='3')
+        //        path(d='M5.99988 20.0005H5.54088C4.83073 20.0004 4.14357 20.2522 3.60165 20.7112C3.05973 21.1702 2.69821 21.8065 2.58138 22.507L2.08188 25.507C2.0102 25.9368 2.03302 26.3771 2.14874 26.7972C2.26446 27.2173 2.47031 27.6071 2.75198 27.9396C3.03364 28.2721 3.38435 28.5393 3.77972 28.7225C4.1751 28.9057 4.60563 29.0005 5.04138 29.0005H10.4999' stroke-width='3' stroke-linecap='round' stroke-linejoin='round')
+        //        path(d='M29.998 20.0005H30.457C31.1672 20.0004 31.8544 20.2522 32.3963 20.7112C32.9382 21.1702 33.2997 21.8065 33.4165 22.507L33.916 25.507C33.9877 25.9368 33.9649 26.3771 33.8492 26.7972C33.7335 27.2173 33.5276 27.6071 33.246 27.9396C32.9643 28.2721 32.6136 28.5393 32.2182 28.7225C31.8228 28.9057 31.3923 29.0005 30.9565 29.0005H25.498' stroke-width='3' stroke-linecap='round' stroke-linejoin='round')
+        //    p.kycOptionsText {{ kycOption[4].text }}
+
+    div.mt-4.d-flex.justify-content-between(style='flex-wrap: wrap;')
+        label(for='inputBusiness').labelText.mt-1 Business Name    
+        input#inputBusiness.form-control-sm(
+            style='background: #E2E2E2; max-width: 290px; width: 100%; border: none'
+            type='text',
+            [(ngModel)]='businessName',
+            (input)= 'inputValueChange($event.target.value, "Business Name")',
+            placeholder='Enter Business',
+        )
+    small
+        small
+            small Business name as per GST
+    div.mt-3.d-flex.justify-content-between(style='flex-wrap: wrap;')
+        label(for='inputIndustry').labelText.mt-1 Industry Type
+        select#inputIndustry.form-control.form-control-sm(
+            style='background: #E2E2E2; max-width: 290px; width: 100%; border: none',
+            [(ngModel)]='industryType',
+            (change)='setPages($event.target.value)'
+        )
+            option Financial Services
+            option E-commerce/Marketplace
+            option IT/ITES
+            option Real Estate
+            option VC/PE
+            option Others
+    div.custom-control.custom-switch.mt-3
+        input#customSwitches.custom-control-input(type='checkbox', style='background: orange',
+            [(ngModel)]='importExport', (change)='importChange($event)')
+        label.custom-control-label(for='customSwitches').labelText.mt-1 Is the entity involved in import/export?
+    div.mt-3.d-flex.justify-content-between(style='flex-wrap: wrap;')
+        label(for='inputAnnual').labelText.mt-1 Annual Revenue (₹)
+        input#inputAnnual.form-control-sm(
+            style='background: #E2E2E2; max-width: 290px; width: 100%; border: none'
+            type='text',
+            [(ngModel)]='annualRevenue',
+            (keydown)='onlyFloatAllowed($event)',
+            placeholder='Annual Revenue',
+        )
+    br
+    div.myanchor(id='bottom', (click)='moveToKyc()')
+        svg.mr-3.mb-3([ngClass]='moveToNextPage ? "arrowOrange" : "arrowBlack"', width='75', height='75', viewbox='0 0 70 70', fill='none', xmlns='http://www.w3.org/2000/svg')
+            path(d='M37.8195 19.8857L34.4416 23.1763L47.6226 36.4212H18.9219V41.1456H47.6226L34.4416 54.3101L37.8195 57.681L56.7171 38.7834L37.8195 19.8857Z')
+            path(d='M37.8189 71.8541C31.2781 71.8541 24.8842 69.9145 19.4457 66.2807C14.0073 62.6468 9.76848 57.4818 7.26543 51.4389C4.76238 45.396 4.10746 38.7466 5.38351 32.3315C6.65955 25.9163 9.80925 20.0237 14.4343 15.3986C19.0593 10.7736 24.952 7.62391 31.3671 6.34786C37.7822 5.07182 44.4317 5.72673 50.4746 8.22979C56.5175 10.7328 61.6824 14.9716 65.3163 20.4101C68.9502 25.8486 70.8898 32.2425 70.8898 38.7833C70.8798 47.5511 67.3923 55.957 61.1925 62.1568C54.9927 68.3567 46.5868 71.8441 37.8189 71.8541ZM37.8189 10.4368C32.2125 10.4368 26.732 12.0993 22.0705 15.2141C17.4089 18.3288 13.7757 22.7559 11.6302 27.9356C9.48474 33.1152 8.92338 38.8147 10.0171 44.3134C11.1109 49.812 13.8106 54.8629 17.7749 58.8272C21.7393 62.7915 26.7901 65.4913 32.2888 66.585C37.7875 67.6788 43.487 67.1174 48.6666 64.972C53.8463 62.8265 58.2734 59.1933 61.3881 54.5317C64.5029 49.8702 66.1653 44.3897 66.1653 38.7833C66.1566 31.268 63.1673 24.0631 57.8532 18.749C52.5391 13.4349 45.3342 10.4456 37.8189 10.4368Z')
+ng-template(#warningMessage)
+  .card-header.modal-header.logoColor Warning Message
+  .card-body
+    p Please allow location tracking to proceed further.
+  .card-footer
+    button.btn.btn-sm.float-right.castlerButtonColor((click)='closeModal(true)') Close

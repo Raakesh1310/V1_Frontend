@@ -1,0 +1,26 @@
+.flex-container
+  sbpro-dashboard-head(
+    icon='send',
+    title='All Transfers',
+    description='View all transfers'
+  )
+  .container-fluid.mt-n10.responsiveForm.flex-grow-1
+    //.row.h-100
+    //  .col-lg-12.h-100
+    //    sbpro-all-fund-transfers(sbproTocItem='Default Form Controls')
+    sbpro-card-navigation(
+      sbproTocItem='Tabs',
+      [navNames]='["All Transfers", "All Bulk Transfers", "All Scheduled Transfers"]',
+      [templates]='[singleTransferAll, bulkTransferAll, scheduledTransferAll]',
+    [selectedIndexForFade] = 'selectedIndexForFade',
+    [selectedIndex] = 'selectedIndexForFade',
+    )
+      ng-template(#singleTransferAll)
+        sbpro-all-fund-transfers(
+          sbproTocItem='Default Form Controls',
+          [readOnly]='readOnly'
+        )
+      ng-template(#bulkTransferAll)
+        sbpro-bulk-table-list([readOnly]='readOnly')
+      ng-template(#scheduledTransferAll)
+        sbpro-scheduled-transfer-sa-overview

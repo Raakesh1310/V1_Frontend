@@ -1,0 +1,243 @@
+sbpro-card
+  .card-header.justify-content-between(class='logoColor') Bulk Transfer Details
+    .row(style='width: 80%; justify-content: end;')
+      a.btn.btn-link.mt-1.mb-1.mr-4.pt-2#linkText(
+        *ngIf='supportingDocuments.length > 0',
+        (click)='openModal(documentUploadModal)',
+      )
+        span Supporting Documents
+      a.btn.mt-1.mb-1.btn-success.ws-nowrap.btn-icon(
+        style='color: white',
+        type='button',
+        target='_blank',
+        [href]='downloadLink'
+      )
+        fa-icon.d-flex.flex-row.align-items-center(
+          [icon]='["fas", "arrow-down"]'
+        )
+  .card-body
+    .table-responsive.pp-table-container
+      table.table
+        thead
+          tr
+            th(scope='col', sbSortable='time')
+              span.ws-nowrap Transfer ID
+            th(scope='col', sbSortable='event')
+              span.ws-nowrap Beneficiary Name
+            th(*ngIf='!isUPIBulkTransfer',scope='col', sbSortable='time')
+              span.ws-nowrap Beneficiary Account No
+            th(*ngIf='!isUPIBulkTransfer',scope='col', sbSortable='time')
+              span.ws-nowrap Beneficiary Bank Name
+            th(*ngIf='!isUPIBulkTransfer',scope='col', sbSortable='time')
+              span.ws-nowrap Beneficiary Bank IFSC
+            th(*ngIf='isUPIBulkTransfer',scope='col', sbSortable='time')
+              span.ws-nowrap Beneficiary VPA
+            th(scope='col', sbSortable='time')
+              span.ws-nowrap Amount
+            th(scope='col', sbSortable='time')
+              span.ws-nowrap UTR
+            th(scope='col', sbSortable='time')
+              span.ws-nowrap Status
+        tbody
+          tr(*ngIf='isLoading || isDocumentLoading')
+            td 
+              .spinner-border.text-primary(role='status')
+                span.sr-only Loading...
+          tr(*ngIf='(payeeOfSingleTransfer.length == 0 && !(isLoading || isDocumentLoading))')
+            td No Entries Found: {{payeeOfSingleTransfer.length}}
+          tr(
+            *ngFor='let data of payeeOfSingleTransfer | slice: (transferPage - 1) * transferPageSize:transferPage * transferPageSize'
+          )
+            td
+              ngb-highlight.ws-nowrap.tableClickEntryColor.myanchor([result]='data.transferId',
+                (click)='showDetails(data.transferId)')
+            td
+              ngb-highlight.ws-nowrap([result]='data.beneficiaryName')
+            td(*ngIf='!isUPIBulkTransfer')
+              ngb-highlight([result]='data.beneficiaryAccNumber')
+            td(*ngIf='!isUPIBulkTransfer')
+              ngb-highlight([result]='data.beneficiaryBankName')
+            td(*ngIf='!isUPIBulkTransfer')
+              ngb-highlight([result]='data.beneficiaryIFSC')
+            td(*ngIf='isUPIBulkTransfer')
+              ngb-highlight([result]='data.vpa')
+            td
+              ngb-highlight([result]='data.amount.toFixed(2)')
+            td
+              ngb-highlight([result]='data.utr')
+            td(*ngIf = 'isTrustee',)
+              ngb-highlight(
+                style='font-weight: bold',
+                [style.color]='setColor(data.status)',
+                [result]='data.status'
+              )
+            td(*ngIf = 'data.status == "Pending for Authorization" && !isTrustee',)
+              ngb-highlight.myanchor(
+                style='color: #F5A500; font-weight: bold',
+                [result]='data.status',
+                (click)='selectedTransfer = data; openMap(statusMap)',
+              )
+            td(*ngIf = 'data.status == "Sent for Processing" && !isTrustee')
+              ngb-highlight.myanchor(
+                style='color: #329ca8; font-weight: bold',
+                [result]='data.status',
+                (click)='selectedTransfer = data; openMap(statusMap)',
+              )
+            td(*ngIf = 'data.status == "Failed" && !isTrustee')
+              ngb-highlight.myanchor(
+                style='color: #FF0000; font-weight: bold',
+                [result]='data.status',
+                (click)='selectedTransfer = data; openMap(statusMap)',
+              )
+            td(*ngIf = 'data.status == "Success" && !isTrustee')
+              ngb-highlight.myanchor(
+                style='color: #18B81F; font-weight: bold',
+                [result]='data.status',
+                (click)='selectedTransfer = data; openMap(statusMap)',
+              )
+            td(*ngIf = 'data.status == "success" && !isTrustee')
+              ngb-highlight.myanchor(
+                style='color: #18B81F; font-weight: bold',
+                [result]='data.status',
+                (click)='selectedTransfer = data; openMap(statusMap)',
+            )
+            td(*ngIf = 'data.status == "failed" && !isTrustee')
+              ngb-highlight.myanchor(
+                style='color: #FF0000; font-weight: bold',
+                [result]='data.status',
+                (click)='selectedTransfer = data; openMap(statusMap)',
+              )
+            td(*ngIf = 'data.status == "pending" && !isTrustee')
+              ngb-highlight.myanchor(
+                style='color: #F5A500; font-weight: bold',
+                [result]='data.status',
+                (click)='selectedTransfer = data; openMap(statusMap)',
+              )
+            td(*ngIf = 'data.status == "rejected" && !isTrustee')
+              ngb-highlight.myanchor(
+                style='color: #FF0000; font-weight: bold',
+                [result]='data.status',
+                (click)='selectedTransfer = data; openMap(statusMap)',
+              )
+    .d-flex.justify-content-between.p-2
+      button.btn.btn-light((click)='goBack()') Back
+      ngb-pagination(
+        [collectionSize]='transferTotal$',
+        [maxSize]='5',
+        [(page)]='transferPage',
+        [pageSize]='transferPageSize',
+        [rotate]='true',
+        [ellipses]='false',
+        (pageChange)='loadPage($event)',
+        [boundaryLinks]='true'
+      )
+
+
+ng-template(#statusMap)
+  .modal-header(class='logoColor') Transfer Status
+  .isDataLoading(*ngIf="isLoadingAuthorization")
+    .spinner-border.text-primary(role='status')
+        span.sr-only Loading...
+
+  .modal-body(*ngIf='!oldMap && !isLoadingAuthorization')
+    .container.mt-5.mb-5
+      .row
+        .col
+          h4 Fund Transfer
+          ul.timeline
+            li.green
+              h3
+                b Initiated
+              i {{ selectedTransfer.createdAt | date:'medium'}}
+            div.p-0.m-0(*ngFor='let auth of authorizers | keyvalue')
+              div.p-0.m-0(*ngFor='let level of authorizers[auth.key] | keyvalue')
+                div.p-0.m-0(*ngFor='let authorizer of authorizers[auth.key][level.key]["authorizers"]')
+                  li(*ngIf='authorizer.verified', [ngClass]='!authorizer.verified? "white" : authorizer.verified && !authorizer.data.approved ? "red" : "green"')
+                    h3
+                      span(*ngIf='authorizer.verified && authorizer.data.approved')
+                        p
+                          b Approved
+                          small(*ngIf='auth.key !== "4trustee" && auth.key !== "3admin"') (Level {{authorizer.data.level}} {{authorizer.data.type.split(' ')[0]}})
+                      span(*ngIf='authorizer.verified && !authorizer.data.approved')
+                        p
+                          b Rejected
+                          small(*ngIf='auth.key !== "4trustee" && auth.key !== "3admin"') (Level {{authorizer.data.level}} {{authorizer.data.type.split(' ')[0]}})
+                    p
+                      i {{authorizer.email}}
+                    i {{ authorizer.verifiedAt | date:'medium' }}
+                li.white(*ngIf='selectedTransfer.status !== "Failed" && !authorizers[auth.key][level.key]["isApproved"]')
+                  h3
+                    p(*ngIf='!auth.verified')
+                      b Pending for approval
+                  p
+                    i(*ngIf='auth.key !== "4trustee" && auth.key !== "3admin"') Level {{level.key}} {{ authorizers[auth.key][level.key].type }} ({{authorizers[auth.key][level.key].minApprovalsNeeded}})
+                    i(*ngIf='auth.key === "4trustee"', style="width: fit-content; max-width: 20ch; overflow-wrap: break-word;") {{ trusteeEmails }}
+                    i(*ngIf='auth.key === "3admin"')  {{ authorizers[auth.key][level.key]["authorizers"][0].email }}
+            li.green(*ngIf='selectedTransfer.status !== "Failed" &&  selectedTransfer.status ==="Sent for Processing" || selectedTransfer.status ==="failed" || selectedTransfer.status === "success"')
+              h3
+                b Sent for processing
+              i {{ selectedTransfer.updatedAt | date:'medium'}}
+            li(*ngIf='selectedTransfer.status ==="Failed" || selectedTransfer.status === "Success"', [ngClass]='selectedTransfer.status ==="Failed" ? "red" : "green"')
+              h3
+                b {{selectedTransfer.status}}
+              i {{ selectedTransfer.updatedAt | date:'medium'}}
+
+  .modal-body(*ngIf='oldMap && !isLoadingAuthorization')
+    div(*ngIf='selectedTransfer.authorization.length === 0')
+      p No approvals found for this transaction.
+    div(*ngIf='selectedTransfer.authorization.length > 0')
+      .container.mt-5.mb-5
+        .row
+          .col
+            h4 Fund Transfer
+            ul.timeline
+              li.green
+                h3
+                  b Initiated
+                i {{ selectedTransfer.createdAt | date:'medium'}}
+              li(*ngFor='let auth of selectedTransfer.authorization', [ngClass]='!auth.verified? "white" : auth.verified && !auth.data.approved ? "red" : "green"')
+                h3
+                  p(*ngIf='!auth.verified')
+                    b Pending for approval
+                  span(*ngIf='auth.verified && auth.data.approved')
+                    p
+                      b Approved
+                  span(*ngIf='auth.verified && !auth.data.approved')
+                    p
+                      b Rejected
+                p
+                  i {{auth.email}}
+                i {{ auth.verifiedAt | date:'medium' }}
+              li.green(*ngIf='selectedTransfer.status ==="Sent for Processing" || selectedTransfer.status ==="failed" || selectedTransfer.status === "success"')
+                h3
+                  b Sent for processing
+                i {{ selectedTransfer.updatedAt | date:'medium'}}
+              li(*ngIf='selectedTransfer.status ==="Failed" || selectedTransfer.status === "Success"',[ngClass]='selectedTransfer.status ==="Failed" ? "red" : "green"')
+                h3
+                  b {{selectedTransfer.status}}
+                i {{ selectedTransfer.updatedAt | date:'medium'}}
+  .modal-footer
+      button.btn.btn-sm((click)='closeModal()', class='castlerButtonColor') Close
+
+ng-template(#documentUploadModal)
+  .modal-header
+    h4.col-12.modal-title.text-center {{supportingDocuments.length > 0 ? supportingDocuments.length + ' Supporting Documents' : 'Supporting Documents'}}
+  .modal-body
+    .div(*ngIf='supportingDocuments.length > 0')
+      .font-weight-bold.justify-content-between(class='logoColor') Supporting Documents
+      .table-responsive.pp-table-container.mt-4
+        table.table.table-striped.table-bordered.table-bordered
+          thead
+            tr
+              th(scope='col', style="width: 10%")
+                span S.No.
+              th(scope='col', style="width: 80%")
+                span Document
+          tbody(*ngIf='supportingDocuments.length > 0')
+            tr(*ngFor='let doc of supportingDocuments; let i = index')
+              td
+                | {{ i + 1 }}
+              td
+                a(href="#", (click)='downloadFile($event, doc.hash, doc?.name)', *ngIf='doc.hash') {{ doc.name }}
+  .modal-footer
+    button.btn.btn-sm((click)='closeModal()', class='castlerButtonColor') Close

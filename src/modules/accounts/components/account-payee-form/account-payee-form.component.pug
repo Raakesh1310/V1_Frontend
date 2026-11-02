@@ -1,0 +1,316 @@
+div(*ngIf='errors.length > 0')
+  sbpro-alert(classes='alert-danger', [dismissable]='true')
+    | {{ errors[0] }}
+form(
+  [formGroup]='linkPayeeForm',
+  autocomplete='off',
+  ngNativeValidate,
+  *ngIf='!readOnly'
+)
+  //- div(*ngIf='!viewMode')
+  .row
+    .col-sm-4
+      .form-group
+        label(for='payee') Payee
+        span.text-danger *
+        br
+        ng-select(
+          [items]='unlinkedPayees',
+          bindLabel='accountHolder',
+          [(ngModel)]='selectedPayee',
+          [ngModelOptions]='{ standalone: true }',
+          loadingText='Loading...',
+          placeholder='Enter Payee Name',
+          (change)='updatePayee()',
+          [loading]="unlinkedLoading$ | async",
+          [disabled]='submitted',
+          (search)='getUnlinkedPayee($event.term)',
+          name='payee'
+        )
+          ng-template(ng-label-tmp='', let-item='item')
+            span(*ngIf='selectedPayee') {{ utilityService.firstCapitalize(item.accountHolder) }} | {{ item.email }}
+          ng-template(
+            ng-option-tmp='',
+            let-item='item',
+            let-search='searchTerm',
+            let-index='index'
+          )
+            span.sup-option {{ utilityService.firstCapitalize(item.accountHolder) }}
+            br
+            span.sub-option(*ngIf='item.bankName && item.accountNumber') {{ item.bankName }} | {{ item.accountNumber }} {{ item.vpa && "| " + item.vpa }}
+            span.sub-option(*ngIf='item.vpa && !item.accountNumber') {{ item.bank && item.bank + "|" }} {{item.vpa}}
+            //- span.sub-option {{ item.bankName ? item.bankName + "|" : item.accountNumber? item.accountNumber : "|"}} {{item.vpa}}
+
+    .col-sm-3
+      .form-group
+        label(for='frm-cntrl-email') Payout Share
+        span.text-danger *
+        br
+        input#frm-cntrl-email.form-control.form-control-sm(
+          type='text',
+          placeholder='Enter payout share',
+          formControlName='share',
+          autocomplete='off',
+          appTwoDigitDecimalNumber
+        )
+
+    .col-sm-2
+      .form-group
+        label Unit
+        span.text-danger *
+        br
+        select#frm-cntrl-unit.form-control.form-control-sm(
+          name='share',
+          [(ngModel)]='draftShareUnit',
+          [ngModelOptions]='{ standalone: true }',
+          [disabled]='linkedPayees.length > 0',
+          (change)='emitShareunit()'
+        )
+          option(value='%') %
+          option(value='INR') INR
+
+    .col-sm-2
+      .form-group
+        label.hidden button
+        br
+        sbpro-app-button(
+          (click)='linkPayee()',
+          text='ADD',
+          [buttonStyle]='417505',
+          loadingText='Adding',
+          [loading]='addingPayee',
+          [disabled]='!this.selectedPayee || share.invalid',
+          [btnClass]='{ "btn-block": false, "btn-primary": true, "btn-sm": true }'
+        ) 
+
+.row(*ngIf='!viewMode')
+  .col-sm-2
+    .form-group
+      label Schedule Auto Transfer
+      br
+      label.switch
+        input(
+          type='checkbox',
+          #checkbox,
+          [disabled]='isDetailPage',
+          [checked]='isAutoTransfer',
+          (click)='checkboxAction(checkbox)'
+        )
+        span.slider.round
+  .col-sm-3(*ngIf='isAutoTransfer')
+    .row
+      .col-sm-12
+        input#isRetentionCheckbox(
+          type='checkbox',
+          #checkbox,
+          name='isRetentionCheckbox',
+          [(ngModel)]='isRetentionChecked',
+          (change)='updateRetCheckBoxVal($event)'
+        )
+        label(for='isRetentionCheckbox') Retention Amount
+    .row(*ngIf='isRetentionChecked')
+      .col-sm-12
+        .form-group
+          input.form-control.form-control-sm(
+            type='text',
+            #retentionAmt,
+            placeholder='Enter amount',
+            (change)='setRetentionAmount($event)',
+            [(ngModel)]='retentionAmount',
+            autocomplete='off',
+            appTwoDigitDecimalNumber
+          )
+.row 
+  .col-sm-2(*ngIf='isAutoTransfer')
+    .form-group
+      label Frequency of Split
+      span.text-danger *
+      br
+      select#frm-cntrl-unit.form-control.form-control-sm(
+        name='share',
+        [readonly]='true',
+        [ngClass]='{ "non-editable": true }',
+        [(ngModel)]='autoTransferType',
+        (change)='enableUpdate()',
+        [ngModelOptions]='{ standalone: true }'
+      )
+        option(value='Instant') Instant
+        option(value='Scheduled') Schedule
+  .col-sm-2(*ngIf='isAutoTransfer && autoTransferType === "Scheduled"')
+    .form-group
+      label Split Time
+      span.text-danger *
+      br
+      select#frm-cntrl-unit.form-control.form-control-sm(
+        name='share',
+        [(ngModel)]='autoScheduledAt',
+        (change)='enableUpdate()',
+        [ngModelOptions]='{ standalone: true }'
+      )
+        option(value='9am') 9:00 AM
+        option(value='12pm') 12:00 PM
+        option(value='3pm') 3:00 PM
+        option(value='6pm') 6:00 PM
+br
+.table-responsive.pp-table-container
+  table.table
+    thead
+      tr
+        th(scope='col')
+          span S.No.
+        th(scope='col')
+          span Payee Name
+        th(scope='col')
+          span Bank Name
+        th(scope='col')
+          span Account Number
+        th(*ngIf='upiPayoutEnabled',scope='col')
+          span VPA 
+        th(scope='col')
+          span Payee Email
+        th(scope='col')
+          span Share
+          span(*ngIf='draftShareUnit === "%"') ({{ shareSum }}%)
+        th(scope='col', *ngIf='!readOnly')
+          span Action
+
+    tbody(*ngIf='linkedPayees.length <= 0 && !(linkedLoading$ | async)')
+      tr
+        td
+          span No payee linked yet
+    tbody(*ngIf='!!(linkedLoading$ | async)')
+      tr
+        td Please wait...
+    tbody(*ngIf='linkedPayees.length > 0 && !(linkedLoading$ | async)')
+      tr(*ngFor='let p of linkedPayees; let i = index')
+        td
+          | {{ i + 1 }}
+        td
+          a.nav-link.p-0.tableClickEntryColor(
+            href='javascript:void(0);',
+            (click)='showDetails(p.payeeId)'
+          )
+            span(*ngIf='p.name') {{ p.name }}
+            span(*ngIf='!p.name') {{ p.accountHolder }}
+        td
+          | {{ p.bankName ? p.bankName : "--"}}
+        td
+          | {{ p.accountNumber ? p.accountNumber : "--" }}
+        td(*ngIf='upiPayoutEnabled')
+          | {{ p.vpa ? p.vpa : "--" }}
+        td
+          | {{ p.email }}
+        td
+          | {{ p.share }} {{ draftShareUnit }}
+        td
+          sbpro-app-button(
+            *ngIf='(isAdmin && !readOnly) || (!p.status && !readOnly)',
+            (click)='isAdmin && p.status === "Active" ? openWarningModal(p.accountPayeeId, i) : deletePayee(p.accountPayeeId, i)', 
+            text='Delete',
+            [buttonStyle]='417505',
+            loadingText='Deleting...',
+            [loading]='deletingPayee === i',
+            [btnClass]='{ "btn-block": false, "btn-light": true, "btn-sm": true }'
+          )
+
+          sbpro-app-button.ml-2(
+            *ngIf='isAdmin && !readOnly && p.status === "Active"',
+            (click)='editPayee(p.accountPayeeId, i)', 
+            text='Edit',
+            loadingText='Editing...',
+            [loading]='editingPayee === i',
+            [btnClass]='{ "btn-block": false, "btn-light": true, "btn-sm": true }'
+          ) 
+
+div(*ngIf='!readOnly') 
+  span 
+  button.btn.castlerButtonColor((click)='goBack()', *ngIf='viewMode') Back
+  | &nbsp;&nbsp;
+
+  sbpro-app-button(
+    *ngIf='!viewMode',
+    (click)='nextForm()',
+    text='Next',
+    loadingText='Updating...',
+    [loading]='updating',
+    [disabled]='linkedPayees.length < 1',
+    [btnClass]='{ "btn-block": false, "btn-primary": true }'
+  ) 
+
+  sbpro-app-button(
+    *ngIf='viewMode && !enableUpdateBt',
+    (click)='patchPayee()',
+    text='Update',
+    loadingText='Updating...',
+    [buttonStyle]='417505',
+    [loading]='updating',
+    [disabled]='draftPayees && draftPayees.length === 0',
+    [btnClass]='{ "btn-block": false, "btn-primary": true }'
+  ) 
+
+  sbpro-app-button(
+    *ngIf='enableUpdateBt && draftPayees && draftPayees.length === 0',
+    (click)='nextForm(true)',
+    text='Update',
+    loadingText='Updating...',
+    [buttonStyle]='417505',
+    [loading]='updating',
+    [disabled]='!enableUpdateBt',
+    [btnClass]='{ "btn-block": false, "btn-primary": true }'
+  ) 
+
+ng-template(#infoMessage)
+  .modal-header
+    h4 Update Payee share
+  .modal-body
+    .row.pl-4
+      .col-sm-2
+        .form-group
+          label(for='payee') Payee Name
+          input#payee.form-control.form-control-sm(
+            type='text',
+            [(ngModel)]='editingPayee.accountHolder',
+            [ngClass]='{ "non-editable": true }',
+            [readonly]='true',
+            [ngModelOptions]='{ standalone: true }'
+          )
+      .col-sm-3.ml-3
+        .form-group
+          label(for='payout-share') Payout Email
+          input#payout-share.form-control.form-control-sm(
+            type='email',
+            [(ngModel)]='editingPayee.email',
+            [ngClass]='{ "non-editable": true }',
+            [readonly]='true',
+            [ngModelOptions]='{ standalone: true }'
+          )
+      .col-sm-3.ml-3
+        .form-group
+          label(for='payout-share') Share
+          input#payout-share.form-control.form-control-sm(
+            type='text',
+            [(ngModel)]='editingPayee.share',
+            [ngModelOptions]='{ standalone: true }'
+          )
+      .col-sm-3.ml-3
+        .form-group
+          label.hidden button
+          br
+          sbpro-app-button(
+            (click)='editPayeeShare(editingPayee.accountPayeeId)',
+            text='Update share',
+            loadingText='Updating',
+            [loading]='addingPayee',
+            [btnClass]='{ "btn-block": false, "btn-primary": true, "btn-sm": true }'
+          ) 
+  .card-footer
+    button.btn.btn-primary.float-right((click)='closeModal(true)') close
+
+ng-template(#warningMessage)
+  .card-header.modal-header Warning Message
+  .card-body
+    p Are you sure you want to unlink payee ?
+  .card-footer
+    button.btn.btn-primary.btn-sm.float-right((click)='closeModal(true)') Yes, Unlink
+    span.float-right &nbsp;&nbsp;&nbsp;
+    button.btn.btn-link.btn-sm.float-right((click)='closeModal(false)') No, Cancel

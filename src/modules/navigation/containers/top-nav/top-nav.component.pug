@@ -1,0 +1,80 @@
+
+ng-container(*ngIf='!rtl')
+  .d-flex.justify-content-center.align-items-center(
+    *ngIf='shouldDisplayStrip',
+    style='height:30px;width: 100%;background-color: #ffce6a !important;color:black;',
+    [ngClass]='{ "nav-fixed": !static }'
+  )
+    span 
+      b 📢 &nbsp; {{ portalNotification.summary }} &nbsp;&nbsp;
+      |
+      span(
+        style='text-decoration: underline; cursor: pointer;color:blue;',
+        (click)='openNoticeModal()'
+      ) 
+        b Read More
+ng-container(*ngIf='!rtl')
+  nav.topnav.navbar.navbar-expand.shadow.navbar-light.bg-white
+    button#sidebarToggle.btn.btn-icon.btn-transparent-dark.order-lg-0.mr-lg-2(
+      data-cy='topNavToggleSideNav',
+      (click)='toggleSideNav()'
+    )
+      i-feather(name='menu')
+    div(style='width: 100%')
+      img.myanchor(
+        src='/assets/img/Castler_logo.png',
+        width='150',
+        height='40',
+        (click)='NavigateToDashboard()'
+      )
+
+    //sbpro-top-nav-search //a.navbar-brand.mr-auto.d-block(routerLink='/dashboard')
+
+    ul.navbar-nav
+      // TODO has to complete this
+      //sbpro-top-nav-docs
+      sbpro-top-nav-merchant(*ngIf='!individual')
+      //sbpro-top-nav-alerts.d-none.d-md-inline-block.d-lg-inline-block
+      //sbpro-top-nav-messages
+      sbpro-top-nav-user
+
+ng-container(*ngIf='rtl')
+  nav.pr-3.pr-lg-0.pl-3.topnav.navbar.navbar-expand.shadow.navbar-light.bg-white
+    ul.navbar-nav.align-items-center.mr-auto
+      sbpro-top-nav-user(placement='bottom-left')
+      sbpro-top-nav-messages(placement='bottom-left')
+      sbpro-top-nav-alerts(placement='bottom-left')
+      sbpro-top-nav-docs(placement='bottom-left')
+
+    sbpro-top-nav-search.ml-auto.d-none.d-lg-block
+
+    button#sidebarToggle.btn.btn-icon.btn-transparent-dark.order-1.order-lg-0.ml-lg-2.ml-2(
+      data-cy='topNavToggleSideNav',
+      (click)='toggleSideNav()'
+    )
+      i-feather(name='menu')
+
+    a.navbar-brand.text-right.d-none.d-sm-block(routerLink='/dashboard')
+      | SB Admin Pro
+
+ng-template(#NoticeModal)
+  sbpro-card([headerActions]='true', style='height: fit-content !important;')
+    .card-header.logoColor
+      div(style='word-break: break-word;text-align: center;width:100%;') 
+        h2.mb-0.logoColor {{ portalNotification.title }}
+    .card-body
+      span([innerHTML]='trustHtml(portalNotification.content)')
+    .card-footer.p-2.d-flex.align-items-center
+      span
+        label.d-flex.mb-0(for='dontshowcheckbox')
+          input#dontshowcheckbox(
+            type='checkbox',
+            [checked]='dontShowAgain',
+            (change)='setDontShow($event)'
+          ) 
+          span.ml-2 Don't show this again
+      button.btn.castlerButtonColor(
+        type='button',
+        (click)='closeNoticeModal()',
+        style='margin-left:auto;'
+      ) Ok, Got it

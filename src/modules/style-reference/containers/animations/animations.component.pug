@@ -1,0 +1,16 @@
+sbpro-dashboard-head(
+    icon='film',
+    title='Animations',
+    description='Custom animation utilities to add motion to your transitioning content'
+)
+.container-fluid.mt-n10
+    .row
+        .col-lg-9
+            sbpro-animations-fade-in(
+                sbproTocItem='Fade In'
+            )
+            sbpro-animations-fade-in-up(
+                sbproTocItem='Fade In Up'
+            )
+        .col-lg-3
+            sbpro-toc-nav([tocIndex]='tocIndex')

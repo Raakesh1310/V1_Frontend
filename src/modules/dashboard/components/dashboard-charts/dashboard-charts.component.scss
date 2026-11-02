@@ -1,0 +1,28 @@
+@import 'styles/variables.scss';
+
+.item {
+  width: auto;
+  height: auto;
+  margin: 10px auto;
+  padding: 18px;
+  background-color: #FFFBF4;
+}
+
+.loaderHeight {
+  height: 200px !important;
+}
+
+:host >>> ngx-skeleton-loader .loader1 {
+  border-radius: 5px;
+  height: 50px;
+  background-color: #992929;
+  border: 1px solid white;
+}
+
+//@media screen and (max-width: 900px) {
+//  #changeGridToColumn {
+//    display:flex;
+//    flex-wrap: wrap;
+//    flex-direction: row;
+//  }
+//}

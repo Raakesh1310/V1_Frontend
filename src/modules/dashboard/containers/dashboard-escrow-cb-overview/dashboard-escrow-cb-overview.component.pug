@@ -1,0 +1,15 @@
+sbpro-dashboard-head(icon='activity', title='Dashboard', description='')
+.container-fluid.mt-n10
+    sbpro-card-navigation(
+        *ngIf='!isAdmin && isAccountAddAllowed && connectedBanking',
+        sbproTocItem='Tabs',
+        [navNames]='["Digital Escrow","Connected Banking"]',
+        [templates]='[escrow, cb]',
+        navType = 'pill'
+    )
+        ng-template(#escrow)
+            sbpro-dashboard-overview([cb]= "false")
+        ng-template(#cb)
+            sbpro-dashboard-overview([cb]= "true")
+
+    sbpro-dashboard-overview(*ngIf = '!isAccountAddAllowed || !connectedBanking')

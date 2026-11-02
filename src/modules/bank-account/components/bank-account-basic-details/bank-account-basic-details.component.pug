@@ -1,0 +1,66 @@
+div
+	div(*ngIf='errors.length > 0')
+		sbpro-alert(classes='alert-danger', [dismissable]='true')
+			| {{ errors[0] }}
+	form([formGroup]='detailForm')
+		.row
+			.col-sm-12.col-md-6.col-lg-6
+				.form-group
+					label.bold(for='accountName') Account Name
+					input#inputAccountName.form-control.form-control-sm(
+						formControlName='accountName',
+						type='text',
+						autocomplete='off',
+						[ngClass]='{ "non-editable": readOnly }'
+					)
+
+			.col-sm-12.col-md-6.col-lg-6
+				.form-group
+					label.bold(for='bankAccountNumber') Account Number
+					input#inputAccountNumber.form-control.form-control-sm(
+						formControlName='bankAccountNumber',
+						type='text',
+						[ngClass]='{ "non-editable": true }'
+					)
+		.row
+			.col-sm-12.col-md-6.col-lg-6
+				.form-group
+					label.bold(for='bankName') Bank Name
+					input#bankName.form-control.form-control-sm(
+						type='text',
+						placeholder='Enter Bank Name',
+						formControlName='bankName',
+						name='bankName',
+						[ngClass]='{ "non-editable": readOnly }'
+					)
+			.col-sm-12.col-md-6.col-lg-6
+				.form-group
+					label.bold(for='accountType') Account Type
+					input#accountType.form-control.form-control-sm(
+						type='text',
+						formControlName='accountType',
+						name='accountType',
+						[ngClass]='{ "non-editable": readOnly }',
+					)
+
+		.row
+			.col-sm-8.col-md-6.col-lg-6
+				.form-group
+					label.bold(for='accountBalance') Account Balance
+					input#accountBalance.form-control.form-control-sm(
+						formControlName='accountBalance',
+						name='accountBalance',
+						[ngClass]='{ "non-editable": readOnly }'
+					)
+			.col-sm-4.col-md-6.col-lg-6
+				.form-group
+					label.bold(for='email') Effective Account Balance
+					input#effectiveAccountBalance.form-control.form-control-sm(
+						formControlName='effectiveAccountBalance',
+						name='effectiveAccountBalance',
+						[ngClass]='{ "non-editable": readOnly }'
+					)
+
+	button.btn.btn-light((click)='goBack()') Back
+ngx-spinner
+	p(style='font-size: 20px; color: white') Processing. Please wait...

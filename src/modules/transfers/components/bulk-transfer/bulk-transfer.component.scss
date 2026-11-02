@@ -1,0 +1,171 @@
+@import 'styles/variables.scss';
+
+.selected-list .c-list .c-token {
+  background: #0abc11 !important;
+}
+
+.pure-checkbox input[type='checkbox']:checked + label:before {
+  background: #0abc11 !important;
+  border-color: #0abc11 !important;
+}
+
+.pure-checkbox input[type='checkbox'] + label:before {
+  color: #0abc11 !important;
+  border: 1px solid #0abc11 !important;
+}
+
+.modal-header {
+  color: rgb(2, 98, 242);
+  font-weight: 500;
+}
+
+.crossButton {
+  &:hover {
+    opacity: 1;
+    text-decoration: underline;
+  }
+  &:active {
+    position: relative;
+    top: 7px;
+    box-shadow: none;
+    color: blue;
+  }
+}
+
+.flex-display {
+  display: flex;
+  flex-direction: row;
+}
+
+.flex-display-1 {
+  display: flex;
+  flex-direction: row;
+}
+
+.leftMargin {
+  margin-left: 20px;
+}
+
+//.dottedBorders {
+//  border-style: dotted;
+//  border-color: #bc8e32;
+//}
+
+.marginTop {
+  margin-top: 12px;
+}
+
+.widthOfUploadCard {
+  width: 30% !important;
+  margin: auto;
+}
+
+.myanchor {
+  text-decoration: none;
+  color: #687281;
+}
+
+@media screen and (max-width: 900px) {
+  .leftMargin {
+    margin-left: 0;
+  }
+
+  .flex-display {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+.selectAccountWidth {
+  width: 50% !important;
+  min-width: 30%;
+}
+
+.fullWidth {
+  width: 85%;
+}
+
+.fullWidth100 {
+  width: 70%;
+}
+
+.makeTransferButtonWidth {
+  width: 12em !important;
+  height: 45px;
+  display: inline-flex;
+}
+
+.w200 {
+  width: auto;
+  height: 45px;
+}
+
+#batchWidth {
+  margin-left: 15px;
+  width: 70% !important;
+}
+
+@media screen and (max-width: 900px) {
+  .selectAccountWidth {
+    width: 100% !important;
+    min-width: 30%;
+  }
+
+  #batchWidth {
+    margin-left: 0;
+    width: 100% !important;
+  }
+
+  .fullWidth100 {
+    width: 100% !important;
+  }
+}
+
+input[type='file'] {
+  display: none;
+}
+
+#batchInput {
+  border: none;
+}
+
+.flex-display-column {
+  display: flex;
+  flex-direction: column;
+}
+
+.statusBorders {
+  box-shadow: 1px 7px 17px -5px rgba(0, 0, 0, 0.19) !important;
+  -webkit-box-shadow: 1px 7px 17px -5px rgba(0, 0, 0, 0.19) !important;
+  -moz-box-shadow: 1px 7px 17px -5px rgba(0, 0, 0, 0.19) !important;
+}
+
+.noShadow {
+  box-shadow: none;
+}
+
+.redDot:before {
+  content: '\A';
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: #ff0000;
+  display: inline-block;
+  margin-right: 3px;
+  margin-bottom: 2px;
+}
+
+#jacks {
+  font-family: 'Poppin', fantasy;
+}
+
+#greenDot:before {
+  content: '\A';
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: #18b81f;
+  display: inline-block;
+  margin: 0 3px 3px 0;
+}

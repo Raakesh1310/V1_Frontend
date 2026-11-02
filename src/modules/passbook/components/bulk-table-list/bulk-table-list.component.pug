@@ -1,0 +1,517 @@
+div
+    div(*ngIf='errors.length > 0')
+        sbpro-alert(classes='alert-danger', [dismissable]='true', (click)='errors = []')
+            | {{ errors[0] }}
+    form
+        .d-flex.mb-2
+            input#search-box.mt-1.form-control.w-100.mr-2(
+                type='text',
+                name='s',
+                placement='top',
+                autocomplete='off',
+                (input) = 'Search($event)',
+                [(ngModel)] = 'searchTerm',
+                ngbPopover='Search by Batch ID, Payment ID, Beneficiary Name',
+                placeholder='Search by Batch ID, Payment ID, Beneficiary Name',
+            )
+            input#date-from.mt-1.form-control.w-25.mr-2(
+                type='text',
+                placeholder='Start Date',
+                name='dateFrom',
+                ngbDatepicker,
+                outsideDays='hidden',
+                autocomplete='off',
+                #dateFrom='ngbDatepicker',
+                (click)='dateFrom.toggle()',
+                [(ngModel)] = 'startDate',
+                (ngModelChange)="startDateChange()",
+                [maxDate]="maxDate"
+            )
+            input#date-to.mt-1.form-control.w-25.mr-2(
+                type='text',
+                placeholder='End Date',
+                name='dateTo',
+                ngbDatepicker,
+                outsideDays='hidden',
+                autocomplete='off',
+                #dateTo='ngbDatepicker',
+                (click)='dateTo.toggle()',
+                [(ngModel)] = 'endDate',
+                (ngModelChange)="endDateChange()",
+                [maxDate]='maxDate',
+            )
+            select.mt-1.form-control.w-25.mr-2(
+                *ngIf='isAdmin && !isTrustee',
+                name='bank',
+                [(ngModel)]='bank'
+            )
+                option(value='') Select Bank
+                option(value='icici') ICICI
+                option(value='rbl') RBL
+                option(value='yes_bank') YES BANK
+                option(value='idfc') IDFC
+                option(value='ibl') IndusInd
+                option(value='hdfc') HDFC
+            select#statusList.mt-1.form-control.w-25.mr-2(
+                name='status',
+                [(ngModel)]='selectedStatus'
+            )
+                option(value='') Status
+                option(*ngFor='let st of statusListSearch', [ngValue]='st') {{ st }}
+            button.btn.ml-2.ws-nowrap.mt-1.mb-1(
+                class='castlerButtonColor',
+                type='submit',
+                (click)='filterData()'
+            )
+                fa-icon.d-flex.flex-row.align-items-center([icon]='["fas", "search"]')
+            button.btn.btn-link.mt-1.mb-1.mr-2(
+                type='button',
+                class='logoColor',
+                (click)='clearSearch()'
+            )
+                | Clear
+            .justify-content-end(*ngIf='!connectedBanking')
+                a.btn.mt-1.mb-1.btn-success.ws-nowrap.btn-icon(
+                    style='color: white',
+                    type='button',
+                    target='_blank',
+                    [href]='downloadLink'
+                )
+                    fa-icon.d-flex.flex-row.align-items-center(
+                        [icon]='["fas", "arrow-down"]'
+                    )
+        .d-flex.mb-2(*ngIf='data.length > 0 ')
+            .flex-row
+                small.mb-2.mt-2 Showing {{  (page - 1)  * 10 + 1 }} to {{ (page - 1)  * 10 +  (data)?.length  }} of {{total$}}
+
+    .table-responsive.pp-table-container.table-responsive-sm
+        table.table
+            thead
+                tr
+                    th(scope='col', sbSortable='event', *ngIf='isAdmin')
+                        span.ws-nowrap Business Name
+                    th(scope='col', sbSortable='event')
+                        span.ws-nowrap Batch ID
+                    th(scope='col', sbSortable='time')
+                        span.ws-nowrap Batch Name
+                    th(scope='col', sbSortable='time', *ngIf='connectedBanking')
+                        span.ws-nowrap Bank Account
+                    th(scope='col', sbSortable='time', *ngIf='!connectedBanking')
+                        span.ws-nowrap Escrow ID
+                    th(scope='col', sbSortable='time', style='width: 100px')
+                        span.ws-nowrap Date
+                    th(scope='col', sbSortable='time')
+                        span.ws-nowrap No of Transfers
+                    th(scope='col', sbSortable='time')
+                        span.ws-nowrap Total Amount
+                    th(scope='col', sbSortable='time')
+                        span.ws-nowrap Status
+                    th(scope='col', sbSortable='time')
+                        span.ws-nowrap Transfer List
+                    th(scope='col', sbSortable='time', *ngIf='(isAdmin && !readOnly) || isTesting')
+                        span.ws-nowrap Action
+            tbody
+                tr(*ngIf='isLoading')
+                    .spinner-border.text-primary(role='status')
+                        span.sr-only Loading...
+                tr(*ngIf='(data.length == 0 && !isLoading)')
+                        td No Entries Found
+                tr(*ngFor='let bulkTransfer of data; index as i')
+                    td(*ngIf='isAdmin')
+                        ngb-highlight([result]='bulkTransfer.merchantTitle')
+                    td((click)="open(content,bulkTransfer.batchId,pageSize,page,data.length)")
+                        ngb-highlight.ws-nowrap.tableClickEntryColor.myanchor([result]='bulkTransfer.batchId')
+                    td
+                        ngb-highlight([result]='bulkTransfer.batchName')
+                    td(*ngIf='!connectedBanking')
+                        ngb-highlight([result]='bulkTransfer.accountId')
+                    td(*ngIf='connectedBanking')
+                        ngb-highlight([result]='bulkTransfer.bankAccountNumber')
+                    td
+                        ngb-highlight([result]='bulkTransfer.createdAt.substring(0,10)')
+                    td
+                        ngb-highlight([result]='bulkTransfer.numberOfTransfers')
+                    td
+                        ngb-highlight([result]='toINR(bulkTransfer.totalAmount.toFixed(2))')
+                    td(*ngIf = 'isTrustee')
+                        ngb-highlight(
+                            style='font-weight: bold',
+                            [style.color]='setColor(bulkTransfer.status)',
+                            [result]='bulkTransfer.status'
+                        )
+                    td(*ngIf = 'bulkTransfer.status == "Pending for Authorization" && !isTrustee')
+                        ngb-highlight.myanchor(
+                            style='color: #F5A500; font-weight: bold',
+                            [result]='bulkTransfer.status',
+                            (click)='openMap(statusMap, bulkTransfer)',
+                            *ngIf='!enableEdit'
+                        )
+                        select#statusListInline.min-w-150px.mt-1.form-control.form-control-sm.w-100(
+                            *ngIf='enableEdit && enableEditIndex == i  && bulkTransfer.accountId.startsWith("500007")',
+                            name='status',
+                            (change) = 'dropdownChange($event,bulkTransfer)',
+                            [(ngModel)]='selectedStatusRow'
+                        )
+                            option(value='') Select Status
+                            option(*ngFor='let st of statusList', [ngValue]='st') {{ st }}
+                        select#statusListInline.min-w-150px.mt-1.form-control.form-control-sm.w-100(
+                            *ngIf='enableEdit && enableEditIndex == i  && !bulkTransfer.accountId.startsWith("500007")',
+                            name='status',
+                            (change) = 'dropdownChange($event,bulkTransfer)',
+                            [(ngModel)]='selectedStatusRow'
+                        )
+                            option(value='') Select Status
+                            option(*ngFor='let st of adminStatusList', [ngValue]='st') {{ st }}
+                    td(*ngIf = 'bulkTransfer.status == "Sent for Processing" && !isTrustee')
+                        ngb-highlight.myanchor(
+                            style='color: #329ca8; font-weight: bold',
+                            [result]='bulkTransfer.status',
+                            (click)='openMap(statusMap, bulkTransfer)',
+                            *ngIf='!enableEdit'
+                        )
+                        select#statusListInline.min-w-150px.mt-1.form-control.form-control-sm.w-100(
+                            *ngIf='enableEdit && enableEditIndex == i  && bulkTransfer.accountId.startsWith("500007")',
+                            name='status',
+                            (change) = 'dropdownChange($event,bulkTransfer)',
+                            [(ngModel)]='selectedStatusRow'
+                        )
+                            option(value='') Select Status
+                            option(*ngFor='let st of statusList', [ngValue]='st') {{ st }}
+                        select#statusListInline.min-w-150px.mt-1.form-control.form-control-sm.w-100(
+                            *ngIf='enableEdit && enableEditIndex == i  && !bulkTransfer.accountId.startsWith("500007")',
+                            name='status',
+                            (change) = 'dropdownChange($event,bulkTransfer)',
+                            [(ngModel)]='selectedStatusRow'
+                        )
+                            option(value='') Select Status
+                            option(*ngFor='let st of adminStatusList', [ngValue]='st') {{ st }}
+                    td(*ngIf = 'bulkTransfer.status == "Failed" && !isTrustee')
+                        ngb-highlight.myanchor(
+                            style='color: #FF0000; font-weight: bold',
+                            [result]='bulkTransfer.status',
+                            (click)='openMap(statusMap, bulkTransfer)',
+                            *ngIf='!enableEdit'
+                        )
+                        select#statusListInline.min-w-150px.mt-1.form-control.form-control-sm.w-100(
+                            *ngIf='enableEdit && enableEditIndex == i',
+                            name='status',
+                            (change) = 'dropdownChange($event,bulkTransfer)',
+                            [(ngModel)]='selectedStatusRow'
+                        )
+                            option(value='') Select Status
+                            option(*ngFor='let st of statusList', [ngValue]='st') {{ st }}
+                    td(*ngIf = 'bulkTransfer.status == "Success" && !isTrustee')
+                        ngb-highlight.myanchor(
+                            style='color: #18B81F; font-weight: bold',
+                            [result]='bulkTransfer.status',
+                            (click)='openMap(statusMap, bulkTransfer)',
+                            *ngIf='!enableEdit'
+                        )
+                        select#statusListInline.min-w-150px.mt-1.form-control.form-control-sm.w-100(
+                            *ngIf='enableEdit && enableEditIndex == i  && bulkTransfer.accountId.startsWith("500007")',
+                            name='status',
+                            (change) = 'dropdownChange($event,bulkTransfer)',
+                            [(ngModel)]='selectedStatusRow'
+                        )
+                            option(value='') Select Status
+                            option(*ngFor='let st of statusList', [ngValue]='st') {{ st }}
+                        select#statusListInline.min-w-150px.mt-1.form-control.form-control-sm.w-100(
+                            *ngIf='enableEdit && enableEditIndex == i  && !bulkTransfer.accountId.startsWith("500007")',
+                            name='status',
+                            (change) = 'dropdownChange($event,bulkTransfer)',
+                            [(ngModel)]='selectedStatusRow'
+                        )
+                            option(value='') Select Status
+                            option(*ngFor='let st of adminStatusList', [ngValue]='st') {{ st }}
+                    td(*ngIf = 'bulkTransfer.status == "Completed" && !isTrustee')
+                        ngb-highlight.myanchor(
+                            style='color: #6C3483; font-weight: bold',
+                            [result]='bulkTransfer.status',
+                            (click)='openMap(statusMap, bulkTransfer)',
+                            *ngIf='!enableEdit'
+                        )
+                        select#statusListInline.min-w-150px.mt-1.form-control.form-control-sm.w-100(
+                            *ngIf='enableEdit && enableEditIndex == i  && bulkTransfer.accountId.startsWith("500007")',
+                            name='status',
+                            (change) = 'dropdownChange($event,bulkTransfer)',
+                            [(ngModel)]='selectedStatusRow'
+                        )
+                            option(value='') Select Status
+                            option(*ngFor='let st of statusList', [ngValue]='st') {{ st }}
+                        select#statusListInline.min-w-150px.mt-1.form-control.form-control-sm.w-100(
+                            *ngIf='enableEdit && enableEditIndex == i  && !bulkTransfer.accountId.startsWith("500007")',
+                            name='status',
+                            (change) = 'dropdownChange($event,bulkTransfer)',
+                            [(ngModel)]='selectedStatusRow'
+                        )
+                            option(value='') Select Status
+                            option(*ngFor='let st of adminStatusList', [ngValue]='st') {{ st }}
+                    td(*ngIf = 'bulkTransfer.status == "success" && !isTrustee')
+                        ngb-highlight.myanchor(
+                            style='color: #18B81F; font-weight: bold',
+                            [result]='bulkTransfer.status',
+                            (click)='openMap(statusMap, bulkTransfer)',
+                            *ngIf='!enableEdit'
+                        )
+                        select#statusListInline.min-w-150px.mt-1.form-control.form-control-sm.w-100(
+                            *ngIf='enableEdit && enableEditIndex == i  && bulkTransfer.accountId.startsWith("500007")',
+                            name='status',
+                            (change) = 'dropdownChange($event,bulkTransfer)',
+                            [(ngModel)]='selectedStatusRow'
+                        )
+                            option(value='') Select Status
+                            option(*ngFor='let st of statusList', [ngValue]='st') {{ st }}
+                        select#statusListInline.min-w-150px.mt-1.form-control.form-control-sm.w-100(
+                            *ngIf='enableEdit && enableEditIndex == i  && !bulkTransfer.accountId.startsWith("500007")',
+                            name='status',
+                            (change) = 'dropdownChange($event,bulkTransfer)',
+                            [(ngModel)]='selectedStatusRow'
+                        )
+                            option(value='') Select Status
+                            option(*ngFor='let st of adminStatusList', [ngValue]='st') {{ st }}
+                    td(*ngIf = 'bulkTransfer.status == "failed" && !isTrustee')
+                        ngb-highlight.myanchor(
+                            style='color: #FF0000; font-weight: bold',
+                            [result]='bulkTransfer.status',
+                            (click)='openMap(statusMap, bulkTransfer)',
+                            *ngIf='!enableEdit'
+                        )
+                        select#statusListInline.min-w-150px.mt-1.form-control.form-control-sm.w-100(
+                            *ngIf='enableEdit && enableEditIndex == i  && bulkTransfer.accountId.startsWith("500007")',
+                            name='status',
+                            (change) = 'dropdownChange($event,bulkTransfer)',
+                            [(ngModel)]='selectedStatusRow'
+                        )
+                            option(value='') Select Status
+                            option(*ngFor='let st of statusList', [ngValue]='st') {{ st }}
+                        select#statusListInline.min-w-150px.mt-1.form-control.form-control-sm.w-100(
+                            *ngIf='enableEdit && enableEditIndex == i  && !bulkTransfer.accountId.startsWith("500007")',
+                            name='status',
+                            (change) = 'dropdownChange($event,bulkTransfer)',
+                            [(ngModel)]='selectedStatusRow'
+                        )
+                            option(value='') Select Status
+                            option(*ngFor='let st of adminStatusList', [ngValue]='st') {{ st }}
+                    td(*ngIf = 'bulkTransfer.status == "pending" && !isTrustee')
+                        ngb-highlight.myanchor(
+                            style='color: #F5A500; font-weight: bold',
+                            [result]='bulkTransfer.status',
+                            (click)='openMap(statusMap, bulkTransfer)',
+                            *ngIf='!enableEdit'
+                        )
+                        select#statusListInline.min-w-150px.mt-1.form-control.form-control-sm.w-100(
+                            *ngIf='enableEdit && enableEditIndex == i  && bulkTransfer.accountId.startsWith("500007")',
+                            name='status',
+                            (change) = 'dropdownChange($event,bulkTransfer)',
+                            [(ngModel)]='selectedStatusRow'
+                        )
+                            option(value='') Select Status
+                            option(*ngFor='let st of statusList', [ngValue]='st') {{ st }}
+                        select#statusListInline.min-w-150px.mt-1.form-control.form-control-sm.w-100(
+                            *ngIf='enableEdit && enableEditIndex == i  && !bulkTransfer.accountId.startsWith("500007")',
+                            name='status',
+                            (change) = 'dropdownChange($event,bulkTransfer)',
+                            [(ngModel)]='selectedStatusRow'
+                        )
+                            option(value='') Select Status
+                            option(*ngFor='let st of adminStatusList', [ngValue]='st') {{ st }}
+                    td(*ngIf = 'bulkTransfer.status == "rejected" && !isTrustee')
+                        ngb-highlight.myanchor(
+                            style='color: #FF0000; font-weight: bold',
+                            [result]='bulkTransfer.status',
+                            (click)='openMap(statusMap, bulkTransfer)',
+                            *ngIf='!enableEdit'
+                        )
+                        select#statusListInline.min-w-150px.mt-1.form-control.form-control-sm.w-100(
+                            *ngIf='enableEdit && enableEditIndex == i  && bulkTransfer.accountId.startsWith("500007")',
+                            name='status',
+                            (change) = 'dropdownChange($event,bulkTransfer)',
+                            [(ngModel)]='selectedStatusRow'
+                        )
+                            option(value='') Select Status
+                            option(*ngFor='let st of statusList', [ngValue]='st') {{ st }}
+                        select#statusListInline.min-w-150px.mt-1.form-control.form-control-sm.w-100(
+                            *ngIf='enableEdit && enableEditIndex == i  && !bulkTransfer.accountId.startsWith("500007")',
+                            name='status',
+                            (change) = 'dropdownChange($event,bulkTransfer)',
+                            [(ngModel)]='selectedStatusRow'
+                        )
+                            option(value='') Select Status
+                            option(*ngFor='let st of adminStatusList', [ngValue]='st') {{ st }}
+                    td(id='excelImage')
+                        img.mr-1.myanchor(
+                            src='/assets/img/excel.png',
+                            width='25',
+                            height='25',
+                            (click)='downloadExcel(bulkTransfer.batchId)'
+                        )
+                    td(*ngIf='(isAdmin && !readOnly) || isTesting')
+                        button.btn.btn-success.btn-xs.mr-2.font-weight-700.ws-nowrap(
+                            *ngIf='enableEdit && enableEditIndex == i',
+                            (click)='updateRow(bulkTransfer)'
+                        ) Save
+                        button.btn.btn-danger.btn-xs.mr-2.font-weight-700.ws-nowrap(
+                            *ngIf='enableEdit && enableEditIndex == i',
+                            (click)='cancelClick(bulkTransfer)'
+                        ) Cancel
+                        button.btn.btn-danger.btn-xs.mr-2.font-weight-700.ws-nowrap(
+                            *ngIf='!enableEdit && (bulkTransfer.status === "Pending" || bulkTransfer.status === "pending" || bulkTransfer.status === "" || bulkTransfer.status === "Pending for Authorization")',
+                            (click)='enableEditMethod($event, i)'
+                        ) Edit
+    .d-flex.justify-content-between.p-2
+        ngb-pagination(
+            [collectionSize]='total$',
+            [maxSize]='5',
+            [(page)]='page',
+            [pageSize]='pageSize',
+            [rotate]='true',
+            [ellipses]='false',
+            (pageChange)='pageChange($event)',
+            [boundaryLinks]='true'
+        )
+
+
+ng-template(#content='', let-modal='')
+    .modal-header.no-border
+        h5#exampleModalLabel.modal-title(class= 'logoColor') Payees Linked
+        button.close(type='button', (click)="modal.dismiss('Cross click')" , aria-label='Close', class = 'castlerButtonColor1')
+            span(aria-hidden='true') &times;
+    .modal-body
+        .table-responsive.pp-table-container
+            table.table
+                thead
+                    tr
+                        th(scope='col', sbSortable='event')
+                            span.ws-nowrap Beneficiary Name
+                        th(scope='col', sbSortable='time')
+                            span.ws-nowrap Beneficiary Account number
+                        th(scope='col', sbSortable='time')
+                            span.ws-nowrap IFSC code
+                        th(scope='col', sbSortable='time')
+                            span.ws-nowrap Amount
+                        th(scope='col', sbSortable='time')
+                            span.ws-nowrap Description / Purpose
+                        th(scope='col', sbSortable='time')
+                            span.ws-nowrap Bank Name
+                tbody(*ngIf='payeeOfSingleTransfer.length == 0')
+                    tr
+                        td No Entries Found
+                tbody
+                    tr(
+                        *ngFor='let data of payeeOfSingleTransfer | slice: (transferPage - 1) * transferPageSize:transferPage * transferPageSize'
+                    )
+                        td
+                            ngb-highlight.ws-nowrap([result]='data.beneficiaryName')
+                        td
+                            ngb-highlight([result]='data.beneficiaryAccNumber')
+                        td
+                            ngb-highlight([result]='data.beneficiaryIFSC')
+                        td
+                            ngb-highlight([result]='toINR(data.amount)')
+                        td
+                            ngb-highlight([result]='data.purpose')
+                        td
+                            ngb-highlight([result]='data.beneficiaryBankName')
+        .d-flex.justify-content-between.p-2
+            ngb-pagination(
+                [collectionSize]='transfersTotal$',
+                [maxSize]='5',
+                [(page)]='transferPage',
+                [pageSize]='transferPageSize',
+                [rotate]='true',
+                [ellipses]='false',
+                (pageChange)='loadPage($event)',
+                [boundaryLinks]='true'
+            )
+    .modal-footer
+        button.btn(type='button', (click)="modal.close('Save click')", class = 'castlerButtonColor') Close
+
+ng-template(#statusMap)
+  .modal-header(class='logoColor') Transfer Status
+  .isDataLoading(*ngIf="isLoadingAuthorization")
+    .spinner-border.text-primary(role='status')
+        span.sr-only Loading...
+
+  .modal-body(*ngIf='!oldMap && !isLoadingAuthorization')
+    .container.mt-5.mb-5
+      .row
+        .col
+          h4 Fund Transfer
+          ul.timeline
+            li.green
+              h3
+                b Initiated
+              p(*ngIf='selectedTransfer.createdByEmail')
+                i {{selectedTransfer.createdByEmail}}  
+              i {{ selectedTransfer.createdAt | date:'medium'}}
+            div.p-0.m-0(*ngFor='let auth of authorizers | keyvalue')
+              div.p-0.m-0(*ngFor='let level of authorizers[auth.key] | keyvalue')
+                div.p-0.m-0(*ngFor='let authorizer of authorizers[auth.key][level.key]["authorizers"]')
+                  li(*ngIf='authorizer.verified', [ngClass]='!authorizer.verified? "white" : authorizer.verified && !authorizer.data.approved ? "red" : "green"')
+                    h3
+                      span(*ngIf='authorizer.verified && authorizer.data.approved')
+                        p
+                          b Approved
+                          small(*ngIf='auth.key !== "4trustee" && auth.key !== "3admin"') (Level {{authorizer.data.level}} {{authorizer.data.type.split(' ')[0]}})
+                      span(*ngIf='authorizer.verified && !authorizer.data.approved')
+                        p
+                          b Rejected
+                          small(*ngIf='auth.key !== "4trustee" && auth.key !== "3admin"') (Level {{authorizer.data.level}} {{authorizer.data.type.split(' ')[0]}})
+                    i(*ngIf='authorizer.email === selectedTransfer.createdBy') 
+                      b(style="font-size:  0.9rem;") Auto Approved
+                    p
+                      i {{authorizer.email}}
+                    i {{ authorizer.verifiedAt | date:'medium' }}
+                li.white(*ngIf='selectedTransfer.status !== "Completed" && selectedTransfer.status !== "Failed" && !authorizers[auth.key][level.key]["isApproved"] && !hasRejectedAuthorizer(auth.key, level.key)')                  
+                  h3
+                    p(*ngIf='!auth.verified')
+                      b Pending for approval
+                  p
+                    i(*ngIf='auth.key !== "4trustee" && auth.key !== "3admin"') Level {{level.key}} {{ authorizers[auth.key][level.key].type }} ({{authorizers[auth.key][level.key].minApprovalsNeeded}})
+                    i(*ngIf='auth.key === "4trustee"', style="width: fit-content; max-width: 20ch; overflow-wrap: break-word;") {{ trusteeEmails }}
+                    i(*ngIf='auth.key === "3admin"')  {{ authorizers[auth.key][level.key]["authorizers"][0].email }}
+            li.green(*ngIf='selectedTransfer.status !== "Failed" &&  selectedTransfer.status ==="Sent for Processing" || selectedTransfer.status ==="failed" || selectedTransfer.status === "success"')
+              h3
+                b Sent for processing
+              i {{ selectedTransfer.updatedAt | date:'medium'}}
+            li(*ngIf='selectedTransfer.status ==="Failed" || selectedTransfer.status === "Success"', [ngClass]='selectedTransfer.status ==="Failed" ? "red" : "green"')
+              h3
+                b {{selectedTransfer.status}}
+              i {{ selectedTransfer.updatedAt | date:'medium'}}
+
+  .modal-body(*ngIf='oldMap && !isLoadingAuthorization')
+    div(*ngIf='selectedTransfer.authorization.length === 0')
+      p No approvals found for this transaction.
+    div(*ngIf='selectedTransfer.authorization.length > 0')
+      .container.mt-5.mb-5
+        .row
+          .col
+            h4 Fund Transfer
+            ul.timeline
+              li.green
+                h3
+                  b Initiated
+                i {{ selectedTransfer.createdAt | date:'medium'}}
+              li(*ngFor='let auth of selectedTransfer.authorization', [ngClass]='!auth.verified? "white" : auth.verified && !auth.data.approved ? "red" : "green"')
+                h3
+                  p(*ngIf='!auth.verified')
+                    b Pending for approval
+                  span(*ngIf='auth.verified && auth.data.approved')
+                    p
+                      b Approved
+                  span(*ngIf='auth.verified && !auth.data.approved')
+                    p
+                      b Rejected
+                p
+                  i {{auth.email}}
+                i {{ auth.verifiedAt | date:'medium' }}
+              li.green(*ngIf='selectedTransfer.status ==="Sent for Processing" || selectedTransfer.status ==="failed" || selectedTransfer.status === "success"')
+                h3
+                  b Sent for processing
+                i {{ selectedTransfer.updatedAt | date:'medium'}}
+              li(*ngIf='selectedTransfer.status ==="Failed" || selectedTransfer.status === "Success"',[ngClass]='selectedTransfer.status ==="Failed" ? "red" : "green"')
+                h3
+                  b {{selectedTransfer.status}}
+                i {{ selectedTransfer.updatedAt | date:'medium'}}
+  .modal-footer
+    button.btn.btn-sm((click)='closeModal()', class='castlerButtonColor', style='box-shadow: none') Close

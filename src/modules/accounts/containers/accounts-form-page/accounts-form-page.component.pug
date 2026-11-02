@@ -1,0 +1,110 @@
+.flex-container
+  sbpro-dashboard-head(icon="book" title="Add New Escrow")
+  .container-fluid.mt-n10.responsiveForm
+    sbpro-card(*ngIf="isPaymentGateway")
+      .card-header Payment
+      .card-body 
+        sbpro-accounts-payment(
+          [currentTab]="currentTab",
+          [merchantDetails]="merchantDetails",
+          [paymentAmount]="paymentAmount"
+        )
+
+    sbpro-card-navigation(
+      *ngIf="!isPaymentGateway",
+      sbproTocItem="Tabs",
+      [navNames]="allTabs",
+      [navNamesDisabled]="disabledTabs",
+      [selectedIndex]="currentTab",
+      [selectedIndexForFade]="currentTab",
+      [templates]="isSAValid(selectedBank) && sourceAccountValidation ? [description, payees, sourceaccount, documents] : [description, payees, documents]"
+    )
+
+    ng-template(#description)
+      sbpro-account-description-form(
+        [accountId]="accountId",
+        [cachedForm]="cachedDescription",
+        [currentTab]="currentTab",
+        (emitCache)="cacheAccountDescription($event)",
+        (emitNextTab)="nextTab($event)",
+        (emitShareUnit)="setDraftShareUnit($event)",
+        (emitMerchantId)="setMerchantId($event)",
+        (emitSelectedBank)="setSelectedBank($event)",
+        (emitAutoTransfer)='toggleAutoTransfer($event)',
+        (emitAutoTransferType)='setAutoTransferType($event)',
+        (emitScheduledAt)='setScheduledAt($event)',
+      )
+    ng-template(#payees)
+      sbpro-account-payee-form(
+        [accountId]="accountId",
+        [draftShareUnit]="draftShareUnit",
+        [currentTab]="currentTab",
+        (emitNextTab)="nextTab($event)",
+        [selectedBank]="selectedBank",
+        (emitCurrentTab)="setCurrentTab($event)",
+        (emitAutoTransfer)="toggleAutoTransfer($event)",
+        (emitAutoTransferType)='setAutoTransferType($event)',
+        (emitAutoScheduledAt)='setScheduledAt($event)',
+        [isAutoTransfer]="isAutoTransfer",
+        [autoScheduledAt]="autoScheduledAt",
+        [autoTransferType]="autoTransferType",
+        [status]="accountStatus",
+        [draftPayees]="draftPayees",
+        (emitDraftPayee)="setdraftPayees($event)",
+        (emitUndraftPayee)="unsetdraftPayees($event)",
+        (emitShareUnit)="setDraftShareUnit($event)",
+        (emitRetention)="setRetention($event)",
+        (emitRetentionAmount)="setRetentionAmount($event)",
+        [isRetentionChecked]="retention",
+        [retentionAmount]="retentionAmount",
+        [merchantId]="merchantId"
+      )
+    ng-template(#sourceaccount)
+      sbpro-account-source-validation(
+        [accountId]="accountId",
+        [selectedBank]="selectedBank",
+        [currentTab]="currentTab",
+        (emitNextTab)="nextTab($event)",
+        (emitCurrentTab)="setCurrentTab($event)"
+
+      )
+    ng-template(#documents)
+      sbpro-account-document-form(
+        [accountId]="accountId",
+        [currentTab]="currentTab",
+        [merchantId]="merchantId",
+        (emitCurrentTab)="setCurrentTab($event)"
+      )
+
+ng-template(#infoMessage)
+  .card-header.modal-header.logoColor Information Message
+  .card-body
+    ul
+      li 
+        b Escrow requires a minimum of one payee.
+      li Please keep at least one of the following documents to upload
+        ul
+          li Request letter for Escrow creation
+          li Escrow Agreement
+          li Transaction parties Agreement
+          li Indemnity Undertaking
+  .card-footer
+    button.btn.float-right.castlerButtonColor(
+      (click)="closeModal()",
+      style="box-shadow: none"
+    ) Proceed
+    span.float-right &nbsp;&nbsp;
+    button.btn.float-right(
+      (click)="redirectToPayee()",
+      style="border-color: #bc8e32;color: #417505; border-width: 2px"
+    ) Add Payee
+
+ng-template(#rejectMessage)
+  .card-header.modal-header.logoColor Information Message
+  .card-body
+    b Escrow Addition is presently not allowed, reach out to your Castler representative or drop us a mail at info@castler.com.
+  .card-footer
+    button.btn.float-right.castlerButtonColor(
+      (click)="redirectToAccount()",
+      style="box-shadow: none"
+    ) Close

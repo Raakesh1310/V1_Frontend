@@ -1,0 +1,19 @@
+@import 'styles/variables.scss';
+
+span.update{
+  color: #417505;
+  font-size: 1.1rem;
+  background: #ffff00;
+  padding: 4px;
+}
+
+@media (max-width: 615px) {
+  .invisible {
+    display: none !important;
+  }
+
+}
+
+::ng-deep.ng-select.ng-select-disabled>.ng-select-container {
+  background-color: #e3e6ec !important;
+}

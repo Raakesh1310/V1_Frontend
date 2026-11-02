@@ -1,0 +1,43 @@
+sbpro-card([headerActions]='true')
+  .card-header
+    | Add Field
+    button.btn.btn-icon.btn-link.btn-xl((click)='closer()')
+      i-feather(name='x-circle')
+  .card-body
+    form([formGroup]='attrForm')
+      div(*ngIf='error') 
+        sbpro-alert(classes='alert-danger')
+          span {{ error }}
+      .row
+        .col-sm-12.col-md-12.col-lg-12
+          .form-group
+            label(for='label') Field
+            ng-select(
+              [(ngModel)]='type',
+              (change)='detectChanges()',
+              placeholder='Add New Field',
+              [ngModelOptions]='{ standalone: true }'
+            )
+              ng-option(*ngFor='let option of selectOptions', [value]='option') {{ option.toUpperCase() }}
+      .row
+        .col-sm-12.col-md-12.col-lg-12
+          .form-group(*ngIf='type === "custom"')
+            label(for='label') Label
+            input#label.form-control(type='text', formControlName='label')
+      .col-sm-12.col-md-12.col-lg-6(*ngIf='verificationFields.includes(type)')
+        .custom-control.custom-checkbox
+          input#verification.custom-control-input(
+            type='checkbox',
+            formControlName='verification'
+          )
+          label.custom-control-label(for='verification') Verification Required
+      .col-sm-12.col-md-12.col-lg-6(*ngIf='requiredFields.includes(type)')
+        .custom-control.custom-checkbox
+          input#required.custom-control-input(
+            type='checkbox',
+            formControlName='required'
+          )
+          label.custom-control-label(for='required') Mandatory Field
+
+  .card-footer
+    button.btn.btn-primary.float-right((click)='submitField()') Add

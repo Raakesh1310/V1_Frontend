@@ -1,0 +1,31 @@
+sbpro-dashboard-head(
+  *ngIf = '!connectedBanking'
+  icon='activity',
+  title='Transfer Report',
+  description='Transfer Details'
+)
+sbpro-dashboard-head(
+  *ngIf = 'connectedBanking'
+  icon='activity',
+  title='Transfer List',
+  description='Transfer Details'
+)
+.container-fluid.mt-n10
+  sbpro-card-navigation(
+    sbproTocItem='Tabs',
+    [navNames]='onlySingleTransfer ? ["Single Transfer","Scheduled Transfers"] : onlyBulkTransfer ? ["Single Transfer","Bulk Transfer"] : ["Single Transfer","Bulk Transfer","Scheduled Transfers"]',
+    [templates]='onlySingleTransfer? [singleTransfer,scheduleTransfer] : onlyBulkTransfer ? [singleTransfer,bulkTransfer] : [singleTransfer,bulkTransfer,scheduleTransfer]',
+    [selectedIndexForFade] = 'selectedIndexForFade',
+    [selectedIndex] = 'selectedIndexForFade',
+  )
+    ng-template(#singleTransfer)
+      sbpro-passbook-table-list([pageSize]='10', [connectedBanking]='false', [isTesting]='isTesting')
+    ng-template(#bulkTransfer)
+      sbpro-bulk-table-list([connectedBanking]='false', [isTesting]='isTesting')
+    ng-template(#scheduleTransfer)
+      sbpro-scheduled-transfer
+
+
+  //.row
+  //  .col-lg-12
+  //    sbpro-passbook-table-list([pageSize]='4')

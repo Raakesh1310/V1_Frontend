@@ -1,0 +1,21 @@
+sbpro-dashboard-head(icon='user', title='Profile settings', description='')
+.container-fluid.mt-n10.responsiveForm
+  sbpro-card-navigation(
+    sbproTocItem='Tabs',
+    [navNames]='canManageApiCredential ? ["Password Reset", "2-Factor Authentication", "API Credentials", "Notifications"] : ["Password Reset", "2-Factor Authentication", "Notifications"]',
+    [templates]='canManageApiCredential ? [resetPassword, twofa, apicred, notifications] : [resetPassword, twofa, notifications]'
+  )
+    ng-template(#resetPassword)
+      //.card-body
+      sbpro-profile-password-reset
+    ng-template(#apicred)
+      //.card-body
+      sbpro-api-credentials
+    ng-template(#twofa)
+      //.card-body
+      sbpro-g-auth
+    ng-template(#twofa)
+      //.card-body
+      sbpro-g-auth
+    ng-template(#notifications)
+      sbpro-notification-settings

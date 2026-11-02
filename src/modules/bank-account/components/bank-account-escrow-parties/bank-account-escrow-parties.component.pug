@@ -1,0 +1,154 @@
+div(*ngIf='errors.length > 0')
+  sbpro-alert(classes='alert-danger', [dismissable]='true')
+    | {{ errors[0] }}
+form(
+  *ngIf='isAdmin && !readOnly && !isMerchantAuthorizer',
+  [formGroup]='linkPartyForm',
+  autocomplete='off',
+  ngNativeValidate,
+)
+  .row
+    .col-sm-4
+      .form-group
+        label(for='party') Party
+        span.text-danger *
+        br
+        ng-select(
+          [items]='unlinkedParties',
+          bindLabel='accountHolder',
+          [(ngModel)]='selectedParty',
+          [ngModelOptions]='{ standalone: true }',
+          loadingText='Loading...',
+          placeholder='Enter Party Name',
+          (change)='updateParty()',
+          [disabled]='submitted',
+          (search)='getParties($event.term)',
+          name='party'
+        )
+          ng-template(ng-label-tmp='' let-item='item')
+            span(*ngIf='selectedParty') {{ utilityService.firstCapitalize(item.businessName) }} | {{ item.accountNo }}
+          ng-template(
+            ng-option-tmp='',
+            let-item='item',
+            let-search='searchTerm',
+            let-index='index'
+          )
+            span.sup-option {{ utilityService.firstCapitalize(item.businessName) }}
+            br
+            span.sub-option {{ item.bankName }} | {{ item.accountNo }}
+
+    .col-sm-3
+      .form-group
+        label(for='frm-cntrl-email') Payout Share
+        span.text-danger *
+        br
+        input#frm-cntrl-email.form-control.form-control-sm(
+          type='text',
+          placeholder='Enter payout share',
+          formControlName='share',
+          autocomplete='off',
+          appTwoDigitDecimalNumber
+        )
+
+    .col-sm-2
+      .form-group
+        label Unit
+        span.text-danger *
+        br
+        select#frm-cntrl-unit.form-control.form-control-sm(
+          name='share',
+          [(ngModel)]='draftShareUnit',
+          [ngModelOptions]='{ standalone: true }',
+          [disabled]='linkedParties.length > 0',
+          (change)='emitShareunit()'
+        )
+          option(value='%') %
+          option( value='INR') INR
+          //- option(value='no-limit') No Limit
+
+    .col-sm-2
+      .form-group
+        label.hidden button
+        br
+        sbpro-app-button(
+          (click)='linkParty()',
+          text='ADD',
+          [buttonStyle]='417505',
+          loadingText='Adding',
+          [loading]='addingParty',
+          [btnClass]='{ "btn-block": false, "btn-primary": true, "btn-sm": true }'
+        ) 
+
+.table-responsive.pp-table-container
+  table.table
+    thead
+      tr
+        th(scope='col')
+          span S.No.
+        th(scope='col')
+          span Escrow Party Name
+        th(scope='col')
+          span Bank Name
+        th(scope='col')
+          span Account Number
+        th(scope='col')
+          span Share
+          span(*ngIf='draftShareUnit === "%"') ({{ shareSum }}%)
+        th(scope='col', *ngIf='isAdmin && !readOnly')
+          span Action
+
+    tbody(*ngIf='linkedParties.length <= 0')
+      tr
+        td
+          span No Parties linked yet
+    tbody(*ngIf='linkedParties.length > 0')
+      tr(*ngFor='let p of linkedParties; let i = index')
+        td
+          | {{ i + 1 }}
+        td
+          span(*ngIf='p?.party?.businessName') {{ p.party.businessName }}
+          span(*ngIf='!p.party.businessName') --
+        td
+          | {{ p.party.bankName }}
+        td
+          | {{ p.party.accountNo }}
+        td(*ngIf='p.shareUnit !== "no-limit"')
+          | {{ p.share }} {{ p.shareUnit }}
+        td(*ngIf='p.shareUnit === "no-limit"')
+          | {{ p.shareUnit }}
+        td
+          sbpro-app-button(
+            *ngIf='(isAdmin && !readOnly && !isMerchantAuthorizer)',
+            (click)='openWarningModal(p.escrowPartyId, i)' 
+            text='Delete',
+            [buttonStyle]='417505',
+            loadingText='Deleting...',
+            [loading]='deletingParty === i',
+            [btnClass]='{ "btn-block": false, "btn-light": true, "btn-sm": true }'
+          )
+
+          sbpro-app-button.ml-2(
+            *ngIf='isAdmin && !readOnly && !isMerchantAuthorizer && p.status === "Active"',
+            (click)='editParty(p.escrowPartyId, i)' 
+            text='Edit',
+            loadingText='Editing...',
+            [loading]='editingParty === i',
+            [btnClass]='{ "btn-block": false, "btn-light": true, "btn-sm": true }'
+          ) 
+
+div
+  span 
+  button.btn.castlerButtonColor((click)='goBack()') Back
+  | &nbsp;&nbsp;
+
+ng-template(#warningMessage)
+  .card-header.modal-header Warning Message
+  .card-body
+    p Are you sure you want to unlink the party ?
+  .card-footer
+    button.btn.btn-primary.btn-sm.float-right((click)='closeModal(true)') Yes, Unlink
+    span.float-right &nbsp;&nbsp;&nbsp;
+    button.btn.btn-link.btn-sm.float-right((click)='closeModal(false)') No, Cancel
+
+ngx-spinner
+  p(style="font-size: 20px; color: white") Processing. Please wait...

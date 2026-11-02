@@ -1,0 +1,70 @@
+div.rounded(style='background: #FFFAF2;padding: 32px;border: none')
+    span((click)="dismissModal.emit()", style='position: absolute; top: 5px; right: 16px; font-size: 25px; Cursor: pointer') &times;
+    .flex-display-column.rounded(style='')
+        input(
+            #inputFile,
+            type='file',
+            [accept]='documentType === "cheque" ? ".png, .jpg, .jpeg" : ".png, .jpg, .jpeg, .pdf"',
+            (click)="$event.target.value=null",
+            (change)="uploadData.emit($event); dataUploaded($event)",
+        )
+        div.imageSelector(*ngIf='!imgSrc', appDrag, (files)="uploadData.emit($event)")
+            svg(width='88', height='66', viewbox='0 0 88 66', fill='none', xmlns='http://www.w3.org/2000/svg')
+                path(d='M33.0107 19.25C33.0107 21.438 32.1415 23.5365 30.5944 25.0836C29.0472 26.6308 26.9488 27.5 24.7607 27.5C22.5727 27.5 20.4743 26.6308 18.9271 25.0836C17.3799 23.5365 16.5107 21.438 16.5107 19.25C16.5107 17.062 17.3799 14.9635 18.9271 13.4164C20.4743 11.8692 22.5727 11 24.7607 11C26.9488 11 29.0472 11.8692 30.5944 13.4164C32.1415 14.9635 33.0107 17.062 33.0107 19.25Z' fill='black' fill-opacity='0.33')
+                path(d='M8.25 0C6.06196 0 3.96354 0.869194 2.41637 2.41637C0.869194 3.96354 0 6.06196 0 8.25L0 57.75C0 59.938 0.869194 62.0365 2.41637 63.5836C3.96354 65.1308 6.06196 66 8.25 66H79.75C81.938 66 84.0365 65.1308 85.5836 63.5836C87.1308 62.0365 88 59.938 88 57.75V8.25C88 6.06196 87.1308 3.96354 85.5836 2.41637C84.0365 0.869194 81.938 0 79.75 0H8.25ZM79.75 5.5C80.4793 5.5 81.1788 5.78973 81.6945 6.30546C82.2103 6.82118 82.5 7.52065 82.5 8.25V41.25L61.7375 30.5415C61.2217 30.2831 60.6378 30.1935 60.0682 30.2853C59.4987 30.3771 58.9725 30.6457 58.564 31.053L38.159 51.458L23.529 41.712C23.0008 41.3603 22.3672 41.2022 21.7357 41.2643C21.1041 41.3265 20.5135 41.6051 20.064 42.053L5.511 55V57.97C5.50443 57.8968 5.50076 57.8234 5.5 57.75V8.25C5.5 7.52065 5.78973 6.82118 6.30546 6.30546C6.82118 5.78973 7.52065 5.5 8.25 5.5H79.75Z' fill='black' fill-opacity='0.33')
+            div.flex-display
+                div.dropImageText(style='color: #3E2808;') {{ documentType === "cheque" ? "Drop your image here, or" : "Drop your image/pdf here, or"  }}
+                div.ml-2.dropImageText(style='color: blue; Cursor: pointer', (click)='openSelectionBox()') Browse.
+            div.dropImageSubText {{ documentType === "cheque" ? "Supports JPG, JPEG & PNG." : "Supports JPG, PNG, JPEG & PDF." }}
+        div.imageSelector(*ngIf='imgSrc', appDrag, (files)="uploadData.emit($event)")
+            div.flex-display(style='width: 300px', *ngIf='documentType == "Aadhar Front"')
+                div.input-group
+                    input.form-control(
+                        style='background: #F1F1F1; border: none',
+                        type='number',
+                        [(ngModel)]= 'aadharNumber',
+                        placeholder='Aadhar Number',
+                        (keydown)='aadharValidator($event)' 
+                    )
+                    div.input-group-append.rounded-right(style='background: #F1F1F1;height: 42px')
+                        input.continueBtn.rounded(
+                            type='button',
+                            (click)='closeModal.emit(aadharNumber)',
+                            value='Proceed',
+                        )
+            div(*ngIf='documentType == "Pan"')
+                //input.form-control.mb-3(
+                //    style='background: #F1F1F1; border: none; width: 300px',
+                //    type='text',
+                //    [(ngModel)]= 'panName',
+                //    placeholder='Name',
+                //)
+                div.flex-display(style='width: 300px')
+                    div.input-group
+                        input.form-control(
+                            style='background: #F1F1F1; border: none',
+                            type='text',
+                            [(ngModel)]= 'panNumber',
+                            placeholder='Pan Number',
+                            (keydown)='utilityService.onlyAlphaNumeric($event)' 
+                        )
+                        div.input-group-append.rounded-right(style='background: #F1F1F1;height: 42px')
+                            input.continueBtn.rounded(
+                                type='button',
+                                (click)='closeModal.emit([panName,panNumber])',
+                                value='{{ isLoading ? "Verifying..." : "Proceed" }}',
+                            )
+            img.mt-3(*ngIf= '!fileType', [src]='imgSrc', height='120', width= '300')
+            div.mt-3(*ngIf='fileType', style='text-align: center') {{ pdfName.length > 45 ? pdfName.substring(0,45) + "..." : pdfName }}
+            div.flex-display.justify-content-center.mt-3
+                input.uploadAgainBtn.rounded(
+                    type='button',
+                    (click)='openSelectionBox()',
+                    value='Upload Again',
+                )
+                input.continueBtn.rounded(
+                    *ngIf='!(documentType == "Aadhar Front" || documentType == "Pan")',
+                    type='button',
+                    (click)='closeModal.emit()',
+                    value='{{ isLoading ? "Verifying..." : "Proceed" }}',
+                )

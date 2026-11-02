@@ -1,0 +1,140 @@
+div
+  form
+    .d-flex.mb-2
+      input#search-box.mt-1.form-control.w-50(
+        type='text',
+        placement='top',
+        autocomplete='off',
+        name='s',
+        placeholder='Search',
+        [(ngModel)]='searchTerm'
+      )
+      button.btn.mr-2.ml-2.ws-nowrap.mb-1.mt-1(
+        class='castlerButtonColor',
+        type='submit',
+        (click)='submitSearchForm()'
+      )
+        fa-icon.d-flex.flex-row.align-items-center([icon]='["fas", "search"]')
+      button.btn.btn-link.mt-1.mb-1.mr-2(
+        type='button',
+        class='logoColor',
+        (click)='clearSearchForm()'
+      )
+        | Clear
+    //.form-group.form-inline.row.align-items-stretch
+    //  .col-xl-5.col-lg-8.col-md-8.col-sm-12
+    //    input#search-box.mt-1.form-control.form-control-sm.w-100(
+    //      type='text',
+    //      name='s',
+    //      placeholder='Search',
+    //      [(ngModel)]='searchTerm'
+    //    )
+    //  .col-xl-3.col-lg-4.col-md-4.col-sm-12.d-flex.flex-row.align-items-end
+    //    button.btn.mr-2.ws-nowrap.mt-1(
+    //      class='castlerButtonColor',
+    //      type='submit',
+    //      (click)='submitSearchForm()'
+    //    )
+    //      fa-icon.d-flex.flex-row.align-items-center([icon]='["fas", "search"]')
+    //    button.btn.btn-link.btn-sm.mt-2.mr-2(
+    //      type='button',
+    //      class='logoColor',
+    //      (click)='clearSearchForm()'
+    //    )
+    //      | Clear
+
+    span.ml-3(*ngIf='transferService.loading$ | async') Loading...
+  .table-responsive.pp-table-container
+    table.table
+      thead
+        tr
+          th(scope='col' sbSortable='date', (sort)='onSort($event)')
+            span Schedule Id
+          th(scope='col' sbSortable='event', (sort)='onSort($event)')
+            span Escrow ID
+          th(scope='col' sbSortable='event', (sort)='onSort($event)')
+            span Payee
+          th(scope='col' sbSortable='time', (sort)='onSort($event)')
+            span Amount
+          th(scope='col' sbSortable='time', (sort)='onSort($event)')
+            span Start Date
+          th(scope='col' sbSortable='time', (sort)='onSort($event)')
+            span Frequency
+          th(scope='col' sbSortable='time', (sort)='onSort($event)')
+            span Remaining payments
+          th(scope='col' sbSortable='time', (sort)='onSort($event)')
+            span Next payment on
+          th(scope='col' sbSortable='time', (sort)='onSort($event)')
+            span Status
+          th(scope='col' sbSortable='time', (sort)='onSort($event)')
+            span Action
+
+      tbody(*ngIf='scheduledTransfers.length < 1')
+        tr
+          td No Entries Found
+      tbody(*ngIf='scheduledTransfers')
+        tr(*ngFor='let transfer of scheduledTransfers')
+          td((click)="open(transfer.scheduledTransferId)")
+            ngb-highlight.ws-nowrap.tableClickEntryColor.myanchor([result]='transfer.scheduledTransferId')
+          td
+            span(*ngIf='transfer.accountId') {{ transfer.accountId }}
+            span(*ngIf='!transfer.accountId') --
+          td
+            span(*ngIf='transfer.payeeId') {{ transfer.payeeId }}
+            span(*ngIf='!transfer.payeeId') --
+          td
+            span(*ngIf='transfer.amount') {{ transfer.amount.toFixed(2) }}
+            span(*ngIf='!transfer.amount') --
+          td
+            span(*ngIf='transfer.startingDate') {{ transfer.startingDate }}
+            span(*ngIf='!transfer.startingDate') --
+          td
+            span(*ngIf='transfer.frequency') {{ transfer.frequency }}
+            span(*ngIf='!transfer.frequency') --
+          td
+            span(*ngIf='transfer.remainingPayments') {{ transfer.remainingPayments }}
+            span(*ngIf='!transfer.remainingPayments') --
+
+          td(*ngIf='transfer.job.length > 0')
+            tr
+              ngb-highlight.ws-nowrap(
+                [result]='transfer.job[0].nextRunAt | date: "d MMM yyyy"',
+                [term]='transfer.job[0].nextRunAt'
+              )
+          td(*ngIf='transfer.job.length === 0') --
+
+          td
+            span(*ngIf='transfer.status') {{ transfer.status === 'Inactive' ? "Stopped" : transfer.status }}
+            span(*ngIf='!transfer.status') --
+          td(*ngIf='transfer.status === "Active"')
+            button.btn.btn-danger.btn-xs.mr-2.font-weight-700.ws-nowrap((click)='openModal(alert, transfer.scheduledTransferId)') Stop
+          td(*ngIf='transfer.status !== "Active"') --
+  ngb-pagination(
+    [collectionSize]='total$',
+    [(page)]='page',
+    [maxSize]='5',
+    [rotate]='true',
+    [ellipses]='false',
+    (pageChange)='pageChange($event)',
+    [boundaryLinks]='true'
+  )
+
+
+ng-template(#alert)
+  .flex-display-column(style='background: #FFFBF4')
+    div.bold.mt-5 Are you sure you want to stop
+    div.mt-0.bold {{ selectedTransferId }} ?
+    input#rejection.form-control.mt-1.w-75.mr-2(
+      type='text',
+      (input) = 'rejectionReasonChange($event)',
+      [(ngModel)] = 'rejectionReason',
+      ngbPopover='Rejection Reason',
+      placeholder='Enter Reason',
+      required,
+      ng-class='rejectionReason == "" ? "ng-invalid" : ""',
+    )
+    div.flex-display.mb-5.mt-3
+      button.btn.btn-light.mr-3(type='button', (click)='closeModal()') No, Go Back
+      button.btn(type='button', [disabled]='disableStatusButton',
+        [ngClass]='"btnColorRed"' ,
+        (click)='stopRecurringTransfer()') {{ disableStatusButton ? "Loading..." : "Yes" }}

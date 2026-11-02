@@ -1,0 +1,26 @@
+@import 'styles/variables.scss';
+
+
+.statement-dashboard{
+    table-layout: fixed;
+    overflow: hidden;
+    height:100%;
+
+}
+
+.text-break{
+    display: block;
+    width: 100px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.btn-view{
+    border-color: #E8E8E8;
+    border-style:solid;
+}
+
+.th-bg{
+   width: 100%;
+}

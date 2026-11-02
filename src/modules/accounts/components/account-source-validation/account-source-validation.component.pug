@@ -1,0 +1,209 @@
+div 
+.alert.alert-danger.alert-dismissible.fade.show(
+  *ngIf="formErrors && formErrors.length > 0",
+  role="alert"
+)
+  ul
+    li(*ngFor="let error of formErrors")
+      p.redDot {{ error }}
+  button.close(
+    type="button",
+    data-dismiss="alert",
+    aria-label="Close",
+    (click)="formErrors = []"
+  )
+    span(aria-hidden="true") &times;
+form.pl-2(
+  [formGroup]="sourceAccountForm",
+  autocomplete="off",
+  *ngIf="enableSourceAccount",
+  [disabled]="readOnly"
+)
+  .row
+    .col
+      .form-group 
+        label Name
+        span.text-danger *
+        input#sourceaccount-name.form-control.form-control-sm(
+          type="text",
+          placeholder="Name",
+          formControlName="name",
+          required
+        )
+        span(
+          *ngIf="sourceAccountForm.get('name').errors && sourceAccountForm.get('name').touched"
+        )
+          span.text-danger {{ sourceAccountForm.controls.name.getError('Error') }}
+    .col
+      .form-group
+        label Bank Account Number
+        span.text-danger *
+        input#sourceaccount-bankAccountNumber.form-control.form-control-sm(
+          type="text",
+          placeholder="Bank Account Number",
+          formControlName="bankAccountNumber",
+          required
+        )
+        span(
+          *ngIf="sourceAccountForm.get('bankAccountNumber').errors && sourceAccountForm.get('bankAccountNumber').touched"
+        )
+          span.text-danger {{ sourceAccountForm.controls.bankAccountNumber.getError('Error') }}
+    .col
+      .form-group
+        label IFSC
+        span.text-danger *
+        input#sourceaccount-ifsc.form-control.form-control-sm(
+          type="text",
+          placeholder="IFSC",
+          formControlName="ifsc",
+          required
+        )
+        span(
+          *ngIf="sourceAccountForm.get('ifsc').errors && sourceAccountForm.get('ifsc').touched"
+        )
+          span.text-danger {{ sourceAccountForm.controls.ifsc.getError('Error') }}
+    .col
+      .form-group
+        label Bank Name
+        span.text-danger *
+        input#authoriser-bankName.form-control.form-control-sm(
+          type="text",
+          placeholder="Bank Name",
+          formControlName="bankName",
+          required
+        )
+        span(
+          *ngIf="sourceAccountForm.get('bankName').errors && sourceAccountForm.get('bankName').touched"
+        )
+          span.text-danger {{ sourceAccountForm.controls.bankName.getError('Error') }}
+    .col-sm-12.col-md-2.col-lg-2.pt-4
+      .form-group
+        button.btn.castlerButtonColor((click)="onAdd()") Add
+.pl-4 
+  input#allow-all-checkbox.form-check-input.pl-2(
+    type="checkbox",
+    [(ngModel)]="enableSourceAccountCheckBox",
+    (click)="allowSourceAccountValidation($event, allowBankAccount)",
+    [disabled]="readOnly"
+  )
+  label Allow All Bank Accounts
+br
+.table-responsive.pp-table-container.align-self-stretch.flex-grow-1.flex-stretch-1.table-striped
+  table.table
+    thead
+      tr
+        th.th-sticky-top(scope="col", sbSortable="date", (sort)="onSort($event)")
+          span.ws-nowrap S.NO
+          sb-sort-icon(
+            *ngIf="sortedColumn === 'date'",
+            [direction]="sortedDirection"
+          )
+        th.th-sticky-top(scope="col", sbSortable="date", (sort)="onSort($event)")
+          span.ws-nowrap Name
+          sb-sort-icon(
+            *ngIf="sortedColumn === 'date'",
+            [direction]="sortedDirection"
+          )
+        th.th-sticky-top(scope="col", sbSortable="event", (sort)="onSort($event)")
+          span.ws-nowrap Account Number
+          sb-sort-icon(
+            *ngIf="sortedColumn === 'date'",
+            [direction]="sortedDirection"
+          )
+        th.th-sticky-top(scope="col", sbSortable="event", (sort)="onSort($event)")
+          span.ws-nowrap IFSC
+          sb-sort-icon(
+            *ngIf="sortedColumn === 'event'",
+            [direction]="sortedDirection"
+          )
+        th.th-sticky-top(scope="col", sbSortable="time", (sort)="onSort($event)")
+          span.ws-nowrap Bank Name
+          sb-sort-icon(
+            *ngIf="sortedColumn === 'time'",
+            [direction]="sortedDirection"
+          )
+        th.th-sticky-top(scope="col", sbSortable="time", (sort)="onSort($event)")
+          span.ws-nowrap Last Update Date
+          sb-sort-icon(
+            *ngIf="sortedColumn === 'time'",
+            [direction]="sortedDirection"
+          )
+        th.th-sticky-top(scope="col", sbSortable="time", (sort)="onSort($event)")
+          span.ws-nowrap Status
+          sb-sort-icon(
+            *ngIf="sortedColumn === 'time'",
+            [direction]="sortedDirection"
+          )
+        th.th-sticky-top(
+          *ngIf="enableSourceAccount && !readOnly",
+          scope="col",
+          sbSortable="time",
+          (sort)="onSort($event)"
+        )
+          span.ws-nowrap Action
+    tbody
+      tr(*ngFor="let data of sourceAccounts; let i = index")
+        td
+          span {{ i + 1 }}.
+        td
+          ngb-highlight([result]="data.accountHolder || '--'")
+        td
+          ngb-highlight([result]="data.bankAccountNumber || '--'")
+        td
+          ngb-highlight([result]="data.ifsc || '--'")
+        td
+          ngb-highlight([result]="data.bankName || '--'")
+        td
+          ngb-highlight(
+            [result]="convertToLocalTime(data.accountUpdatedAt) || '--'"
+          )
+        td
+          ngb-highlight([result]="data.status || '--'")
+        td(
+          *ngIf="data.status !== 'Inactive' && enableSourceAccount && !readOnly"
+        )
+          button.btn.btn-blue.mr-2.btn-sm(
+            type="button",
+            (click)="deleteConfirmationModal(delete, data.accountHolder, data.bankAccountNumber, data.bankName, data.ifsc)"
+          ) Delete
+
+        td(
+          *ngIf="data.status === 'Inactive' && enableSourceAccount && !readOnly"
+        )
+          ngb-highlight.pl-3([result]="'--'")
+br
+sbpro-app-button.float-right(
+  *ngIf="currentTab !== undefined && currentTab !== null",
+  text="Next",
+  [btnClass]="{ 'btn-block': false, 'btn-primary': true }",
+  (click)="nextForm()"
+) 
+ng-template(#delete)
+  .modal-header.p-4(style="flex: display; justify-content: center")
+    h3 Are you sure you want to delete Source Account?
+  .modal-body.p-4(style="justify-content: center")
+    h4(*ngIf="lastAccount") The last active source account is being deleted. After this, escrow will accept deposits from all bank accounts.
+    br
+    h5.align-center  Details of the Source Account
+    label.align-center Name : {{ name }}
+    br
+    label.align-center Bank Account Number : {{ bankAccountNumber }}
+    br
+    label.align-center IFSC : {{ ifsc }}
+    br
+    label.align-center Bank Name : {{ bankName }}
+  .modal-footer.flex-display(style="justify-content: center")
+    button.btn.btn-light.mr-5(type="button", (click)="closeModal()") Cancel
+    button.btn.castlerButtonColor((click)="deleteSourceAccount()") Delete
+
+ng-template(#allowBankAccount)
+  .modal-header(style="flex: display; justify-content: center")
+    h3 Are you sure you want to {{ action }} Allow all bank accounts
+  .modal-body(style="justify-content: center") 
+    p {{ modalBody }}
+  .modal-footer.flex-display(style="justify-content: center")
+    button.btn.btn-light.mr-5(type="button", (click)="closeAllBankAccountModal()") Cancel
+    button.btn.castlerButtonColor((click)="updateSourceAccountValidation()") Update
+
+ngx-spinner
+  p(style="font-size: 20px; color: white") Processing. Please wait...

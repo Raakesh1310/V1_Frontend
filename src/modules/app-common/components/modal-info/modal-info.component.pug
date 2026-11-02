@@ -1,0 +1,12 @@
+
+.modal-header
+  h5.modal-title(class='logoColor') Auto Transfer
+.modal-body
+  ul
+    li This will enable automatic transfer of funds to linked payees as and when funds are received in this account
+    li Funds will be split as per the % payout of each payee
+    li Manual Transfer will be allowed for Retention amount only
+
+.modal-footer
+  button.btn.btn-link(type='button', (click)='onClose(false)', class='castlerButtonColor1') Cancel
+  button.btn(type='button', (click)='onClose(true)', class='castlerButtonColor') Understood

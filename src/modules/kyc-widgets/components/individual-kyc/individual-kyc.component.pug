@@ -1,0 +1,201 @@
+div.rightSideWidthHeight(*ngIf='!panVerified')
+    div.mt-3.kycDetailsText(style="") KYC DETAILS
+    div(style='border-top: 5px solid rgba(0, 0, 0, 0.19);width: 220px')
+    div.mt-3
+        .row
+            .col-md
+                div.completeAadhaarKycText Verify Your Photo First
+                input.continueBtn.rounded.mt-4(
+                    type='button',
+                    (click)='openModal(selfie,$event)',
+                    [value]='userSelfie != "" ? "Re-take" : "Capture"',
+                )
+            .col-md(style='display: flex; justify-content: center')
+                img([src]= 'userSelfie != "" ? userSelfie : "/assets/img/users-icon.png"',
+                    width='130', height='120')
+    div.mt-5
+        .row
+            .col-md
+                div.completeAadhaarKycText Complete Your Digital KYC
+                div.mt-3 Share your aadhaar & pan details for verification.
+            .col-md
+                img(src='/assets/img/aadhaarImage.jpg', width='200', height='120')
+
+        input.continueBtn.rounded.mt-2(
+            type='button',
+            (click)='startDigilocker()',
+            value='Start',
+        )
+    div.mr-3.mb-3.bottomRight.myanchor((click)='moveFront()')
+        svg([ngClass]='allDocsVerified ? "arrowOrange" : "arrowBlack"', width='75', height='75', viewbox='0 0 70 70', fill='none', xmlns='http://www.w3.org/2000/svg')
+            path(d='M37.8195 19.8857L34.4416 23.1763L47.6226 36.4212H18.9219V41.1456H47.6226L34.4416 54.3101L37.8195 57.681L56.7171 38.7834L37.8195 19.8857Z')
+            path(d='M37.8189 71.8541C31.2781 71.8541 24.8842 69.9145 19.4457 66.2807C14.0073 62.6468 9.76848 57.4818 7.26543 51.4389C4.76238 45.396 4.10746 38.7466 5.38351 32.3315C6.65955 25.9163 9.80925 20.0237 14.4343 15.3986C19.0593 10.7736 24.952 7.62391 31.3671 6.34786C37.7822 5.07182 44.4317 5.72673 50.4746 8.22979C56.5175 10.7328 61.6824 14.9716 65.3163 20.4101C68.9502 25.8486 70.8898 32.2425 70.8898 38.7833C70.8798 47.5511 67.3923 55.957 61.1925 62.1568C54.9927 68.3567 46.5868 71.8441 37.8189 71.8541ZM37.8189 10.4368C32.2125 10.4368 26.732 12.0993 22.0705 15.2141C17.4089 18.3288 13.7757 22.7559 11.6302 27.9356C9.48474 33.1152 8.92338 38.8147 10.0171 44.3134C11.1109 49.812 13.8106 54.8629 17.7749 58.8272C21.7393 62.7915 26.7901 65.4913 32.2888 66.585C37.7875 67.6788 43.487 67.1174 48.6666 64.972C53.8463 62.8265 58.2734 59.1933 61.3881 54.5317C64.5029 49.8702 66.1653 44.3897 66.1653 38.7833C66.1566 31.268 63.1673 24.0631 57.8532 18.749C52.5391 13.4349 45.3342 10.4456 37.8189 10.4368Z')
+
+
+div.rightSideWidthHeight(*ngIf='panVerified')
+    div.mt-3.kycDetailsText(style="") KYC DETAILS
+    div(style='border-top: 5px solid rgba(0, 0, 0, 0.19);width: 220px')
+    div.mt-5.flex-display
+        div.labelTexts.mr-5 PAN
+    div.mt-2.flex-display.justify-content-between
+        div.input-group.inputBoxStyle.flex-display.rounded
+            input.form-control.myanchor(
+                style='background: #F1F1F1; border: none; color: rgba(62, 40, 8, 0.8);',
+                type='text',
+                [(ngModel)]= 'userPan',
+                readonly,
+                (click)='openModal(pan,$event)',
+            )
+        svg.mt-1(width='30', height='28', viewbox='0 0 30 28', fill='none', xmlns='http://www.w3.org/2000/svg')
+            path(d='M25.623 0.757812L11.877 18.8809L3.75 10.7598L0 14.5098L12.498 27.0078L30 4.50781L25.623 0.757812Z' fill='#15AD1C')
+        //div.yellowBoxWidthHeight(style='', *ngIf='panVerified')
+        //    .container-fluid
+        //        .row
+        //            .col-8
+        //                p.mt-3.yellowBoxDetails Name (as on PAN Card)
+        //                p.yellowBoxHeadings {{ userName }}
+        //            .col-4
+        //                p.mt-3.yellowBoxDetails PAN Number
+        //                p.yellowBoxHeadings {{ userPan }}
+    div.mt-3.flex-display
+        div.labelTexts.mr-5 Adhar Card
+    div.mt-2.flex-display.justify-content-between
+        div.input-group.inputBoxStyle.flex-display.rounded
+            input.form-control.myanchor(
+                style='background: #F1F1F1; border: none; color: rgba(62, 40, 8, 0.8);',
+                type='text',
+                [(ngModel)]='userAadhar',
+                readonly,
+            )
+        svg.mt-1(width='30', height='28', viewbox='0 0 30 28', fill='none', xmlns='http://www.w3.org/2000/svg')
+            path(d='M25.623 0.757812L11.877 18.8809L3.75 10.7598L0 14.5098L12.498 27.0078L30 4.50781L25.623 0.757812Z' fill='#15AD1C')
+    div.mr-3.mb-3.bottomRight.myanchor((click)='moveFront()')
+        svg([ngClass]='allDocsVerified ? "arrowOrange" : "arrowBlack"', width='75', height='75', viewbox='0 0 70 70', fill='none', xmlns='http://www.w3.org/2000/svg')
+            path(d='M37.8195 19.8857L34.4416 23.1763L47.6226 36.4212H18.9219V41.1456H47.6226L34.4416 54.3101L37.8195 57.681L56.7171 38.7834L37.8195 19.8857Z')
+            path(d='M37.8189 71.8541C31.2781 71.8541 24.8842 69.9145 19.4457 66.2807C14.0073 62.6468 9.76848 57.4818 7.26543 51.4389C4.76238 45.396 4.10746 38.7466 5.38351 32.3315C6.65955 25.9163 9.80925 20.0237 14.4343 15.3986C19.0593 10.7736 24.952 7.62391 31.3671 6.34786C37.7822 5.07182 44.4317 5.72673 50.4746 8.22979C56.5175 10.7328 61.6824 14.9716 65.3163 20.4101C68.9502 25.8486 70.8898 32.2425 70.8898 38.7833C70.8798 47.5511 67.3923 55.957 61.1925 62.1568C54.9927 68.3567 46.5868 71.8441 37.8189 71.8541ZM37.8189 10.4368C32.2125 10.4368 26.732 12.0993 22.0705 15.2141C17.4089 18.3288 13.7757 22.7559 11.6302 27.9356C9.48474 33.1152 8.92338 38.8147 10.0171 44.3134C11.1109 49.812 13.8106 54.8629 17.7749 58.8272C21.7393 62.7915 26.7901 65.4913 32.2888 66.585C37.7875 67.6788 43.487 67.1174 48.6666 64.972C53.8463 62.8265 58.2734 59.1933 61.3881 54.5317C64.5029 49.8702 66.1653 44.3897 66.1653 38.7833C66.1566 31.268 63.1673 24.0631 57.8532 18.749C52.5391 13.4349 45.3342 10.4456 37.8189 10.4368Z')
+
+
+    //div.mt-5.flex-display
+    //    div.flex-display-column
+    //
+    //    img(src='/assets/img/aadhaarImage.jpg', width='50', height='50')
+
+    //div.mt-5.flex-display(style='')
+    //    div.labelTexts.mr-5 PAN
+    //    .chip.mt-1(#parentElement, *ngIf='panVerified && panImageName')
+    //        div.mt-1(style='font-size: 12px; color: #001AFF; cursor: pointer', (click)='download("pan")') {{ panImageName }}
+    //        div.mb-2.closeBtn((click)="closeChip(selectedDoc.pan)", *ngIf='!notDeletable') &times;
+    //        a(#anPan, [href] = 'apiStartUrl + "/uploads/kyc/" + panImageDocId', *ngIf='notDeletable', target='_blank')
+    //div.mt-2.flex-display.justify-content-between
+    //    div.input-group.inputBoxStyle.flex-display.rounded(style='', *ngIf='!panVerified')
+    //        input.form-control.myanchor(
+    //            style='background: #F1F1F1; border: none; color: rgba(62, 40, 8, 0.8);',
+    //            type='text',
+    //            [(ngModel)]= 'userPan',
+    //            readonly,
+    //            (click)='openModal(pan,$event)',
+    //        )
+    //        div.input-group-append(*ngIf='!panVerified')
+    //            input.continueBtn.rounded(
+    //                type='button',
+    //                (click)='openModal(pan,$event)',
+    //                value='Upload',
+    //            )
+    //    //svg.mt-1(*ngIf='panVerified', width='30', height='28', viewbox='0 0 30 28', fill='none', xmlns='http://www.w3.org/2000/svg')
+    //    //    path(d='M25.623 0.757812L11.877 18.8809L3.75 10.7598L0 14.5098L12.498 27.0078L30 4.50781L25.623 0.757812Z' fill='#15AD1C')
+    //    div.yellowBoxWidthHeight(style='', *ngIf='panVerified')
+    //        .container-fluid
+    //            .row
+    //                .col-8
+    //                    p.mt-3.yellowBoxDetails Name (as on PAN Card)
+    //                    p.yellowBoxHeadings {{ userName }}
+    //                .col-4
+    //                    p.mt-3.yellowBoxDetails PAN Number
+    //                    p.yellowBoxHeadings {{ userPan }}
+    //                    //p.yellowBoxHeadings {{ businessAddress.length > thirty ? businessAddress.substring(0,thirty) + "..." : businessAddress }}
+    ////div.mt-2.flex-display.justify-content-between(*ngIf='panVerified')
+    ////    div.input-group.inputBoxStyle.flex-display.rounded(style='')
+    ////        input#name.form-control.myanchor(
+    ////            style='background: #F1F1F1; border: none; color: rgba(62, 40, 8, 0.8);',
+    ////            type='text',
+    ////            [(ngModel)]= 'userName',
+    ////            readonly,
+    ////        )
+    ////    svg.mt-1(width='30', height='28', viewbox='0 0 30 28', fill='none', xmlns='http://www.w3.org/2000/svg')
+    ////        path(d='M25.623 0.757812L11.877 18.8809L3.75 10.7598L0 14.5098L12.498 27.0078L30 4.50781L25.623 0.757812Z' fill='#15AD1C')
+    //
+    //div.mt-3.flex-display(style='')
+    //    div.labelTexts.mr-5 Adhar Card
+    //    .chip.mt-1.mr-2(#parentElement, *ngIf='aadharFrontVerified && aadharFrontImageName')
+    //        div.mt-1(style='font-size: 12px; color: #001AFF; cursor: pointer', (click)='download("Ac_Front")') {{ aadharFrontImageName }}
+    //        div.mb-2.closeBtn((click)="closeChip(selectedDoc.aadharFront)", *ngIf='!notDeletable') &times;
+    //        a(#anAcFront, [href] = 'apiStartUrl + "/uploads/kyc/" + aadhaarFrontDocId', *ngIf='notDeletable', target='_blank')
+    //    .chip.mt-1(#parentElement, *ngIf='aadharBackVerified && aadhaarFrontDocId')
+    //        div.mt-1(style='font-size: 12px; color: #001AFF; cursor: pointer', (click)='download("Ac_Back")') {{ aadharBackImageName }}
+    //        div.mb-2.closeBtn((click)="closeChip(selectedDoc.aadharBack)", *ngIf='!notDeletable') &times;
+    //        a(#anAcBack, [href] = 'apiStartUrl + "/uploads/kyc/" + aadhaarBackDocId', *ngIf='notDeletable', target='_blank')
+    //div.mt-2.flex-display.justify-content-between
+    //    div.input-group.inputBoxStyle.flex-display.rounded(style='')
+    //        input.form-control.myanchor(
+    //            style='background: #F1F1F1; border: none; color: rgba(62, 40, 8, 0.8);',
+    //            type='text',
+    //            [(ngModel)]='userAadhar',
+    //            readonly,
+    //        )
+    //        div.input-group-append(*ngIf='!(aadharFrontVerified && aadharBackVerified)')
+    //            input.continueBtn.rounded(
+    //                type='button',
+    //                (click)='openModal(aadharFront,$event)',
+    //                value='Front',
+    //                *ngIf='!aadharFrontVerified',
+    //            )
+    //            input.continueBtn.rounded(
+    //                type='button',
+    //                (click)='openModal(aadharBack,$event)',
+    //                value='Back',
+    //                *ngIf='!aadharBackVerified',
+    //            )
+    //            //input(
+    //            //    #inputFile,
+    //            //    type='file',
+    //            //    accept='.png, .jpg',
+    //            //    (click)="$event.target.value=null",
+    //            //    (change)="uploadData($event, selectedDoc.aadhar)",
+    //            //)
+    //    svg.mt-1(*ngIf='(aadharFrontVerified && aadharBackVerified)', width='30', height='28', viewbox='0 0 30 28', fill='none', xmlns='http://www.w3.org/2000/svg')
+    //        path(d='M25.623 0.757812L11.877 18.8809L3.75 10.7598L0 14.5098L12.498 27.0078L30 4.50781L25.623 0.757812Z' fill='#15AD1C')
+
+    ////div.ml-3.mb-3.bottomLeft.myanchor((click)='moveBack()')
+    ////    svg(width='76', height='77', viewbox='0 0 76 77', fill='none', xmlns='http://www.w3.org/2000/svg')
+    ////        path(d='M37.7928 57.6809L41.1708 54.3904L27.9897 41.1455H56.6904V36.4211H27.9897L41.1708 23.2565L37.7928 19.8857L18.8952 38.7833L37.7928 57.6809Z' fill='black' fill-opacity='0.28')
+    ////        path(d='M37.7944 5.71254C44.3352 5.71254 50.7291 7.65211 56.1676 11.286C61.606 14.9199 65.8448 20.0848 68.3479 26.1277C70.8509 32.1706 71.5058 38.8201 70.2298 45.2352C68.9537 51.6503 65.804 57.543 61.179 62.168C56.554 66.793 50.6613 69.9427 44.2462 71.2188C37.8311 72.4948 31.1816 71.8399 25.1387 69.3369C19.0958 66.8338 13.9308 62.595 10.297 57.1566C6.66309 51.7181 4.72353 45.3242 4.72353 38.7834C4.73353 30.0155 8.22098 21.6096 14.4208 15.4098C20.6206 9.21 29.0265 5.72254 37.7944 5.71254ZM37.7944 67.1298C43.4008 67.1298 48.8813 65.4673 53.5428 62.3526C58.2044 59.2378 61.8376 54.8107 63.9831 49.6311C66.1285 44.4515 66.6899 38.7519 65.5961 33.2533C64.5024 27.7546 61.8027 22.7038 57.8383 18.7394C53.874 14.7751 48.8232 12.0754 43.3245 10.9816C37.8258 9.88786 32.1263 10.4492 26.9467 12.5947C21.767 14.7402 17.3399 18.3734 14.2252 23.0349C11.1104 27.6965 9.44793 33.177 9.44793 38.7834C9.45668 46.2986 12.446 53.5036 17.7601 58.8177C23.0742 64.1318 30.2791 67.1211 37.7944 67.1298Z' fill='black' fill-opacity='0.28')
+    //div.mr-3.mb-3.bottomRight.myanchor((click)='moveFront()')
+    //    svg([ngClass]='allDocsVerified ? "arrowOrange" : "arrowBlack"', width='75', height='75', viewbox='0 0 70 70', fill='none', xmlns='http://www.w3.org/2000/svg')
+    //        path(d='M37.8195 19.8857L34.4416 23.1763L47.6226 36.4212H18.9219V41.1456H47.6226L34.4416 54.3101L37.8195 57.681L56.7171 38.7834L37.8195 19.8857Z')
+    //        path(d='M37.8189 71.8541C31.2781 71.8541 24.8842 69.9145 19.4457 66.2807C14.0073 62.6468 9.76848 57.4818 7.26543 51.4389C4.76238 45.396 4.10746 38.7466 5.38351 32.3315C6.65955 25.9163 9.80925 20.0237 14.4343 15.3986C19.0593 10.7736 24.952 7.62391 31.3671 6.34786C37.7822 5.07182 44.4317 5.72673 50.4746 8.22979C56.5175 10.7328 61.6824 14.9716 65.3163 20.4101C68.9502 25.8486 70.8898 32.2425 70.8898 38.7833C70.8798 47.5511 67.3923 55.957 61.1925 62.1568C54.9927 68.3567 46.5868 71.8441 37.8189 71.8541ZM37.8189 10.4368C32.2125 10.4368 26.732 12.0993 22.0705 15.2141C17.4089 18.3288 13.7757 22.7559 11.6302 27.9356C9.48474 33.1152 8.92338 38.8147 10.0171 44.3134C11.1109 49.812 13.8106 54.8629 17.7749 58.8272C21.7393 62.7915 26.7901 65.4913 32.2888 66.585C37.7875 67.6788 43.487 67.1174 48.6666 64.972C53.8463 62.8265 58.2734 59.1933 61.3881 54.5317C64.5029 49.8702 66.1653 44.3897 66.1653 38.7833C66.1566 31.268 63.1673 24.0631 57.8532 18.749C52.5391 13.4349 45.3342 10.4456 37.8189 10.4368Z')
+
+
+
+ng-template(#selfie)
+    sbpro-selfie-kyc((dismissModal)= 'dismissModal()', [crnId]= 'crnId', (captureImg) = 'captureImage($event)')
+
+ng-template(#pan)
+    sbpro-document-upload-modal((uploadData)='uploadData($event,selectedDoc.pan)', (dismissModal)= 'dismissModal()',
+            [imgSrc] = 'imgSrc', (closeModal)='closeModal($event, selectedDoc.pan)', [documentType] = '"Pan"',
+            [isLoading] = 'isLoading')
+
+ng-template(#aadharFront)
+    sbpro-document-upload-modal((uploadData)='uploadData($event,selectedDoc.aadharFront)', (dismissModal)= 'dismissModal()',
+            [imgSrc] = 'imgSrc', (closeModal)='closeModal($event, selectedDoc.aadharFront)',
+            [documentType] = '"Aadhar Front"')
+
+ng-template(#aadharBack)
+    sbpro-document-upload-modal((uploadData)='uploadData($event,selectedDoc.aadharBack)', (dismissModal)= 'dismissModal()',
+            [imgSrc] = 'imgSrc', (closeModal)='closeModal(selectedDoc.aadharBack)')
+
+ng-template(#warningMessage)
+  .card-header.modal-header.logoColor Warning Message
+  .card-body
+    p Please allow location tracking to proceed further.
+  .card-footer
+    button.btn.btn-sm.float-right.castlerButtonColor((click)='closeModal(true)') Close

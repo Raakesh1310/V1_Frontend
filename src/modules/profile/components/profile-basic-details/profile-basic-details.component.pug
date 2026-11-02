@@ -1,0 +1,633 @@
+div(*ngIf='!(loadingData$ | async) && dataLoaded')
+  form(
+    [formGroup]='profileForm',
+    autocomplete='off',
+    (ngSubmit)='verifyBusinessDetail()',
+    *ngIf='!isIndividual'
+  )
+    div
+      h4 Business Details
+      hr
+    .alert.alert-danger.alert-dismissible.fade.show(
+      role='alert',
+      *ngIf='profileErrors.length > 0'
+    )
+      ul
+        li(*ngFor='let error of profileErrors')
+          p.redDot {{ error }}
+      button.close(
+        type='button',
+        data-dismiss='alert',
+        aria-label='Close',
+        (click)='profileErrors = []'
+      )
+        span(aria-hidden='true') &times;
+    .d-flex
+      .form-group.flex-even.mr-3
+        label(for='business-name')
+          | Business Name (As mentioned in GST)
+          span.text-danger *
+          span.ml-1(*ngIf='businessVerified')
+            i-feather.text-success(name='check-circle')
+        input#business-name.form-control(
+          type='text',
+          placeholder='Business Name',
+          formControlName='businessName',
+          value='{{ profileForm.controls.businessName.value }}',
+          [ngClass]='{ "non-editable": isReadonly || readOnly }',
+          [readonly]='isReadonly'
+        )
+        br(*ngIf='updateValues.updateBusinessName')
+        span.update(*ngIf='updateValues.updateBusinessName') Updated Value: {{ updateValues.updateBusinessName }}
+      .form-group.flex-even
+        label(for='business-type')
+          | Business Type
+          span.text-danger *
+          span.ml-1(*ngIf='businessVerified')
+            i-feather.text-success(name='check-circle')
+        select#business-type.form-control(
+          formControlName='businessType',
+          (change)='updateBusinessType()',
+          *ngIf='!isReadonly && !readOnly'
+        )
+          option(value='') Select Business Type
+          option(*ngFor='let item of dropdown', [value]='item') {{ item }}
+        input#business-type-input.form-control(
+          type='text',
+          formControlName='businessType',
+          [ngClass]='{ "non-editable": (isReadonly || readOnly)}',
+          [readonly]='isReadonly || readOnly',
+          *ngIf='isReadonly || readOnly'
+        )
+        br(*ngIf='updateValues.updateBusinessType')
+        span.update(*ngIf='updateValues.updateBusinessType') Updated Value: {{ updateValues.updateBusinessType }}
+    .d-flex
+      .form-group.flex-even.mr-3
+        label(for='gstNo')
+          | GST Number
+          span.text-danger *
+          span.ml-1(*ngIf='businessVerified')
+            i-feather.text-success(name='check-circle')
+        input#gstNo.form-control(
+          type='text',
+          placeholder='XXXXXXXXXXXXXXX',
+          formControlName='businessGst',
+          value='{{ profileForm.controls.businessGst.value }}',
+          [ngClass]='{ "non-editable": isReadonly || readOnly }',
+          [readonly]='isReadonly'
+        )
+        p(style='color: green', *ngIf='businessVerifiedTime') Verified on
+          | &nbsp; {{ getDate(businessVerifiedTime) }}
+        br(*ngIf='updateValues.updateBusinessGst')
+        span.update(*ngIf='updateValues.updateBusinessGst') Updated Value: {{ updateValues.updateBusinessGst }}
+
+      .form-group.flex-even(*ngIf='panRequired')
+        label(for='companyPan')
+          | Business PAN
+          span.text-danger *
+          span.ml-1(*ngIf='businessVerified')
+            i-feather.text-success(name='check-circle')
+        input#companyPan.form-control(
+          type='text',
+          placeholder='XXXXXXXXXX',
+          formControlName='businessPan',
+          value='{{ profileForm?.controls?.businessPan?.value }}',
+          [ngClass]='{ "non-editable": isReadonly || readOnly }',
+          [readonly]='isReadonly'
+        )
+        p(style='color: green', *ngIf='businessVerifiedTime') Verified on
+          | &nbsp; {{ getDate(businessVerifiedTime) }}
+        br(*ngIf='updateValues.updateBusinessPan')
+        span.update(*ngIf='updateValues.updateBusinessPan') Updated Value: {{ updateValues.updateBusinessPan }}
+    //.form-group(*ngIf='merchantId && businessVerified')
+    //  .custom-control.custom-checkbox
+    //    input#businessVerified.custom-control-input(
+    //        type='checkbox',
+    //        formControlName='businessVerified'
+    //    )
+    //    label.custom-control-label(for='businessVerified') Business verified
+  form([formGroup]='addressForm', autocomplete='off', *ngIf='!isIndividual')
+    div
+      .form-block
+        h4 Address Details
+        hr
+      .flex-display
+        .form-group.flex-even.mr-3
+          label(for='address')
+            | Address
+            span.text-danger *
+            span.ml-1(*ngIf='businessVerified')
+              i-feather.text-success(name='check-circle')
+          input#address.form-control(
+            type='text',
+            placeholder='Business Address',
+            formControlName='addressLine',
+            value='{{ addressForm.controls.addressLine.value }}',
+            [ngClass]='{ "non-editable": isReadonly || readOnly }',
+            [readonly]='isReadonly',
+            autocomplete='new-addressLine'
+          )
+          br(*ngIf='updateValues.updateAddressLine')
+          span.update(*ngIf='updateValues.updateAddressLine') Updated Value: {{ updateValues.updateAddressLine }}
+        .form-group.flex-even
+          label(for='pinCode')
+            | Pin code
+            span.text-danger *
+            span.ml-1(*ngIf='businessVerified')
+              i-feather.text-success(name='check-circle')
+          input#pinCode.form-control(
+            type='text',
+            placeholder='Enter your 6 digit pincode',
+            formControlName='pinCode',
+            value='{{ addressForm.controls.pinCode.value }}',
+            [ngClass]='{ "non-editable": isReadonly || readOnly }',
+            [readonly]='isReadonly',
+            autocomplete='new-pin'
+          )
+          br(*ngIf='updateValues.updatePinCode')
+          span.update(*ngIf='updateValues.updatePinCode') Updated Value: {{ updateValues.updatePinCode }}
+      .flex-display
+        .form-group.flex-even.mr-3
+          label(for='city')
+            | City
+            span.text-danger *
+            span.ml-1(*ngIf='businessVerified')
+              i-feather.text-success(name='check-circle')
+          input#city.form-control(
+            type='text',
+            placeholder='City',
+            formControlName='city',
+            value='{{ addressForm.controls.city.value }}',
+            [ngClass]='{ "non-editable": isReadonly || readOnly }',
+            [readonly]='isReadonly',
+            autocomplete='new-city'
+          )
+          br(*ngIf='updateValues.updateCity')
+          span.update(*ngIf='updateValues.updateCity') Updated Value: {{ updateValues.updateCity }}
+        .form-group.flex-even
+          label(for='state')
+            | State
+            span.text-danger *
+            span.ml-1(*ngIf='businessVerified')
+              i-feather.text-success(name='check-circle')
+          input#state.form-control(
+            type='text',
+            placeholder='State',
+            formControlName='state',
+            value='{{ addressForm.controls.state.value }}',
+            [ngClass]='{ "non-editable": isReadonly || readOnly }',
+            [readonly]='isReadonly'
+          )
+          br(*ngIf='updateValues.updateState')
+          span.update(*ngIf='updateValues.updateState') Updated Value: {{ updateValues.updateState }}
+  // check business and Address....
+  sbpro-app-button(
+    *ngIf='merchantId && editMode',
+    text='Verify',
+    loadingText='verifying',
+    [loading]='verifyingBusinessDetails$ | async',
+    (click)='verifyBusinessDetail()'
+  )
+    div(*ngIf='!mercahntId && !businessVerified')
+      button.btn.btn-sm.castlerButtonColor(
+        type='submit',
+        *ngIf='!merchantId'
+      )
+        .spinner-border.spinner-border-sm.text-light.mr-1(
+          role='status',
+          aria-hidden='true',
+          *ngIf='verifyingBusinessDetails$ | async'
+        )
+        i-feather.mr-2(
+          name='arrow-right-circle',
+          *ngIf='!(verifyingBusinessDetails$ | async)'
+        )
+        span(*ngIf='!(verifyingBusinessDetails$ | async)') Verify
+        span(*ngIf='verifyingBusinessDetails$ | async') Verifying
+
+  //// Authorizer start here....
+  //form.mt-5(
+  //  [formGroup]='authorizedPersonForm',
+  //  autocomplete='off',
+  //  (ngSubmit)='verifyPersonDetails()'
+  //)
+  //  .from-block
+  //    h4(*ngIf='!isIndividual') Authorized Person Details
+  //    h4(*ngIf='isIndividual') Personal Details
+  //    hr
+  //    div(*ngIf='panErrors.length === 1')
+  //      sbpro-alert([icon]='true', classes='alert-danger sb-alert-solid')
+  //        p {{ panErrors[0] }}
+  //    div(*ngIf='panErrors.length > 1')
+  //      sbpro-alert([icon]='true', classes='alert-danger sb-alert-solid')
+  //        ul
+  //          li(*ngFor='let error of panErrors')
+  //            p {{ error }}
+  //    .form-group
+  //      label(for='firstName')
+  //        | First Name
+  //        span.text-danger *
+  //        span.ml-1(*ngIf='authorizedPersonPanVerified')
+  //          i-feather.text-success(name='check-circle')
+  //      input#firstName.form-control.form-group(
+  //        type='text',
+  //        placeholder='Enter your first name',
+  //        formControlName='firstName',
+  //        required,
+  //        [ngClass]='{ "non-editable": isReadonly }',
+  //        [readonly]='isReadonly'
+  //      )
+  //      label(for='lastName')
+  //        | Last Name
+  //        span.text-danger *
+  //        span.ml-1(*ngIf='authorizedPersonPanVerified')
+  //          i-feather.text-success(name='check-circle')
+  //      input#lastName.form-control(
+  //        type='text',
+  //        placeholder='Enter your last name',
+  //        formControlName='lastName',
+  //        required,
+  //        [ngClass]='{ "non-editable": isReadonly }',
+  //        [readonly]='isReadonly'
+  //      )
+  //    .form-group
+  //      label(for='authorizedPersonPan')
+  //        | PAN Number
+  //        span.text-danger *
+  //        span.ml-1(*ngIf='authorizedPersonPanVerified')
+  //          i-feather.text-success(name='check-circle')
+  //      input#authorizedPersonForm.form-control(
+  //        type='text',
+  //        placeholder='XXXXXXXXXX',
+  //        formControlName='authorizedPersonPan',
+  //        value='{{ authorizedPersonForm.controls.authorizedPersonPan.value }}',
+  //        [ngClass]='{ "non-editable": isReadonly }',
+  //        required,
+  //        [readonly]='isReadonly'
+  //      )
+  //    .form-group(*ngIf='merchantId && authorizedPersonPanVerified')
+  //      .custom-control.custom-checkbox
+  //        input#authorizedPersonPanVerified.custom-control-input(
+  //          type='checkbox',
+  //          formControlName='authorizedPersonPanVerified'
+  //        )
+  //        label.custom-control-label(for='authorizedPersonPanVerified') Pan Verified
+  //sbpro-app-button(
+  //  *ngIf='merchantId && editMode',
+  //  text='Verify',
+  //  loadingText='Verifying',
+  //  [loading]='verifyingPersonDetails$ | async',
+  //  (click)='verifyPersonDetails();'
+  //)
+
+  // Bank start here.....
+  .flex-display.mb-2.mt-5
+    h4.mr-3 Bank Details
+  .alert.alert-danger.alert-dismissible.fade.show(
+    role='alert',
+    *ngIf='bankFormErrors.length > 0'
+  )
+    ul
+      li(*ngFor='let error of bankFormErrors')
+        p.redDot {{ error }}
+    button.close(
+      type='button',
+      data-dismiss='alert',
+      aria-label='Close',
+      (click)='bankFormErrors = []'
+    )
+      span(aria-hidden='true') &times;
+  hr
+  form([formGroup]='bankForm', autocomplete='off')
+    .form-block
+      .d-flex
+        .form-group.flex-even.mr-3
+          label(for='accountNo')
+            | Account Number
+            span.ml-2(*ngIf='bankAccountVerified')
+              i-feather.text-success(name='check-circle')
+          input.form-control(
+            type='text',
+            placeholder='Account Number',
+            formControlName='accountNo',
+            required,
+            value='{{ bankForm.controls.accountNo.value }}',
+            [ngClass]='{ "non-editable": isReadonly || readOnly }',
+            [readonly]='isReadonly',
+            autocomplete='new-addressLine'
+          )
+          br(*ngIf='updateValues.updateAccountNo')
+          span.update(*ngIf='updateValues.updateAccountNo') Updated Value: {{ updateValues.updateAccountNo }}
+          //.flex-display
+          //  input.form-control(
+          //    type='text',
+          //    placeholder='Account Number',
+          //    formControlName='accountNo',
+          //    required,
+          //    [ngClass]='{ "non-editable": isReadonly }',
+          //    [readonly]='isReadonly',
+          //    autocomplete='new-addressLine'
+          //  )
+          //  span.ml-1(*ngIf='bankAccountVerified')
+          //    i-feather.text-success(name='check-circle')
+          p(
+            style='color: green',
+            *ngIf='bankAccountVerified && bankForm.controls["bankVerifiedAt"].value'
+          ) Verified on
+            | &nbsp; {{ getDate(bankForm.controls["bankVerifiedAt"].value) }}
+        .form-group.flex-even
+          label(for='bankName')
+            | IFSC
+            span.ml-2(*ngIf='bankAccountVerified')
+              i-feather.text-success(name='check-circle')
+          input.form-control(
+            type='text',
+            placeholder='Ifsc',
+            formControlName='ifsc',
+            value='{{ bankForm.controls.ifsc.value }}',
+            required,
+            (focusout)='updateIfscDetails($event)',
+            [ngClass]='{ "non-editable": isReadonly || readOnly }',
+            [readonly]='isReadonly',
+            autocomplete='new-addressLine'
+          )
+          br(*ngIf='updateValues.updateIfsc')
+          span.update(*ngIf='updateValues.updateIfsc') Updated Value: {{ updateValues.updateIfsc }}
+      .d-flex
+        .form-group.flex-even.mr-3
+          label(for='ifsc')
+            | Bank Name
+          input.form-control(
+            type='text',
+            placeholder='Bank Name',
+            formControlName='bankName',
+            value='{{ bankForm.controls.bankName.value }}',
+            required,
+            [ngClass]='{ "non-editable": isReadonly || readOnly }',
+            [readonly]='isReadonly',
+            autocomplete='new-addressLine'
+          )
+          br(*ngIf='updateValues.updateBankName')
+          span.update(*ngIf='updateValues.updateBankName') Updated Value: {{ updateValues.updateBankName }}
+        .form-group.flex-even
+          label(for='bankBranch')
+            | Bank Branch
+          input.form-control(
+            type='text',
+            placeholder='Bank Branch',
+            formControlName='bankBranch',
+            value='{{ bankForm.controls.bankBranch.value }}',
+            required,
+            [ngClass]='{ "non-editable": isReadonly || readOnly }',
+            [readonly]='isReadonly',
+            autocomplete='new-addressLine'
+          )
+          br(*ngIf='updateValues.updateBankBranch')
+          span.update(*ngIf='updateValues.updateBankBranch') Updated Value: {{ updateValues.updateBankBranch }}
+      //.form-group(*ngIf='merchantId')
+      //  .custom-control.custom-checkbox
+      //    input.custom-control-input(
+      //      type='checkbox',
+      //      formControlName='bankAccountVerified'
+      //    )
+      //    label.custom-control-label(for='bankAccountVerified') Bank Verified
+  sbpro-app-button(
+    *ngIf='merchantId && editMode',
+    text='Verify',
+    loadingText='Verifying',
+    [loading]='verifyingPersonDetails$ | async',
+    (click)='verifyBankDetails()'
+  )
+
+  // Promoters start here.....
+  .flex-display.mt-5.mb-4
+    h4.mr-3 Promoter Details ({{ promoterForm.controls.length }})
+    button.btn.castlerButtonColor(
+      (click)='addPromoter()',
+      [disabled]='!editMode',
+      *ngIf='merchantId && !readOnly'
+    )
+      span + Add
+  .alert.alert-danger.alert-dismissible.fade.show(
+    role='alert',
+    *ngIf='promoterFormErrors.length > 0'
+  )
+    ul
+      li(*ngFor='let error of promoterFormErrors')
+        p.redDot {{ error }}
+    button.close(
+      
+      type='button',
+      data-dismiss='alert',
+      aria-label='Close',
+      (click)='promoterFormErrors = []'
+    )
+      span(aria-hidden='true') &times;
+  hr
+  div(*ngFor='let promoter of promoterForm.controls; index as i')
+    ng-container([formGroup]='promoter')
+      .d-flex
+        .form-group.flex-even.mr-3
+          label(for='firstName')
+            | First Name
+          input.form-control(
+            type='text',
+            placeholder='First Name',
+            formControlName='firstName',
+            value='{{ promoterForm.at(i).value.firstName }}',
+            required,
+            [ngClass]='{ "non-editable": isReadonly || readOnly }',
+            [readonly]='isReadonly',
+            autocomplete='new-addressLine'
+          )
+          br(*ngIf='promoterForm.at(i).value.updateFirstName')
+          span.update(*ngIf='promoterForm.at(i).value.updateFirstName') Updated Value: {{ promoterForm.at(i).value.updateFirstName }}
+        .form-group.flex-even
+          label(for='lastName')
+            | Last Name
+          input.form-control(
+            type='text',
+            placeholder='Last Name',
+            formControlName='lastName',
+            value='{{ promoterForm.at(i).value.lastName }}',
+            required,
+            [ngClass]='{ "non-editable": isReadonly || readOnly }',
+            [readonly]='isReadonly',
+            autocomplete='new-addressLine'
+          )
+          br(*ngIf='promoterForm.at(i).value.updateLastName')
+          span.update(*ngIf='promoterForm.at(i).value.updateLastName') Updated Value: {{ promoterForm.at(i).value.updateLastName }}
+      .d-flex
+        .form-group.flex-even.mr-3
+          label(for='pan')
+            | Pan
+            span.ml-2(
+              *ngIf='promoterForm.at(i).value.promoterDetailsVerifiedAt != ""'
+            )
+              i-feather.text-success(name='check-circle')
+          input.form-control(
+            type='text',
+            placeholder='Pan',
+            formControlName='authorizedPersonPan',
+            value='{{ promoterForm.at(i).value.authorizedPersonPan }}',
+            required,
+            [ngClass]='{ "non-editable": isReadonly || readOnly }',
+            [readonly]='isReadonly',
+            autocomplete='new-addressLine'
+          )
+          br(*ngIf='promoterForm.at(i).value.updateAuthorizedPersonPan')
+          span.update(*ngIf='promoterForm.at(i).value.updateAuthorizedPersonPan') Updated Value: {{ promoterForm.at(i).value.updateAuthorizedPersonPan }}
+          p(
+            style='color: green',
+            *ngIf='promoterForm.at(i).value.promoterDetailsVerifiedAt != ""'
+          ) Verified on
+            | &nbsp; {{ getDate(promoterForm.at(i).value.promoterDetailsVerifiedAt) }}
+        .form-group.flex-even
+          label(for='aadhaar')
+            | Aadhaar
+          input.form-control(
+            type='text',
+            placeholder='Aadhaar',
+            formControlName='aadhar',
+            value='{{ promoterForm.at(i).value.aadhar }}',
+            required,
+            [ngClass]='{ "non-editable": isReadonly || readOnly }',
+            [readonly]='isReadonly',
+            autocomplete='new-addressLine'
+          )
+          br(*ngIf='promoterForm.at(i).value.updateAadhar')
+          span.update(*ngIf='promoterForm.at(i).value.updateAadhar') Updated Value: {{ promoterForm.at(i).value.updateAadhar }}
+      .d-flex.justify-content-end
+        button.btn.btn-light.mb-3(
+          (click)='removePromoter(i)',
+          *ngIf='promoterForm.controls.length > 1 && i != 0 && !isReadonly',
+          [disabled]='!editMode'
+        )
+          i-feather(name='trash-2')
+  button.btn.btn-light.mr-3(*ngIf='merchantId && editMode', (click)='goBack()') Back
+  sbpro-app-button(
+    *ngIf='merchantId && editMode',
+    text='Verify',
+    loadingText='Verifying',
+    [loading]='verifyingPersonDetails$ | async',
+    (click)='verifyPromotersDetails()'
+  )
+
+  div(*ngIf='!authorizedPersonPanVerified')
+    //- button.btn.btn-primary(
+    //-   type='submit',
+    //-   [disabled]='isDisabled',
+    //-   *ngIf='!isReadonly'
+    //- )
+    button.btn.btn-sm.castlerButtonColor(type='submit', *ngIf='!merchantId')
+      .spinner-border.spinner-border-sm.text-light.mr-1(
+        role='status',
+        aria-hidden='true',
+        *ngIf='verifyingPersonDetails$ | async'
+      )
+      i-feather.mr-2(
+        name='arrow-right-circle',
+        *ngIf='!(verifyingPersonDetails$ | async)'
+      )
+      span(*ngIf='!(verifyingPersonDetails$ | async)') Verify
+      span(*ngIf='verifyingPersonDetails$ | async') Verifying
+
+  button.btn.btn-light(*ngIf='merchantId && !editMode', (click)='goBack()') Back
+  span &nbsp;&nbsp;
+  button.btn.castlerButtonColor(
+    *ngIf='merchantId && !editMode && !readOnly',
+    (click)='toggleEditMode()'
+  ) Edit
+
+  form(
+    [formGroup]='addressForm',
+    autocomplete='off',
+    (ngSubmit)='setAddressDetails()',
+    *ngIf='isIndividual'
+  )
+    div
+      .form-block
+        h4 Address Details
+        hr
+        .form-group
+          label(for='address')
+            | Address
+            span.text-danger *
+            span.ml-1(*ngIf='!merchantId && businessVerified')
+              i-feather.text-success(name='check-circle')
+          input#address.form-control(
+            type='text',
+            placeholder='Address',
+            formControlName='addressLine',
+            required,
+            value='{{ addressForm.controls.addressLine.value }}',
+            [ngClass]='{ "non-editable": isReadonly || readOnly }',
+            [readonly]='isReadonly',
+            autocomplete='new-addressLine'
+          )
+        .form-group
+          label(for='pinCode')
+            | Pin code
+            span.text-danger *
+            span.ml-1(*ngIf='!merchantId && businessVerified')
+              i-feather.text-success(name='check-circle')
+          input#pinCode.form-control(
+            type='text',
+            placeholder='Emter your 6 digit pincode',
+            formControlName='pinCode',
+            required,
+            value='{{ addressForm.controls.pinCode.value }}',
+            [ngClass]='{ "non-editable": isReadonly || readOnly }',
+            [readonly]='isReadonly',
+            autocomplete='new-pin'
+          )
+        .form-group
+          label(for='city')
+            | City
+            span.text-danger *
+            span.ml-1(*ngIf='!merchantId && businessVerified')
+              i-feather.text-success(name='check-circle')
+          input#city.form-control(
+            type='text',
+            placeholder='City',
+            formControlName='city',
+            required,
+            value='{{ addressForm.controls.city.value }}',
+            [ngClass]='{ "non-editable": isReadonly || readOnly }',
+            [readonly]='isReadonly',
+            autocomplete='new-city'
+          )
+        .form-group
+          label(for='state')
+            | State
+            span.text-danger *
+            span.ml-1(*ngIf='!merchantId && businessVerified')
+              i-feather.text-success(name='check-circle')
+          input#state.form-control(
+            type='text',
+            placeholder='State',
+            formControlName='state',
+            required,
+            value='{{ addressForm.controls.state.value }}',
+            [ngClass]='{ "non-editable": isReadonly || readOnly }',
+            [readonly]='isReadonly'
+          )
+        .form-group
+          div(*ngIf='!businessVerified')
+            button.btn.btn-sm.castlerButtonColor(
+              type='submit',
+              *ngIf='!merchantId'
+            )
+              .spinner-border.spinner-border-sm.text-light.mr-1(
+                role='status',
+                aria-hidden='true',
+                *ngIf='setAddressDetails$ | async'
+              )
+              i-feather.mr-2(
+                name='arrow-right-circle',
+                *ngIf='!(setAddressDetails$ | async)'
+              )
+              span(*ngIf='!(setAddressDetails$ | async)') Submit
+              span(*ngIf='setAddressDetails$ | async') Submitting
+.flex-container.flex-row(*ngIf='loadingData$ | async')
+  .align-self-center Please wait...

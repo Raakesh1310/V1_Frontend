@@ -1,0 +1,76 @@
+sbpro-card([headerActions]='true')
+  .card-header
+    | Form
+    button.btn.btn-icon.btn-link.btn-xl((click)='closeModal()')
+      i-feather(name='x-circle')
+  .card-body
+    div(*ngIf='errors && errors.length > 0')
+      sbpro-alert(classes='alert-danger')
+        | {{ errors[0] }}
+    form([formGroup]='fdForm')
+      .d-flex
+        .form-group.w-100.mr-2
+          label(for='frm-cntrl-amount') Amount
+          input#frm-cntrl-amount.form-control.form-control-sm(
+            type='number',
+            formControlName='amount',
+            placeholder='Amount',
+          )
+        .form-group.w-100
+          label(for='frm-cntrl-tenure') Tenure
+          input#frm-cntrl-tenure.form-control.form-control-sm(
+            type='number',
+            formControlName='tenure',
+            placeholder='Tenure'
+          )
+      .d-flex
+        .form-group.w-100.mr-2
+          label(for='frm-cntrl-valueDate') Value Date
+          input#frm-cntrl-valueDate.mt-1.form-control.form-control-sm.mr-2(
+            type='text',
+            name='sd',
+            placeholder='Value Date',
+            autocomplete='off',
+            ngbDatepicker,
+            outsideDays='hidden',
+            #sd='ngbDatepicker',
+            (click)='sd.toggle()',
+            formControlName='valueDate'
+          )
+        .form-group.w-100
+          label(for='frm-cntrl-maturityDate') Maturity Date
+          input#frm-cntrl-maturityDate.mt-1.form-control.form-control-sm.mr-2(
+            type='text',
+            name='ed',
+            placeholder='Maturity Date',
+            autocomplete='off',
+            ngbDatepicker,
+            outsideDays='hidden',
+            #ed='ngbDatepicker',
+            (click)='ed.toggle()',
+            formControlName='maturityDate'
+          )
+      .d-flex
+        .form-group.w-100
+          label(for='frm-cntrl-fdaccountnumber') Escrow ID
+          input#frm-cntrl-fdaccountnumber.form-control.form-control-sm(
+            type='string',
+            formControlName='fdAccountNo',
+            placeholder='Escrow ID'
+          )
+
+    sbpro-app-button.float-right(
+      *ngIf='!fd',
+      (click)='onSubmit()',
+      [loading]='submitting',
+      text='Create',
+      loadingText='Creating'
+    )
+
+    sbpro-app-button.float-right(
+      *ngIf='fd',
+      (click)='onSubmit()',
+      [loading]='submitting',
+      text='Update',
+      loadingText='Updating'
+    )

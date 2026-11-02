@@ -1,0 +1,171 @@
+div
+  .mb-4.mt-4.ml-1.flex-display
+    p#introWidth Enter the required details in the template and upload (.xls, .xlsx, .csv)
+    //- p.mr-1.mt-2.myanchor((click)='downloadExcel()' style='width : 180px') Download Sample
+    //- img.mr-1.mt-2.myanchor(src='/assets/img/excel.png' width='25' height='25', (click)='downloadExcel()')
+    .mt-2.myanchor(
+      style='width:190px;padding:0;margin-right:2%;text-align:center;'
+    )
+      a(
+        href='{{ sampleFileUrl }}',
+        target='_self',
+        download='{{ "Bulk_payee_sample.xlsx" }}',
+        style='color: #687281'
+      )
+        .float-left
+          | Download Template
+        .float-right
+          img.ml-1(src='/assets/img/excel.png' width='25' height='25')
+  div(*ngIf='errors.length > 0')
+    sbpro-alert(classes='alert-danger', [dismissable]='true')
+      | {{ errors[0] }}
+  input(
+    type='file',
+    #inputFile,
+    accept='.xlsx, .xls, .csv',
+    (change)='uploadExcel($event)',
+    (click)='$event.target.value = null'
+  )
+  sbpro-card.mt-5.myanchor((click)='openUpload()')
+    .card-body.flex-display.justify-content-center(
+      *ngIf='payeeStatus === states.upload'
+    )
+      p(style='font-size: 18px') Upload File
+      //button(class="my third", (click)='openUpload()') Upload
+      //    svg.bi.bi-file-earmark-arrow-up.ml-2(xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='currentColor' viewbox='0 0 16 16')
+      //        path(d='M8.5 11.5a.5.5 0 0 1-1 0V7.707L6.354 8.854a.5.5 0 1 1-.708-.708l2-2a.5.5 0 0 1 .708 0l2 2a.5.5 0 0 1-.708.708L8.5 7.707V11.5z')
+      //        path(d='M14 14V4.5L9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2zM9.5 3A1.5 1.5 0 0 0 11 4.5h2V14a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h5.5v2z')
+      svg.bi.bi-file-earmark-arrow-up-fill.ml-3.marginTop(
+        xmlns='http://www.w3.org/2000/svg',
+        width='24',
+        height='24',
+        fill='currentColor',
+        viewbox='0 0 16 16'
+      )
+        path(
+          d='M9.293 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V4.707A1 1 0 0 0 13.707 4L10 .293A1 1 0 0 0 9.293 0zM9.5 3.5v-2l3 3h-2a1 1 0 0 1-1-1zM6.354 9.854a.5.5 0 0 1-.708-.708l2-2a.5.5 0 0 1 .708 0l2 2a.5.5 0 0 1-.708.708L8.5 8.707V12.5a.5.5 0 0 1-1 0V8.707L6.354 9.854z'
+        )
+      //p.mt-1.mr-3 Upload from computer
+      //img(src='/assets/img/upload.png' width='30' height='30', #uploadButton, (click)='openUpload()')
+    .card-body.flex-display.justify-content-center(
+      *ngIf='payeeStatus === states.moveToPayeeList'
+    )
+      p.logoColor.mr-3 Payee(s) added successfully
+      button.btn.castlerButtonColor((click)='navigateToPayeeList()') Go to Payee List
+    .card-body.flex-display.justify-content-around.align-center(
+      *ngIf='payeeStatus === states.submit'
+    )
+      .flex-display
+        p.logoColor.mr-3.pt-2.textSize {{ uploadedFileName }}
+        button.btn.castlerButtonColor3((click)='openModal()') Add Payee
+      .flex-display(*ngIf='errorData.length > 0')
+        button.btn.castlerButtonColor((click)='uploadAgainAfterSubmit()') Upload Again
+        input(
+          type='file',
+          #inputFile,
+          accept='.xlsx, .xls, .csv',
+          (change)='uploadExcel($event)',
+          (click)='$event.target.value = null'
+        )
+    .card-body.flex-display.justify-content-around.align-center(
+      *ngIf='payeeStatus === states.error'
+    )
+      p.pt-2(style='color: red') {{ checkForValidHeaders ? "Error in File Headers, Upload Valid File" : "No payees added. Error in the fle. Upload again" }}
+      .flex-display.mt-2
+        p(style='font-size: 18px') Upload File
+          //button(class="my third", (click)='openUpload()') Upload
+          //    svg.bi.bi-file-earmark-arrow-up.ml-2(xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='currentColor' viewbox='0 0 16 16')
+          //        path(d='M8.5 11.5a.5.5 0 0 1-1 0V7.707L6.354 8.854a.5.5 0 1 1-.708-.708l2-2a.5.5 0 0 1 .708 0l2 2a.5.5 0 0 1-.708.708L8.5 7.707V11.5z')
+          //        path(d='M14 14V4.5L9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2zM9.5 3A1.5 1.5 0 0 0 11 4.5h2V14a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h5.5v2z')
+        svg.bi.bi-file-earmark-arrow-up-fill.ml-3.marginTop(
+          xmlns='http://www.w3.org/2000/svg',
+          width='24',
+          height='24',
+          fill='currentColor',
+          viewbox='0 0 16 16'
+        )
+          path(
+            d='M9.293 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V4.707A1 1 0 0 0 13.707 4L10 .293A1 1 0 0 0 9.293 0zM9.5 3.5v-2l3 3h-2a1 1 0 0 1-1-1zM6.354 9.854a.5.5 0 0 1-.708-.708l2-2a.5.5 0 0 1 .708 0l2 2a.5.5 0 0 1-.708.708L8.5 8.707V12.5a.5.5 0 0 1-1 0V8.707L6.354 9.854z'
+          )
+        input(
+          type='file',
+          #inputFile,
+          accept='.xlsx, .xls, .csv',
+          (change)='uploadExcel($event)',
+          (click)='$event.target.value = null'
+        )
+
+  p.mt-5.mb-4 Invalid entries in your uploaded file will be displayed here-
+  .table-responsive.pp-table-container.table-responsive-sm
+    table.table
+      thead
+        tr
+          th(scope='col' sbSortable='event')
+            span.ws-nowrap Excel row no
+          th(scope='col' sbSortable='time')
+            span.ws-nowrap Payee name
+          th(scope='col' sbSortable='time')
+            span.ws-nowrap Email iD
+          th(scope='col' sbSortable='time')
+            span.ws-nowrap Mobile
+          th(scope='col' sbSortable='time')
+            span.ws-nowrap Bank Account No.
+          th(scope='col' sbSortable='time')
+            span.ws-nowrap Bank IFSC
+          th(scope='col' sbSortable='time')
+            span Bank Name
+          th(scope='col' sbSortable='time')
+            span Bank Branch
+          th(*ngIf='upiEnabled' scope='col' sbSortable='time')
+            span UPI ID
+          th(scope='col' sbSortable='time')
+            span Remarks
+      tbody(*ngIf='errorData.length == 0')
+        tr
+          td
+      tbody
+        tr(
+          *ngFor='let data of errorData | slice: (page - 1) * pageSize:page * pageSize'
+        )
+          td
+            ngb-highlight.ws-nowrap([result]='data.rowNumber')
+          td
+            ngb-highlight([result]='data.accountHolder')
+          td
+            ngb-highlight([result]='data.email')
+          td
+            ngb-highlight([result]='data.mobile')
+          td
+            ngb-highlight([result]='data.accountNumber')
+          td
+            ngb-highlight([result]='data.ifsc')
+          td
+            ngb-highlight([result]='data.bankName')
+          td
+            ngb-highlight([result]='data.bankAddress')
+          td(*ngIf='upiEnabled')
+            ngb-highlight([result]='data.vpa')
+          td
+            div(
+              *ngFor='let err of data.remarks',
+              style='color: red;font-weight: bold'
+            )
+              .redDot {{ err }}
+            //ngb-highlight.logoColor(
+            //  style='font-weight:bold',
+            //  [result]='data.remarks'
+            //)
+  .d-flex.justify-content-between.p-2
+    ngb-pagination(
+      [collectionSize]='total$',
+      [maxSize]='5',
+      [(page)]='page',
+      [pageSize]='pageSize',
+      [rotate]='true',
+      [ellipses]='false',
+      (pageChange)='loadPage($event)',
+      [boundaryLinks]='true'
+    )
+
+ngx-spinner
+  p(style='font-size: 20px; color: white') Adding Payees...

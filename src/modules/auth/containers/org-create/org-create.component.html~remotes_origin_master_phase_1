@@ -1,0 +1,24 @@
+<sb-layout-auth
+    ><div class="container">
+        <div class="row justify-content-center">
+            <div class="col-xl-8 col-lg-8 col-md-8 col-sm-11">
+                <div class="card mt-5">
+                    <div class="card-body p-3 text-center">
+                        <center><img src="https://www.protectpay.in/wp-content/uploads/2020/07/pp-logo-400.png" /></center>
+                    </div>
+                    <hr class="m-0" />
+                    <div class="card-body p-5">
+                        <form [formGroup]="organizationNewForm" autocomplete="off" (ngSubmit)="onSubmit()">
+                            <div class="form-group">
+                                <input class="form-control form-control-solid" data-cy="nameInput" type="text" placeholder="Enter new organization name" aria-describedby="nameHelp" formControlName="name" [class.is-valid]="nameControlValid" [class.is-invalid]="nameControlInvalid" />
+                                <div class="invalid-feedback" *ngIf='nameControl.hasError("required")'>Name required</div>
+                                <div class="invalid-feedback" *ngIf='nameControl.hasError("name")'>Name is not available</div>
+                            </div>
+                            <div class="form-group mb-0"><button class="btn btn-block btn-primary" data-cy="organizationNewButton" type="submit" [disabled]="organizationNewForm.invalid">Create Organization</button></div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div></sb-layout-auth
+>

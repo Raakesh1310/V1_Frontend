@@ -1,0 +1,72 @@
+form.details
+  .container-fluid.border.rounded.w-75.float-left.shadow-lg.p-3.mb-5.bg-white.rounded
+    .row.p-2
+      .col
+        h4 Document Type
+      .col 
+        h4 File(s) Uploaded
+      .col
+    br
+    .row.p-2
+      .col PAN
+      .col-6
+        div(style='cursor: pointer')
+          li(*ngFor='let doc of panDocs; let i = index')
+            a(href="#", (click)='downloadFile($event, doc.hash, doc?.name)') {{ doc.name }} - {{ toIST(doc.createdAt) }}
+      .col
+        button.btn.castlerButtonColor.btn-xs((click)='selectPan()') Upload
+        input(
+          #inputPan,
+          type='file',
+          accept='.png, .jpg, .pdf',
+          (click)='$event.target.value = null',
+          (change)='uploadData($event, 1)'
+        )
+    br
+    .row.p-2
+      .col GST Certificate
+      .col-6
+        div(style='cursor: pointer')
+          li(*ngFor='let doc of gstDocs; let i = index')
+            a(href="#", (click)='downloadFile($event, doc.hash, doc?.name)')  {{ doc.name }} - {{ toIST(doc.createdAt) }}
+      .col
+        button.btn.castlerButtonColor.btn-xs((click)='selectGst()') Upload
+        input(
+          #inputGst,
+          type='file',
+          accept='.png, .jpg, .pdf',
+          (click)='$event.target.value = null',
+          (change)='uploadData($event, 2)'
+        )
+    br
+    .row.p-2
+      .col COI
+      .col-6
+        div(style='cursor: pointer')
+          li(*ngFor='let doc of coiDocs; let i = index')
+            a(href="#", (click)='downloadFile($event, doc.hash, doc?.name)')  {{ doc.name }} - {{ toIST(doc.createdAt) }}
+      .col
+        button.btn.castlerButtonColor.btn-xs((click)='selectCoi()') Upload
+        input(
+          #inputCoi,
+          type='file',
+          accept='.png, .jpg, .pdf',
+          (click)='$event.target.value = null',
+          (change)='uploadData($event, 3)'
+        )
+    br
+    .row.p-2
+      .col Board Resolution
+      .col-6
+        div(style='cursor: pointer')
+          li(*ngFor='let doc of brDocs; let i = index')
+            a(href="#", (click)='downloadFile($event, doc.hash, doc?.name)') {{ doc.name }} - {{ toIST(doc.createdAt) }}
+      .col
+        button.btn.castlerButtonColor.btn-xs((click)='selectBr()') Upload
+        input(
+          #inputBr,
+          type='file',
+          accept='.png, .jpg, .pdf',
+          (click)='$event.target.value = null',
+          (change)='uploadData($event, 4)'
+        )

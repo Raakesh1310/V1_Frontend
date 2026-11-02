@@ -1,0 +1,76 @@
+@import 'styles/variables.scss';
+
+.flex-display {
+  display: flex;
+  flex-direction: row;
+}
+
+#introWidth {
+  width: 85%;
+}
+
+input[type='file'] {
+  display: none;
+}
+
+.marginTop {
+  margin-top: 12px;
+}
+
+.myanchor {
+  text-decoration: none;
+  color: #687281;
+}
+
+.verifyButton {
+  color: #417505;
+  font-weight: 800;
+}
+
+.textSize {
+  font-size: 16px;
+}
+
+@media screen and (max-width: 665px) {
+  .flex-display {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+}
+
+.flex-display-column {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+
+@media screen and (max-width: 395px) {
+  .textSize {
+    font-size: 13px;
+  }
+
+  .castlerButtonColor3 {
+    background: #417505;
+    color: white;
+    margin-left: 32px;
+  }
+}
+
+@media screen and (max-width: 395px) {
+  .textSize {
+    font-size: 13px;
+  }
+
+  .castlerButtonColor3 {
+    background: #417505;
+    color: white;
+    margin-left: 32px;
+  }
+}
+
+@media screen and (max-width: 325px) {
+  .textSize {
+    font-size: 10px;
+  }
+}

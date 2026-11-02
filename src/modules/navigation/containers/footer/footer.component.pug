@@ -1,0 +1,13 @@
+footer.footer.mt-auto(
+    [ngClass]='{"footer-light": !dark, "footer-dark": dark}'
+)
+    .container-fluid
+        .row
+            .col-md-6.small
+                | Copyright &copy; Castler 2021
+            .col-md-6.text-md-right.small
+                a(href='https://www.castler.com/privacy-policy' target='_blank') Privacy Policy
+                | 
+                | &middot;
+                | 
+                a(href='https://castler.com/domestic-tcs/' target='_blank') Terms &amp; Conditions

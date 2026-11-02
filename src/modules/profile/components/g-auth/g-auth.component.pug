@@ -1,0 +1,159 @@
+div
+  .sb-preview
+    .sbp-preview-content
+      .row 
+        .col
+          center
+            span(style='font-weight:bold;font-size: 24;') Google Authenticator
+            div(*ngIf='!gauthEnabled', style='margin-top: 32px;   margin-bottom: 25px;')
+              p Add an extra layer of security to your account by using Google Authenticator code in addition to your password each time you log in.
+            div(*ngIf='errors.length > 0')
+              sbpro-alert(classes='alert-danger', [dismissable]='true')
+                | {{ errors[0] }}
+            div(*ngIf='!gauthEnabled')
+              div(*ngIf='!showQR')
+                br
+                button.btn(type='submit', (click)='generateGAuthQR()', class='castlerButtonColor') Enable 2-Factor Authentication
+              div(*ngIf='showQR', style='text-align:left;')
+                br
+                ol
+                  li Please download "Google Authenticator" APP on your smartphone.
+                  li Open the App and scan the QR code
+                  li Enter the OTP generated
+                br
+                img.svgIcon([src]='qr')
+                div 
+                  form([formGroup]='otpForm')
+                    .form-group
+                      br
+                      label.small.mb-1(for='inputOTP') OTP
+                      input#inputOTP.form-control.py-4(
+                        data-cy='otp',
+                        type='text',
+                        placeholder='Enter OTP',
+                        formControlName='otp',
+                        [class.is-valid]='otpControlValid',
+                        [class.is-invalid]='otpControlInvalid',
+                        maxLength=6
+                      )
+                      .invalid-feedback(*ngIf='otpControl.hasError?.required')
+                        | OTP is required.
+                      .invalid-feedback(*ngIf='otpControl.hasError("minlength")')
+                        | Enter the 6 digit OTP.
+                      .invalid-feedback(*ngIf='otpControl.hasError("maxlength")')
+                        | Enter the 6 digit OTP.
+                      br
+                      button.btn(
+                        type='submit',
+                        (click)='enableGAuth()',
+                        [disabled]='otpForm.invalid',
+                        class='textColor'
+                      ) Verify and Enable 2-Factor Authentication
+                      | &nbsp;&nbsp;&nbsp;&nbsp;&emsp;
+                      button.btn.btn-link(type='submit', (click)='onCancel()') Cancel
+            div(*ngIf='gauthEnabled', style='margin-top: 32px;margin-bottom: 25px;')
+              | Google Authenticator is enabled for your account
+            //- div(*ngIf='gauthEnabled')
+            //-   div(*ngIf='!openForm')
+            //-     br
+            //-     button.btn.btn-primary(type='submit', (click)='disable()', class='castlerButtonColor') Disable 2-Factor Authentication
+            //-   div(*ngIf='openForm')
+            //-     form([formGroup]='otpForm', autocomplete='off')
+            //-       .form-group
+            //-         label.small.mb-1(for='inputOTP') OTP
+            //-         input#inputOTP.form-control.py-4(
+            //-           data-cy='otp',
+            //-           type='text',
+            //-           placeholder='Enter OTP generated on google authenticator',
+            //-           formControlName='otp',
+            //-           [class.is-valid]='otpControlValid',
+            //-           [class.is-invalid]='otpControlInvalid',
+            //-           maxLength=6
+            //-         )
+            //-         .invalid-feedback(*ngIf='otpControl.hasError?.required')
+            //-           | OTP is required.
+            //-         .invalid-feedback(*ngIf='otpControl.hasError("minlength")')
+            //-           | Enter the 6 digit OTP.
+            //-         .invalid-feedback(*ngIf='otpControl.hasError("maxlength")')
+            //-           | Enter the 6 digit OTP.
+            //-         br
+            //-         button.btn.btn-primary(
+            //-           type='submit',
+            //-           (click)='disableGAuth()',
+            //-           [disabled]='otpForm.invalid',
+            //-           class='castlerButtonColor'
+            //-         ) Disable 2-Factor Authentication
+            //-         | &nbsp;&nbsp;&nbsp;&nbsp;&emsp;
+            //-         button.btn.btn-link(type='submit', (click)='onCancel()', class='castlerButtonColor') Cancel
+        .col
+          center 
+            span(style='font-weight:bold;font-size: 24') Mobile OTP
+            div(*ngIf='!isLoginOTPEnabled', style='margin-top: 32px;margin-bottom: 25px;')
+              .row
+                | Add an extra layer of security to your account by using a one-time mobile OTP in addition to your password each time you log in.
+              div(*ngIf='!enableLoginOTP')
+                br
+                button.btn(type='submit', (click)='enableSendOTP()', class='castlerButtonColor') Enable Mobile OTP
+              div(*ngIf='enableLoginOTP')
+                div 
+                  form([formGroup]='otpForm')
+                    .form-group
+                      br
+                      label.small.mb-1(for='inputOTP') Enter OTP sent on your registered mobile number
+                      input#inputOTP.form-control.py-4(
+                        data-cy='otp',
+                        type='text',
+                        placeholder='Enter OTP',
+                        formControlName='otp',
+                        [class.is-valid]='otpControlValid',
+                        [class.is-invalid]='otpControlInvalid',
+                        maxLength=6
+                      )
+                      .invalid-feedback(*ngIf='otpControl.hasError?.required')
+                        | OTP is required.
+                      .invalid-feedback(*ngIf='otpControl.hasError("minlength")')
+                        | Enter the 6 digit OTP.
+                      .invalid-feedback(*ngIf='otpControl.hasError("maxlength")')
+                        | Enter the 6 digit OTP.
+                      br
+                      button.btn(
+                        type='submit',
+                        (click)='enableLoginOTPFn()',
+                        [disabled]='otpForm.invalid',
+                        class='textColor'
+                      ) Verify and Enable 2-Factor Authentication
+                      | &nbsp;&nbsp;&nbsp;&nbsp;&emsp;
+                      button.btn.btn-link(type='submit', (click)='onCancelLoginOTP()') Cancel
+            div(*ngIf='isLoginOTPEnabled', style='margin-top: 32px;margin-bottom: 25px;')
+              | Mobile OTP is enabled for your account
+              //- div(*ngIf='!openForm')
+              //-   br
+              //-   button.btn.btn-primary(type='submit', (click)='disable()', class='castlerButtonColor') Disable 2-Factor Authentication
+              //- div(*ngIf='openForm')
+              //-   form([formGroup]='otpForm', autocomplete='off')
+              //-     .form-group
+              //-       label.small.mb-1(for='inputOTP') Enter OTP sent on your registered mobile number
+              //-       input#inputOTP.form-control.py-4(
+              //-         data-cy='otp',
+              //-         type='text',
+              //-         placeholder='Enter OTP generated on google authenticator',
+              //-         formControlName='otp',
+              //-         [class.is-valid]='otpControlValid',
+              //-         [class.is-invalid]='otpControlInvalid',
+              //-         maxLength=6
+              //-       )
+              //-       .invalid-feedback(*ngIf='otpControl.hasError?.required')
+              //-         | OTP is required.
+              //-       .invalid-feedback(*ngIf='otpControl.hasError("minlength")')
+              //-         | Enter the 6 digit OTP.
+              //-       .invalid-feedback(*ngIf='otpControl.hasError("maxlength")')
+              //-         | Enter the 6 digit OTP.
+              //-       br
+              //-       button.btn.btn-primary(
+              //-         type='submit',
+              //-         (click)='disableLoginOTP()',
+              //-         [disabled]='otpForm.invalid',
+              //-         class='castlerButtonColor'
+              //-       ) Disable 2-Factor Authentication
+              //-       | &nbsp;&nbsp;&nbsp;&nbsp;&emsp;
+              //-       button.btn.btn-link(type='submit', (click)='onCancelLoginOTP()', class='castlerButtonColor') Cancel

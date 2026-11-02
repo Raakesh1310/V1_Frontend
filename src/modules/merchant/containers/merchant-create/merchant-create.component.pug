@@ -1,0 +1,55 @@
+.flex-container
+  sbpro-dashboard-head(
+    icon='book',
+    title='Merchant Details',
+    description='Merchant Details.'
+  )
+  .container-fluid.mt-n10.responsiveForm
+    sbpro-card-navigation(
+      sbproTocItem='Tabs',
+      [navNames]='["Basic Details", "Business profile", "Documents", "Bank details","Escrow Parties", "Fees", "Authorizer", "Settings"]',
+      [templates]='[basic, profile, doc, Bank, parties, Invoicing, authorizer, Settings]',
+      [selectedIndex]='tabIndex',
+      [selectedIndexForFade]='tabIndex',
+      [navNamesDisabled]='disabledTabs'
+    )
+      ng-template(#basic)
+        sbpro-merchant-basic-detail(
+          [merchantId]='merchantId',
+          [editMode]='true',
+          [new]='true',
+          (emitMerchantIdAndEmail)='setMerchantIdAndEmail($event)'
+        )
+      ng-template(#profile)
+        sbpro-profile-basic-details(
+          [merchantId]='merchantId',
+          (emitBusinessType)='setBusinessType($event)',
+          [businessType]='businessType',
+          [editMode]='true'
+        )
+      ng-template(#doc)
+        sbpro-profile-document(
+          [merchantId]='merchantId',
+          (emitAllDocumentsUploaded)='setAllDocumentsUploaded($event)',
+          [businessType]='businessType'
+        )
+      ng-template(#Bank)
+        sbpro-profile-bank-details([merchantId]='merchantId', [editMode]='true')
+      ng-template(#parties)
+        sbpro-parties-list(
+          [merchantId]='merchantId'
+        )
+      ng-template(#Invoicing)
+        sbpro-merchant-invioce-details(
+          [merchantId]='merchantId',
+          ,
+          [editMode]='true'
+        )
+      ng-template(#authorizer)
+        sbpro-authorizers([merchantId]='merchantId')
+      ng-template(#Settings)
+        sbpro-merchant-settings(
+          [merchantId]='merchantId',
+          [merchantEmail]='merchantEmail',
+          [editMode]='true'
+        )

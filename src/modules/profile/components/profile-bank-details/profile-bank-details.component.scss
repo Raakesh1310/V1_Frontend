@@ -1,0 +1,35 @@
+@import 'styles/variables.scss';
+
+#myDiv {
+  height: 500px;
+  overflow: scroll;
+}
+
+.bank-list{
+  max-height:300px; 
+  overflow-y:auto; 
+  overflow-x:hidden;
+}
+
+.bank-card{
+  margin-right:10px;
+  margin-left: 5px;
+  width:440px;
+}
+
+.row.card.p-3{
+  font-size:12px !important;
+  padding:0.5rem !important;
+}
+
+.hard-escrow-list{
+  float:left;
+}
+
+.badge-light{
+  width:100% !important;
+}
+
+.ml-2{
+  margin-top: 5px;
+}

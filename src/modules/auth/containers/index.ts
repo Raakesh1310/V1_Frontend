@@ -1,0 +1,31 @@
+import { ForgotPasswordSocialComponent } from './forgot-password-social/forgot-password-social.component';
+import { ForgotPasswordComponent } from './forgot-password/forgot-password.component';
+import { LinkVerificationPageComponent } from './link-verification-page/link-verification-page.component';
+import { LoginSocialComponent } from './login-social/login-social.component';
+import { LoginComponent } from './login/login.component';
+import { MultiTenantAddUsersComponent } from './multi-tenant-add-users/multi-tenant-add-users.component';
+import { MultiTenantSelectComponent } from './multi-tenant-select/multi-tenant-select.component';
+import { OrgCreateComponent } from './org-create/org-create.component';
+import { OrgJoinComponent } from './org-join/org-join.component';
+import { RegisterSocialComponent } from './register-social/register-social.component';
+import { RegisterComponent } from './register/register.component';
+import { ResetPasswordComponent } from './reset-password/reset-password.component';
+import { CreatePasswordComponent } from './create-password/create-password.component';
+import { EmailVerifiedComponent } from './email-verified/email-verified.component';
+
+export const containers = [LoginComponent, RegisterComponent, ForgotPasswordComponent, LoginSocialComponent, RegisterSocialComponent, ForgotPasswordSocialComponent, MultiTenantSelectComponent, OrgCreateComponent, OrgJoinComponent, MultiTenantAddUsersComponent, LinkVerificationPageComponent, ResetPasswordComponent, CreatePasswordComponent, EmailVerifiedComponent];
+
+export * from './login/login.component';
+export * from './register/register.component';
+export * from './forgot-password/forgot-password.component';
+export * from './login-social/login-social.component';
+export * from './register-social/register-social.component';
+export * from './forgot-password-social/forgot-password-social.component';
+export * from './multi-tenant-select/multi-tenant-select.component';
+export * from './org-create/org-create.component';
+export * from './org-join/org-join.component';
+export * from './multi-tenant-add-users/multi-tenant-add-users.component';
+export * from './link-verification-page/link-verification-page.component';
+export * from './reset-password/reset-password.component';
+export * from './create-password/create-password.component';
+export * from './email-verified/email-verified.component';

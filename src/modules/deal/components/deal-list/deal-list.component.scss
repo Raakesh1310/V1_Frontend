@@ -1,0 +1,20 @@
+@import 'styles/variables.scss';
+
+th,
+td {
+  border-top: none;
+  border-bottom: 1px solid #e3e6ec;
+}
+
+.action {
+  width: 100%;
+}
+
+.buttonColor {
+  background: #F5A500;
+  color: white;
+}
+
+.logoGreen {
+  color: #417505;
+}

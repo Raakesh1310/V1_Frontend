@@ -1,0 +1,1542 @@
+div(*ngIf='!(loadingData$ | async) && dataLoaded')
+  .form-group
+    div(*ngIf='errors.length > 0')
+      sbpro-alert(classes='alert-danger', [dismissable]='true')
+        | {{ errors[0] }}
+    div(*ngIf='success.length > 0')
+      sbpro-alert([icon]='true' classes='alert-success sb-alert-solid')
+        p {{ success[0] }}
+  form(autocomplete='off', [formGroup]='bankForm')
+    .block
+      h4 Bank Details
+      br
+    .form-group
+      .col-sm-12.col-md-12.col-lg-12(style='overflow:auto')
+        label.font-weight-bold.text-black(*ngIf='!readOnly')
+          | Select One or Multiple Banks
+        br
+        br
+        .row
+          .card.border.rounded.float-left.shadow-lg.mb-5.bg-white.rounded.bank-card
+            .card-header(style='display:block')
+              .row
+                .col-sm-12.col-md-6.col-lg-6
+                  label(for='rblCheckbox') 
+                    | RBL
+                .col-sm-12.col-md-6.col-lg-6
+                  input(
+                    type='checkbox',
+                    #checkbox,
+                    name='rblCheckbox',
+                    formControlName='rblCheckbox',
+                    (change)='updateCheckBoxVal("rblCheckbox", $event)',
+                    [disabled]='readOnly ? false : null',
+                    style='float:right'
+                  )
+            .row(*ngIf='bankForm.controls.rblCheckbox.value' style='padding:10%')
+              .col-sm-12.col-md-6.col-lg-6
+                .row
+                  input(
+                    type='radio',
+                    name='rblAccountTypeSelect',
+                    [checked]='rblAccountType == "global"',
+                    (click)='changeRBLAccountType("global")'
+                  )
+                  label(for='rblAccountTypeSelect')
+                    | &nbsp;&nbsp; NCOME Escrow
+                .row
+                  input(
+                    type='radio',
+                    name='rblAccountTypeSelect',
+                    [checked]='rblAccountType == "custom"',
+                    (click)='changeRBLAccountType("custom")'
+                  )
+                  label(for='rblAccountTypeSelect')
+                    | &nbsp;&nbsp; Merchant Escrow
+                  .col-sm-12.col-md-6.col-lg-6
+              br
+              .col-sm-12.col-md-6.col-lg-6
+                .row(*ngIf='bankForm.controls.rblCheckbox.value && rblAccountType == "custom"')
+                  button.btn.ws-wrap.castlerButtonColor(
+                    type='button',
+                    (click)='createAccount("rbl")',
+                    style='margin:auto'
+                  )
+                    span + Add Account
+                  br
+                  br
+                  br
+              .card.w-100.p-3.mt-2(*ngIf='bankForm.controls.rblCheckbox.value')
+                .h4 Select Account
+                br
+                div.bank-list
+                  div(
+                    formArrayName='rblBanksFA',
+                    *ngFor='let order of rblBanksFormArray.controls; let i = index'
+                  )
+                    .row
+                      .col-sm-12.col-md-12.col-lg-12
+                        .badge.badge-light
+                          .ml-2.hard-escrow-list(*ngIf='rblAccountType == "custom"' style='float:left')
+                            a(
+                              [routerLink]='',
+                              (click)='editAccount(rblBanks[i], "rbl")' 
+                            ) {{ i + 1 }}.{{ rblBanks[i].rblAccountNo }} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                          .ml-2.hard-escrow-list(
+                            *ngIf='rblAccountType == "global"',
+                            style='float:left'
+                          )
+                            a {{ i + 1 }}.{{ rblBanks[i].rblAccountNo }} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                          input(
+                            type='checkbox',
+                            (change)='updateCheckBoxRBlBanks(i, $event)',
+                            [checked]='order.value.accountChecked',
+                            style='float:right;'
+                          )
+                      br
+                    .div(*ngIf='order.value.accountChecked && order.value.payoutMode === "api"')
+                      .row
+                        .col-sm-12.col-md-12.col-lg-12
+                          label
+                            | Trustee Access
+                      .row
+                        .col-sm-12.col-md-4.col-lg-4
+                          input(
+                            type='radio',
+                            name='rblTrusteeAccessCheckBox{{i}}',
+                            [checked]='order.value.trusteeAccess == "view"',
+                            (click)='updateTrusteeAccess(i, "view", "rbl")' 
+                          ) 
+                          br
+                          label.hard-escrow-settings
+                            | View
+                        .col-sm-12.col-md-4.col-lg-4
+                          input(
+                            type='radio',
+                            name='rblTrusteeAccessCheckBox{{i}}',
+                            [checked]='order.value.trusteeAccess == "approve"',
+                            (click)='updateTrusteeAccess(i, "approve", "rbl")' 
+                          ) 
+                          br
+                          label.hard-escrow-settings
+                            | Approve
+                        .col-sm-12.col-md-4.col-lg-4
+                          input(
+                            type='radio',
+                            name='rblTrusteeAccessCheckBox{{i}}',
+                            [checked]='order.value.trusteeAccess == "none"',
+                            (click)='updateTrusteeAccess(i, "none", "rbl")' 
+                          )
+                          br
+                          label.hard-escrow-settings
+                            | No Rights
+                      br
+                    .row(
+                      *ngIf='order.value.trusteeAccess == "approve" && order.value.accountChecked && order.value.payoutMode === "api"'
+                    )
+                      .col-sm-12.col-md-12.col-lg-12
+                        label
+                          | Approval Threshold
+                    .row(
+                      *ngIf='order.value.trusteeAccess == "approve" && order.value.accountChecked && order.value.payoutMode === "api"'
+                    )
+                      .col
+                        input(
+                          type='number',
+                          formControlName='trusteeThresholdAmt',
+                          [value]='order.value.trusteeThresholdFreq == "no-limit" ? 0 : order.value.trusteeThresholdAmt',
+                          (change)='trusteeThresholdAmt(i, $event, "rbl")',
+                          [attr.disabled]='order.value.trusteeThresholdFreq == "no-limit" ? true : null'
+                        )
+                      .col
+                        select#approve-threshold-freq.form-control.form-control-sm(
+                          formControlName='trusteeThresholdFreq',
+                          style='height:24px',
+                          (change)='trusteeThresholdFreq(i, $event, "rbl")' 
+                        )
+                          option(
+                            value='per-day',
+                            [selected]='order.value.trusteeThresholdFreq === "per-day"'
+                          ) Per Day
+                          option(
+                            value='per-month',
+                            [selected]='order.value.trusteeThresholdFreq === "per-month"'
+                          ) Per Month
+                          option(
+                            value='per-transaction',
+                            [selected]='order.value.trusteeThresholdFreq === "per-transaction"'
+                          ) Per Transaction
+                          option(
+                            value='no-limit',
+                            [selected]='order.value.trusteeThresholdFreq === "no-limit"'
+                          ) No limit
+                      br
+                      br
+                    .row(*ngIf='order.value.accountChecked && order.value.payoutMode === "api"')
+                      .col-sm-12.col-md-10.col-lg-10
+                        label
+                          | Disable Admin Approval
+                      .col-sm-12.col-md-2.col-lg-2
+                        input(
+                          type='checkbox',
+                          name='rblAdminDisableCheckBox{{i}}',
+                          (click)='adminDisable(i, $event, "rbl")',
+                          [checked]='order.value.disableAdmin'
+                        )
+                      br
+                    .row(*ngIf='order.value.accountChecked && order.value.payoutMode === "api"')
+                      .col-sm-12.col-md-10.col-lg-10
+                        label
+                          | Enable IMPS
+                      .col-sm-12.col-md-2.col-lg-2
+                        input(
+                          type='checkbox',
+                          name='rblEnableIMPSCheckBox{{i}}',
+                          (click)='enableIMPS(i, $event, "rbl")',
+                          [checked]='order.value.isIMPS'
+                        )
+                      br
+                    .div(*ngIf='order.value.accountChecked')
+                      .row
+                        .col-sm-12.col-md-10.col-lg-10
+                          label
+                            | Payout Mode
+                        .row.pl-4
+                          .col-sm-6
+                            input(
+                              type='radio',
+                              name='rblPayoutMode{{i}}',
+                              [checked]='order.value.payoutMode == "api"',
+                              (click)='updatePayoutMode(i, "api", "rbl")' 
+                            ) 
+                            br
+                            label.hard-escrow-settings
+                              | API
+                          .col-sm-6
+                            input(
+                              type='radio',
+                              name='rblPayoutMode{{i}}',
+                              [checked]='order.value.payoutMode == "h2h"',
+                              (click)='updatePayoutMode(i, "h2h", "rbl")' 
+                            ) 
+                            br
+                            label.hard-escrow-settings
+                              | H2H
+                        br
+            br
+          .card.border.rounded.float-left.shadow-lg.mb-5.bg-white.rounded.bank-card
+            .card-header(style='display:block')
+              .row
+                .col-sm-12.col-md-6.col-lg-6
+                  label(for='iciciCheckbox') 
+                    | ICICI
+                .col-sm-12.col-md-6.col-lg-6
+                  input(
+                    type='checkbox',
+                    #checkbox,
+                    name='iciciCheckbox',
+                    formControlName='iciciCheckbox',
+                    (change)='updateCheckBoxVal("iciciCheckbox", $event)',
+                    [disabled]='readOnly ? false : null',
+                    style='float:right'
+                  )
+            .row(*ngIf='bankForm.controls.iciciCheckbox.value' style='padding:10%')
+              .col-sm-12.col-md-6.col-lg-6
+                .row
+                  input(
+                    type='radio',
+                    name='iciciAccountTypeSelect',
+                    [checked]='iciciAccountType == "global"',
+                    (click)='changeICICIAccountType("global")'
+                  )
+                  label(for='iciciAccountTypeSelect')
+                    | &nbsp;&nbsp; NCOME Escrow
+                .row
+                  input(
+                    type='radio',
+                    name='iciciAccountTypeSelect',
+                    [checked]='iciciAccountType == "custom"',
+                    (click)='changeICICIAccountType("custom")'
+                  )
+                  label(for='iciciAccountTypeSelect')
+                    | &nbsp;&nbsp; Merchant Escrow
+                  .col-sm-12.col-md-6.col-lg-6
+              br
+              .col-sm-12.col-md-6.col-lg-6
+                .row(*ngIf='bankForm.controls.iciciCheckbox.value && iciciAccountType == "custom"')
+                  button.btn.ws-wrap.castlerButtonColor(
+                    type='button',
+                    (click)='createAccount("icici")',
+                    style='margin:auto'
+                  )
+                    span + Add Account
+                  br
+                  br
+                  br
+              .card.w-100.p-3.mt-2(*ngIf='bankForm.controls.iciciCheckbox.value')
+                .h4 Select Account
+                br
+                div.bank-list
+                  div(
+                    formArrayName='iciciBanksFA',
+                    *ngFor='let order of iciciBanksFormArray.controls; let i = index'
+                  )
+                    .row
+                      .col-sm-12.col-md-12.col-lg-12
+                        .badge.badge-light
+                          .ml-2.hard-escrow-list(*ngIf='iciciAccountType == "custom"' style='float:left')
+                            a(
+                              [routerLink]='',
+                              (click)='editAccount(iciciBanks[i], "icici")' 
+                            ) {{ i + 1 }}.{{ iciciBanks[i].accountNo }} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                          .ml-2.hard-escrow-list(
+                            *ngIf='iciciAccountType == "global"',
+                            style='float:left'
+                          )
+                            a {{ i + 1 }}.{{ iciciBanks[i].accountNo }} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                          input(
+                            type='checkbox',
+                            (change)='updateCheckBoxICICIBanks(i, $event)',
+                            [checked]='order.value.accountChecked',
+                            style='float:right;'
+                          )
+                      br
+                    .div(*ngIf='order.value.accountChecked && iciciAccountType === "custom"')
+                      .row
+                        .col-sm-12.col-md-12.col-lg-12
+                          label
+                            | Trustee Access
+                      .row
+                        .col-sm-12.col-md-4.col-lg-4(*ngIf ='order.value.payoutMode === "api"')
+                          input(
+                            type='radio',
+                            name='iciciTrusteeAccessCheckBox{{i}}',
+                            [checked]='order.value.trusteeAccess == "view"',
+                            (click)='updateTrusteeAccess(i, "view", "icici")' 
+                          ) 
+                          br
+                          label.hard-escrow-settings
+                            | View
+                        .col-sm-12.col-md-4.col-lg-4
+                          input(
+                            type='radio',
+                            name='iciciTrusteeAccessCheckBox{{i}}',
+                            [checked]='order.value.trusteeAccess == "approve"',
+                            (click)='updateTrusteeAccess(i, "approve", "icici")' 
+                          ) 
+                          br
+                          label.hard-escrow-settings
+                            | Approve
+                        .col-sm-12.col-md-4.col-lg-4
+                          input(
+                            type='radio',
+                            name='iciciTrusteeAccessCheckBox{{i}}',
+                            [checked]='order.value.trusteeAccess == "none"',
+                            (click)='updateTrusteeAccess(i, "none", "icici")' 
+                          )
+                          br
+                          label.hard-escrow-settings
+                            | No Rights
+                      br
+                    .row(
+                      *ngIf='order.value.trusteeAccess == "approve" && order.value.accountChecked && order.value.payoutMode === "api"'
+                    )
+                      .col-sm-12.col-md-12.col-lg-12
+                        label
+                          | Approval Threshold
+                    .row(
+                      *ngIf='order.value.trusteeAccess == "approve" && order.value.accountChecked && order.value.payoutMode === "api"'
+                    )
+                      .col
+                        input(
+                          type='number',
+                          formControlName='trusteeThresholdAmt',
+                          [value]='order.value.trusteeThresholdFreq == "no-limit" ? 0 : order.value.trusteeThresholdAmt',
+                          (change)='trusteeThresholdAmt(i, $event, "icici")',
+                          [attr.disabled]='order.value.trusteeThresholdFreq == "no-limit" ? true : null'
+                        )
+                      .col
+                        select#approve-threshold-freq.form-control.form-control-sm(
+                          formControlName='trusteeThresholdFreq',
+                          style='height:24px',
+                          (change)='trusteeThresholdFreq(i, $event, "icici")' 
+                        )
+                          option(
+                            value='per-day',
+                            [selected]='order.value.trusteeThresholdFreq === "per-day"'
+                          ) Per Day
+                          option(
+                            value='per-month',
+                            [selected]='order.value.trusteeThresholdFreq === "per-month"'
+                          ) Per Month
+                          option(
+                            value='per-transaction',
+                            [selected]='order.value.trusteeThresholdFreq === "per-transaction"'
+                          ) Per Transaction
+                          option(
+                            value='no-limit',
+                            [selected]='order.value.trusteeThresholdFreq === "no-limit"'
+                          ) No limit
+                      br
+                      br
+                    .row(*ngIf='order.value.accountChecked && iciciAccountType === "custom"')
+                      .col-sm-12.col-md-10.col-lg-10
+                        label
+                          | Disable Admin Approval
+                      .col-sm-12.col-md-2.col-lg-2
+                        input(
+                          type='checkbox',
+                          name='iciciAdminDisableCheckBox{{i}}',
+                          (click)='adminDisable(i, $event, "icici")',
+                          [checked]='order.value.disableAdmin'
+                        )
+                      br
+                    .row(*ngIf='order.value.accountChecked')
+                      .col-sm-12.col-md-10.col-lg-10
+                        label
+                          | Enable IMPS
+                      .col-sm-12.col-md-2.col-lg-2
+                        input(
+                          type='checkbox',
+                          name='iciciEnableIMPSCheckBox{{i}}',
+                          (click)='enableIMPS(i, $event, "icici")',
+                          [checked]='order.value.isIMPS'
+                        )
+                      br
+                    .div(*ngIf='order.value.accountChecked')
+                      .row
+                        .col-sm-12.col-md-10.col-lg-10
+                          label
+                            | Payout Mode
+                      .row.pl-4
+                        .col.float-left
+                          input(
+                            type='radio',
+                            name='iciciPayoutMode{{i}}',
+                            [checked]='order?.value?.payoutMode === "h2h"',
+                            (click)='updatePayoutMode(i, "h2h", "icici")' 
+                          ) 
+                          br
+                          label.hard-escrow-settings
+                            | H2H
+                      br
+            br
+        .row
+          .card.border.rounded.float-left.shadow-lg.mb-5.bg-white.rounded.bank-card
+            .card-header(style='display:block')
+              .row
+                .col-sm-12.col-md-6.col-lg-6
+                  label(for='yesBankCheckbox') 
+                    | YES
+                .col-sm-12.col-md-6.col-lg-6
+                  input(
+                    type='checkbox',
+                    #checkbox,
+                    name='yesBankCheckbox',
+                    formControlName='yesBankCheckbox',
+                    (change)='updateCheckBoxVal("yesBankCheckbox", $event)',
+                    [disabled]='readOnly ? false : null',
+                    style='float:right'
+                  )
+            .row(
+              *ngIf='bankForm.controls.yesBankCheckbox.value',
+              style='padding:10%'
+            )
+              .col-sm-12.col-md-6.col-lg-6
+                .row
+                  input(
+                    type='radio',
+                    name='yesAccountTypeSelect',
+                    [checked]='yesAccountType == "global"',
+                    (click)='changeYesAccountType("global")'
+                  )
+                  label(for='yesAccountTypeSelect')
+                    | &nbsp;&nbsp; NCOME Escrow
+                .row
+                  input(
+                    type='radio',
+                    name='yesAccountTypeSelect',
+                    [checked]='yesAccountType == "custom"',
+                    (click)='changeYesAccountType("custom")'
+                  )
+                  label(for='yesAccountTypeSelect')
+                    | &nbsp;&nbsp; Merchant Escrow
+                  .col-sm-12.col-md-6.col-lg-6
+              br
+              .col-sm-12.col-md-6.col-lg-6
+                .row(
+                  *ngIf='bankForm.controls.yesBankCheckbox.value && yesAccountType == "custom"'
+                )
+                  button.btn.ws-wrap.castlerButtonColor(
+                    type='button',
+                    (click)='createAccount("yes_bank")',
+                    style='margin:auto'
+                  )
+                    span + Add Account
+                  br
+                  br
+                  br
+              .card.w-100.p-3.mt-2(*ngIf='bankForm.controls.yesBankCheckbox.value')
+                .h4 Select Account
+                br
+                div.bank-list
+                  div(
+                    formArrayName='yesBanksFA',
+                    *ngFor='let order of yesBanksFormArray.controls; let i = index'
+                  )
+                    .row
+                      .col-sm-12.col-md-12.col-lg-12
+                        .badge.badge-light
+                          .ml-2.hard-escrow-list(*ngIf='yesAccountType == "custom"')
+                            a(
+                              [routerLink]='',
+                              (click)='editAccount(yesBanks[i], "yes_bank")' 
+                            ) {{ i + 1 }}.{{ yesBanks[i].yesAccountNo }}
+                          .ml-2.hard-escrow-list(
+                            *ngIf='yesAccountType == "global"'
+                          )
+                            a {{ i + 1 }}.{{ yesBanks[i].yesAccountNo }}
+                          input(
+                            type='checkbox',
+                            (change)='updateCheckBoxYesBanks(i, $event)',
+                            [checked]='order.value.accountChecked',
+                            style='float:right;'
+                          )
+                      br
+                    .div(*ngIf='order.value.accountChecked')
+                      .row
+                        .col-sm-12.col-md-12.col-lg-12
+                          label
+                            | Trustee Access
+                      .row
+                        .col-sm-12.col-md-4.col-lg-4
+                          input(
+                            type='radio',
+                            name='yesTrusteeAccessCheckBox{{i}}',
+                            [checked]='order.value.trusteeAccess == "view"',
+                            (click)='updateTrusteeAccess(i, "view", "yes_bank")' 
+                          ) 
+                          br
+                          label.hard-escrow-settings
+                            | View
+                        .col-sm-12.col-md-4.col-lg-4
+                          input(
+                            type='radio',
+                            name='yesTrusteeAccessCheckBox{{i}}',
+                            [checked]='order.value.trusteeAccess == "approve"',
+                            (click)='updateTrusteeAccess(i, "approve", "yes_bank")' 
+                          ) 
+                          br
+                          label.hard-escrow-settings
+                            | Approve
+                        .col-sm-12.col-md-4.col-lg-4
+                          input(
+                            type='radio',
+                            name='yesTrusteeAccessCheckBox{{i}}',
+                            [checked]='order.value.trusteeAccess == "none"',
+                            (click)='updateTrusteeAccess(i, "none", "yes_bank")' 
+                          )
+                          br
+                          label.hard-escrow-settings
+                            | No Rights
+                      br
+                    .row(
+                      *ngIf='order.value.trusteeAccess == "approve" && order.value.accountChecked'
+                    )
+                      .col-sm-12.col-md-12.col-lg-12
+                        label
+                          | Approval Threshold
+                    .row(
+                      *ngIf='order.value.trusteeAccess == "approve" && order.value.accountChecked'
+                    )
+                      .col
+                        input(
+                          type='number',
+                          formControlName='trusteeThresholdAmt',
+                          [value]='order.value.trusteeThresholdFreq == "no-limit" ? 0 : order.value.trusteeThresholdAmt',
+                          (change)='trusteeThresholdAmt(i, $event, "yes_bank")',
+                          [attr.disabled]='order.value.trusteeThresholdFreq == "no-limit" ? true : null'
+                        )
+                      .col
+                        select#approve-threshold-freq.form-control.form-control-sm(
+                          formControlName='trusteeThresholdFreq',
+                          style='height:24px',
+                          (change)='trusteeThresholdFreq(i, $event, "yes_bank")' 
+                        )
+                          option(
+                            value='per-day',
+                            [selected]='order.value.trusteeThresholdFreq === "per-day"'
+                          ) Per Day
+                          option(
+                            value='per-month',
+                            [selected]='order.value.trusteeThresholdFreq === "per-month"'
+                          ) Per Month
+                          option(
+                            value='per-transaction',
+                            [selected]='order.value.trusteeThresholdFreq === "per-transaction"'
+                          ) Per Transaction
+                          option(
+                            value='no-limit',
+                            [selected]='order.value.trusteeThresholdFreq === "no-limit"'
+                          ) No limit
+                      br
+                      br
+                    .row(*ngIf='order.value.accountChecked')
+                      .col-sm-12.col-md-10.col-lg-10
+                        label
+                          | Disable Admin Approval
+                      .col-sm-12.col-md-2.col-lg-2
+                        input(
+                          type='checkbox',
+                          name='yesAdminDisableCheckBox{{i}}',
+                          (click)='adminDisable(i, $event, "yes_bank")',
+                          [checked]='order.value.disableAdmin'
+                        )
+                      br
+                    .row(*ngIf='order.value.accountChecked')
+                      .col-sm-12.col-md-10.col-lg-10
+                        label
+                          | Enable IMPS
+                      .col-sm-12.col-md-2.col-lg-2
+                        input(
+                          type='checkbox',
+                          name='yesEnableIMPSCheckBox{{i}}',
+                          (click)='enableIMPS(i, $event, "yes_bank")',
+                          [checked]='order.value.isIMPS'
+                        )
+                      br
+          .card.border.rounded.float-left.shadow-lg.mb-5.bg-white.rounded.bank-card
+            .card-header(style='display:block')
+              .row
+                .col-sm-12.col-md-6.col-lg-6
+                  label(for='idfcBankCheckbox') 
+                    | IDFC
+                .col-sm-12.col-md-6.col-lg-6
+                  input(
+                    type='checkbox',
+                    #checkbox,
+                    name='idfcBankCheckbox',
+                    formControlName='idfcBankCheckbox',
+                    (change)='updateCheckBoxVal("idfcBankCheckbox", $event)',
+                    [disabled]='readOnly ? false : null',
+                    style='float:right'
+                  )
+            .row(
+              *ngIf='bankForm.controls.idfcBankCheckbox.value',
+              style='padding:10%'
+            )
+              .col-sm-12.col-md-6.col-lg-6
+                .row
+                  input(
+                    type='radio',
+                    name='idfcAccountTypeSelect',
+                    [checked]='idfcAccountType == "global"',
+                    (click)='changeIDFCAccountType("global")'
+                  )
+                  label(for='idfcAccountTypeSelect')
+                    | &nbsp;&nbsp; NCOME Escrow
+                .row
+                  input(
+                    type='radio',
+                    name='idfcAccountTypeSelect',
+                    [checked]='idfcAccountType == "custom"',
+                    (click)='changeIDFCAccountType("custom")'
+                  )
+                  label(for='idfcAccountTypeSelect')
+                    | &nbsp;&nbsp; Merchant Escrow
+                  .col-sm-12.col-md-6.col-lg-6
+              br
+              .col-sm-12.col-md-6.col-lg-6
+                .row(
+                  *ngIf='bankForm.controls.idfcBankCheckbox.value && idfcAccountType == "custom"'
+                )
+                  button.btn.ws-wrap.castlerButtonColor(
+                    type='button',
+                    (click)='createAccount("idfc")',
+                    style='margin:auto'
+                  )
+                    span + Add Account
+                  br
+                  br
+                  br
+              .card.w-100.p-3.mt-2(*ngIf='bankForm.controls.idfcBankCheckbox.value')
+                .h4 Select Account
+                br
+                div.bank-list
+                  div(
+                    formArrayName='idfcBanksFA',
+                    *ngFor='let order of idfcBanksFormArray.controls; let i = index'
+                  )
+                    .row
+                      .col-sm-12.col-md-12.col-lg-12
+                        .badge.badge-light
+                          .ml-2.hard-escrow-list(*ngIf='idfcAccountType == "custom"')
+                            a(
+                              [routerLink]='',
+                              (click)='editAccount(idfcBanks[i], "idfc")' 
+                            ) {{ i + 1 }}.{{ idfcBanks[i].idfcAccountNo }}
+                          .ml-2.hard-escrow-list(
+                            *ngIf='idfcAccountType == "global"'
+                          )
+                            a {{ i + 1 }}.{{ idfcBanks[i].idfcAccountNo }}
+                          input(
+                            type='checkbox',
+                            (change)='updateCheckBoxIDFCBanks(i, $event)', 
+                            [checked]='order.value.accountChecked',
+                            style='float:right;'
+                          )
+                      br
+                    .div(*ngIf='order.value.accountChecked')
+                      .row
+                        .col-sm-12.col-md-12.col-lg-12
+                          label
+                            | Trustee Access
+                      .row
+                        .col-sm-12.col-md-4.col-lg-4
+                          input(
+                            type='radio',
+                            name='idfcTrusteeAccessCheckBox{{i}}',
+                            [checked]='order?.value?.trusteeAccess == "view"',
+                            (click)='updateTrusteeAccess(i, "view", "idfc")' 
+                          ) 
+                          br
+                          label.hard-escrow-settings
+                            | View
+                        .col-sm-12.col-md-4.col-lg-4
+                          input(
+                            type='radio',
+                            name='idfcTrusteeAccessCheckBox{{i}}',
+                            [checked]='order.value.trusteeAccess == "approve"',
+                            (click)='updateTrusteeAccess(i, "approve", "idfc")' 
+                          ) 
+                          br
+                          label.hard-escrow-settings
+                            | Approve
+                        .col-sm-12.col-md-4.col-lg-4
+                          input(
+                            type='radio',
+                            name='idfcTrusteeAccessCheckBox{{i}}',
+                            [checked]='order.value.trusteeAccess == "none"',
+                            (click)='updateTrusteeAccess(i, "none", "idfc")' 
+                          )
+                          br
+                          label.hard-escrow-settings
+                            | No Rights
+                      br
+                    .row(
+                      *ngIf='order.value.trusteeAccess == "approve" && order.value.accountChecked'
+                    )
+                      .col-sm-12.col-md-12.col-lg-12
+                        label
+                          | Approval Threshold
+                    .row(
+                      *ngIf='order.value.trusteeAccess == "approve" && order.value.accountChecked'
+                    )
+                      .col
+                        input(
+                          type='number',
+                          formControlName='trusteeThresholdAmt',
+                          [value]='order.value.trusteeThresholdFreq == "no-limit" ? 0 : order.value.trusteeThresholdAmt',
+                          (change)='trusteeThresholdAmt(i, $event, "idfc")',
+                          [attr.disabled]='order.value.trusteeThresholdFreq == "no-limit" ? true : null'
+                        )
+                      .col
+                        select#approve-threshold-freq.form-control.form-control-sm(
+                          formControlName='trusteeThresholdFreq',
+                          style='height:24px',
+                          (change)='trusteeThresholdFreq(i, $event, "idfc")' 
+                        )
+                          option(
+                            value='per-day',
+                            [selected]='order.value.trusteeThresholdFreq == "per-day"'
+                          ) Per Day
+                          option(
+                            value='per-month',
+                            [selected]='order.value.trusteeThresholdFreq == "per-month"'
+                          ) Per Month
+                          option(
+                            value='per-transaction',
+                            [selected]='order.value.trusteeThresholdFreq === "per-transaction"'
+                          ) Per Transaction
+                          option(
+                            value='no-limit',
+                            [selected]='order.value.trusteeThresholdFreq == "no-limit"'
+                          ) No limit
+                      br
+                      br
+                    .row(*ngIf='order.value.accountChecked')
+                      .col-sm-12.col-md-10.col-lg-10
+                        label
+                          | Disable Admin Approval
+                      .col-sm-12.col-md-2.col-lg-2
+                        input(
+                          type='checkbox',
+                          name='idfcAdminDisableCheckBox{{i}}',
+                          (click)='adminDisable(i, $event, "idfc")',
+                          [checked]='order.value.disableAdmin'
+                        )
+                      br
+                    .row(*ngIf='order?.value?.accountChecked')
+                      .col-sm-12.col-md-10.col-lg-10
+                        label
+                          | Enable IMPS
+                      .col-sm-12.col-md-2.col-lg-2
+                        input(
+                          type='checkbox',
+                          name='idfcEnableIMPSCheckBox{{i}}',
+                          (click)='enableIMPS(i, $event, "idfc")',
+                          [checked]='order.value.isIMPS'
+                        )
+                      br
+                    .div(*ngIf='order?.value?.accountChecked')
+                      .row
+                        .col-sm-12.col-md-10.col-lg-10
+                          label
+                            | Payout Mode
+                        .row.pl-4
+                          .col-sm-4
+                            input(
+                              type='radio',
+                              name='idfcPayoutMode{{i}}',
+                              [checked]='order?.value?.payoutMode == "api"',
+                              (click)='updatePayoutMode(i, "api", "idfc")' 
+                            ) 
+                            br
+                            label.hard-escrow-settings
+                              | API
+                          .col-sm-4
+                            input(
+                              type='radio',
+                              name='idfcPayoutMode{{i}}',
+                              [checked]='order?.value?.payoutMode == "h2h"',
+                              (click)='updatePayoutMode(i, "h2h", "idfc")' 
+                            ) 
+                            br
+                            label.hard-escrow-settings
+                              | H2H
+                          .col-sm-4
+                            input(
+                              type='radio',
+                              name='idfcPayoutMode{{i}}',
+                              [checked]='order?.value?.payoutMode == "pobo"',
+                              (click)='updatePayoutMode(i, "pobo", "idfc")' 
+                            ) 
+                            br
+                            label.hard-escrow-settings
+                              | POBO
+                        br
+        .row
+          .card.border.rounded.float-left.shadow-lg.mb-5.bg-white.rounded.bank-card
+            .card-header(style='display:block')
+              .row
+                .col-sm-12.col-md-6.col-lg-6
+                  label(for='iblCheckbox') 
+                    | IndusInd Bank
+                .col-sm-12.col-md-6.col-lg-6
+                  input(
+                    type='checkbox',
+                    #checkbox,
+                    name='iblCheckbox',
+                    formControlName='iblCheckbox',
+                    (change)='updateCheckBoxVal("iblCheckbox", $event)', 
+                    [disabled]='readOnly ? false : null',
+                    style='float:right'
+                  )
+            .row(*ngIf='bankForm.controls.iblCheckbox.value' style='padding:10%')
+              .col-sm-12.col-md-6.col-lg-6
+                .row
+                  input(
+                    type='radio',
+                    name='iblAccountTypeSelect',
+                    [checked]='iblAccountType === "global"',
+                    (click)='changeIBLAccountType("global")'
+                  )
+                  label(for='yesAccountTypeSelect')
+                    | &nbsp;&nbsp; NCOME Escrow
+
+              br
+              .card.w-100.p-3.mt-2(*ngIf='bankForm.controls.iblCheckbox.value')
+                .h4 Select Account
+                br
+                div.bank-list
+                  div(
+                    formArrayName='iblBanksFA',
+                    *ngFor='let order of iblBankFormArray.controls; let i = index'
+                  )
+                    .row
+                      .col-sm-12.col-md-12.col-lg-12
+                        .badge.badge-light
+                          //- .ml-2.hard-escrow-list(*ngIf='yesAccountType == "custom"')
+                          //-   a(
+                          //-     [routerLink]='',
+                          //-     (click)='editAccount(yesBanks[i], "yes_bank")' 
+                          //-   ) {{ i + 1 }}.{{ yesBanks[i].yesAccountNo }}
+                          .ml-2.hard-escrow-list(
+                            *ngIf='iblAccountType === "global"'
+                          )
+                            a {{ i + 1 }}. {{ iblBanks[i].iblAccountNo }}
+                          input(
+                            type='checkbox',
+                            (change)='updateCheckBoxIBLBanks(i, $event)', 
+                            [checked]='order.value.accountChecked',
+                            style='float:right;'
+                          )
+                      br
+                    .div(*ngIf='order.value.accountChecked')
+                      .row
+                        .col-sm-12.col-md-12.col-lg-12
+                          label
+                            | Trustee Access
+                      .row
+                        .col-sm-12.col-md-4.col-lg-4
+                          input(
+                            type='radio',
+                            name='iblTrusteeAccessCheckBox{{i}}',
+                            [checked]='order.value.trusteeAccess == "view"',
+                            (click)='updateTrusteeAccess(i, "view", "ibl")' 
+                          ) 
+                          br
+                          label.hard-escrow-settings
+                            | View
+                        .col-sm-12.col-md-4.col-lg-4
+                          input(
+                            type='radio',
+                            name='iblTrusteeAccessCheckBox{{i}}',
+                            [checked]='order.value.trusteeAccess == "approve"',
+                            (click)='updateTrusteeAccess(i, "approve", "ibl")' 
+                          ) 
+                          br
+                          label.hard-escrow-settings
+                            | Approve
+                        .col-sm-12.col-md-4.col-lg-4
+                          input(
+                            type='radio',
+                            name='iblTrusteeAccessCheckBox{{i}}',
+                            [checked]='order.value.trusteeAccess == "none"',
+                            (click)='updateTrusteeAccess(i, "none", "ibl")' 
+                          )
+                          br
+                          label.hard-escrow-settings
+                            | No Rights
+                      br
+                    .row(
+                      *ngIf='order.value.trusteeAccess == "approve" && order.value.accountChecked'
+                    )
+                      .col-sm-12.col-md-12.col-lg-12
+                        label
+                          | Approval Threshold
+                    .row(
+                      *ngIf='order.value.trusteeAccess == "approve" && order.value.accountChecked'
+                    )
+                      .col
+                        input(
+                          type='number',
+                          formControlName='trusteeThresholdAmt',
+                          [value]='order.value.trusteeThresholdFreq == "no-limit" ? 0 : order.value.trusteeThresholdAmt',
+                          (change)='trusteeThresholdAmt(i, $event, "ibl")', 
+                          [attr.disabled]='order.value.trusteeThresholdFreq == "no-limit" ? true : null'
+                        )
+                      .col
+                        select#approve-threshold-freq.form-control.form-control-sm(
+                          formControlName='trusteeThresholdFreq',
+                          style='height:24px',
+                          (change)='trusteeThresholdFreq(i, $event, "ibl")' 
+                        )
+                          option(
+                            value='per-day',
+                            [selected]='order.value.trusteeThresholdFreq == "per-day"'
+                          ) Per Day
+                          option(
+                            value='per-month',
+                            [selected]='order.value.trusteeThresholdFreq == "per-month"'
+                          ) Per Month
+                          option(
+                            value='per-transaction',
+                            [selected]='order.value.trusteeThresholdFreq === "per-transaction"'
+                          ) Per Transaction
+                          option(
+                            value='no-limit',
+                            [selected]='order.value.trusteeThresholdFreq == "no-limit"'
+                          ) No limit
+                      br
+                      br
+                    .row(*ngIf='order.value.accountChecked')
+                      .col-sm-12.col-md-10.col-lg-10
+                        label
+                          | Disable Admin Approval
+                      .col-sm-12.col-md-2.col-lg-2
+                        input(
+                          type='checkbox',
+                          name='iblAdminDisableCheckBox{{i}}',
+                          (click)='adminDisable(i, $event, "ibl")', 
+                          [checked]='order.value.disableAdmin'
+                        )
+                      br
+                    .row(*ngIf='order.value.accountChecked')
+                      .col-sm-12.col-md-10.col-lg-10
+                        label
+                          | Enable IMPS
+                      .col-sm-12.col-md-2.col-lg-2
+                        input(
+                          type='checkbox',
+                          name='iblEnableIMPSCheckBox{{i}}',
+                          (click)='enableIMPS(i, $event, "ibl")', 
+                          [checked]='order.value.isIMPS'
+                        )
+                      br
+          .card.border.rounded.float-left.shadow-lg.mb-5.bg-white.rounded.bank-card
+            .card-header(style='display:block')
+              .row
+                .col-sm-12.col-md-6.col-lg-6
+                  label(for='hdfcBankCheckbox') 
+                    | HDFC
+                .col-sm-12.col-md-6.col-lg-6
+                  input(
+                    type='checkbox',
+                    #checkbox,
+                    name='hdfcBankCheckbox',
+                    formControlName='hdfcBankCheckbox',
+                    (change)='updateCheckBoxVal("hdfcBankCheckbox", $event)',
+                    [disabled]='readOnly ? false : null',
+                    style='float:right'
+                  )
+            .row(
+              *ngIf='bankForm.controls.hdfcBankCheckbox.value',
+              style='padding:10%'
+            )
+              .col-sm-12.col-md-6.col-lg-6
+                .row
+                  input(
+                    type='radio',
+                    name='hdfcAccountTypeSelect',
+                    [checked]='hdfcAccountType == "global"',
+                    (click)='changeHdfcAccountType("global")'
+                  )
+                  label(for='yesAccountTypeSelect')
+                    | &nbsp;&nbsp; NCOME Escrow
+                //- .row
+                //-   input(
+                //-     type='radio',
+                //-     name='yesAccountTypeSelect',
+                //-     [checked]='yesAccountType == "custom"',
+                //-     (click)='changeYesAccountType("custom")'
+                //-   )
+                //-   label(for='yesAccountTypeSelect')
+                //-     | &nbsp;&nbsp; Merchant Escrow
+                //-   .col-sm-12.col-md-6.col-lg-6
+              br
+              .card.w-100.p-3.mt-2(*ngIf='bankForm.controls.hdfcBankCheckbox.value')
+                .h4 Select Account
+                br
+                div.bank-list
+                  div(
+                    formArrayName='hdfcBanksFA',
+                    *ngFor='let order of hdfcBanksFormArray.controls; let i = index'
+                  )
+                    .row
+                      .col-sm-12.col-md-12.col-lg-12
+                        .badge.badge-light
+                          //- .ml-2.hard-escrow-list(*ngIf='hdfcAccountType == "custom"')
+                          //-   a(
+                          //-     [routerLink]='',
+                          //-     (click)='editAccount(yesBanks[i], "yes_bank")'
+                          //-   ) {{ i + 1 }}.{{ yesBanks[i].yesAccountNo }}
+                          .ml-2.hard-escrow-list(
+                            *ngIf='hdfcAccountType === "global"'
+                          )
+                            a {{ i + 1 }}. {{ hdfcBanks[i].hdfcAccountNo }}
+                          input(
+                            type='checkbox',
+                            (change)='updateCheckBoxHDFCBanks(i, $event)',
+                            [checked]='order.value.accountChecked',
+                            style='float:right;'
+                          )
+                      br
+                    .div(*ngIf='order.value.accountChecked')
+                      .row
+                        .col-sm-12.col-md-12.col-lg-12
+                          label
+                            | Trustee Access
+                      .row
+                        .col-sm-12.col-md-4.col-lg-4
+                          input(
+                            type='radio',
+                            name='hdfcTrusteeAccessCheckBox{{i}}',
+                            [checked]='order.value.trusteeAccess == "view"',
+                            (click)='updateTrusteeAccess(i, "view", "hdfc")'
+                          ) 
+                          br
+                          label.hard-escrow-settings
+                            | View
+                        .col-sm-12.col-md-4.col-lg-4
+                          input(
+                            type='radio',
+                            name='hdfcTrusteeAccessCheckBox{{i}}',
+                            [checked]='order.value.trusteeAccess == "approve"',
+                            (click)='updateTrusteeAccess(i, "approve", "hdfc")'
+                          ) 
+                          br
+                          label.hard-escrow-settings
+                            | Approve
+                        .col-sm-12.col-md-4.col-lg-4
+                          input(
+                            type='radio',
+                            name='hdfcTrusteeAccessCheckBox{{i}}',
+                            [checked]='order.value.trusteeAccess == "none"',
+                            (click)='updateTrusteeAccess(i, "none", "hdfc")'
+                          )
+                          br
+                          label.hard-escrow-settings
+                            | No Rights
+                      br
+                    .row(
+                      *ngIf='order.value.trusteeAccess == "approve" && order.value.accountChecked'
+                    )
+                      .col-sm-12.col-md-12.col-lg-12
+                        label
+                          | Approval Threshold
+                    .row(
+                      *ngIf='order.value.trusteeAccess == "approve" && order.value.accountChecked'
+                    )
+                      .col
+                        input(
+                          type='number',
+                          formControlName='trusteeThresholdAmt',
+                          [value]='order.value.trusteeThresholdFreq == "no-limit" ? 0 : order.value.trusteeThresholdAmt',
+                          (change)='trusteeThresholdAmt(i, $event, "hdfc")',
+                          [attr.disabled]='order.value.trusteeThresholdFreq == "no-limit" ? true : null'
+                        )
+                      .col
+                        select#approve-threshold-freq.form-control.form-control-sm(
+                          formControlName='trusteeThresholdFreq',
+                          style='height:24px',
+                          (change)='trusteeThresholdFreq(i, $event, "hdfc")'
+                        )
+                          option(
+                            value='per-day',
+                            [selected]='order.value.trusteeThresholdFreq === "per-day"'
+                          ) Per Day
+                          option(
+                            value='per-month',
+                            [selected]='order.value.trusteeThresholdFreq === "per-month"'
+                          ) Per Month
+                          option(
+                            value='per-transaction',
+                            [selected]='order.value.trusteeThresholdFreq === "per-transaction"'
+                          ) Per Transaction
+                          option(
+                            value='no-limit',
+                            [selected]='order.value.trusteeThresholdFreq === "no-limit"'
+                          ) No limit
+                      br
+                      br
+                    .row(*ngIf='order.value.accountChecked')
+                      .col-sm-12.col-md-10.col-lg-10
+                        label
+                          | Disable Admin Approval
+                      .col-sm-12.col-md-2.col-lg-2
+                        input(
+                          type='checkbox',
+                          name='hdfcAdminDisableCheckBox{{i}}',
+                          (click)='adminDisable(i, $event, "hdfc")',
+                          [checked]='order.value.disableAdmin'
+                        )
+                      br
+                    .row(*ngIf='order.value.accountChecked')
+                      .col-sm-12.col-md-10.col-lg-10
+                        label
+                          | Enable IMPS
+                      .col-sm-12.col-md-2.col-lg-2
+                        input(
+                          type='checkbox',
+                          name='hdfcEnableIMPSCheckBox{{i}}',
+                          (click)='enableIMPS(i, $event, "hdfc")',
+                          [checked]='order.value.isIMPS'
+                        )
+                      br
+        .row
+          .card.border.rounded.float-left.shadow-lg.mb-5.bg-white.rounded.bank-card
+            .card-header(style='display:block')
+              .row
+                .col-sm-12.col-md-6.col-lg-6
+                  label(for='dbsCheckbox') 
+                    | DBS Bank
+                .col-sm-12.col-md-6.col-lg-6
+                  input(
+                    type='checkbox',
+                    #checkbox,
+                    name='dbsCheckbox',
+                    formControlName='dbsCheckbox',
+                    (change)='updateCheckBoxVal("dbsCheckbox", $event)', 
+                    [disabled]='readOnly ? false : null',
+                    style='float:right'
+                  )
+            .row(*ngIf='bankForm.controls.dbsCheckbox.value' style='padding:10%')
+              .col-sm-12.col-md-6.col-lg-6
+                .row
+                  input(
+                    type='radio',
+                    name='dbsAccountTypeSelect',
+                    [checked]='dbsAccountType === "global"',
+                    (click)='changeDBSAccountType("global")'
+                  )
+                  label(for='dbsAccountTypeSelect')
+                    | &nbsp;&nbsp; NCOME Escrow
+                .row
+                  input(
+                    type='radio',
+                    name='dbsAccountTypeSelect',
+                    [checked]='dbsAccountType == "custom"',
+                    (click)='changeDBSAccountType("custom")'
+                  )
+                  label(for='dbsAccountTypeSelect')
+                    | &nbsp;&nbsp; Merchant Escrow
+                  .col-sm-12.col-md-6.col-lg-6
+              br
+              .col-sm-12.col-md-6.col-lg-6
+                .row(
+                  *ngIf='bankForm.controls.dbsCheckbox.value && dbsAccountType == "custom"'
+                )
+                  button.btn.ws-wrap.castlerButtonColor(
+                    type='button',
+                    (click)='createAccount("dbs")',
+                    style='margin:auto'
+                  )
+                    span + Add Account
+                  br
+                  br
+                  br
+              .card.w-100.p-3.mt-2(*ngIf='bankForm.controls.dbsCheckbox.value')
+                .h4 Select Account
+                br
+                div.bank-list
+                  div(
+                    formArrayName='dbsBanksFA',
+                    *ngFor='let order of dbsBankFormArray.controls; let i = index'
+                  )
+                    .row
+                      .col-sm-12.col-md-12.col-lg-12
+                        .badge.badge-light
+                          .ml-2.hard-escrow-list(*ngIf='dbsAccountType == "custom"')
+                            a(
+                              [routerLink]='',
+                              (click)='editAccount(dbsBanks[i], "dbs")' 
+                            ) {{ i + 1 }}.{{ dbsBanks[i].accountNo }}
+                          .ml-2.hard-escrow-list(
+                            *ngIf='dbsAccountType == "global"'
+                          )
+                            a {{ i + 1 }}.{{ dbsBanks[i].accountNo }}
+                          input(
+                            type='checkbox',
+                            (change)='updateCheckBoxDBSBanks(i, $event)',
+                            [checked]='order.value.accountChecked',
+                            style='float:right;'
+                          )
+                      br
+                    .div(*ngIf='order.value.accountChecked')
+                      .row
+                        .col-sm-12.col-md-12.col-lg-12
+                          label
+                            | Trustee Access
+                      .row
+                        .col-sm-12.col-md-4.col-lg-4
+                          input(
+                            type='radio',
+                            name='dbsTrusteeAccessCheckBox{{i}}',
+                            [checked]='order.value.trusteeAccess == "view"',
+                            (click)='updateTrusteeAccess(i, "view", "dbs")' 
+                          ) 
+                          br
+                          label.hard-escrow-settings
+                            | View
+                        .col-sm-12.col-md-4.col-lg-4
+                          input(
+                            type='radio',
+                            name='dbsTrusteeAccessCheckBox{{i}}',
+                            [checked]='order.value.trusteeAccess == "approve"',
+                            (click)='updateTrusteeAccess(i, "approve", "dbs")' 
+                          ) 
+                          br
+                          label.hard-escrow-settings
+                            | Approve
+                        .col-sm-12.col-md-4.col-lg-4
+                          input(
+                            type='radio',
+                            name='dbsTrusteeAccessCheckBox{{i}}',
+                            [checked]='order.value.trusteeAccess == "none"',
+                            (click)='updateTrusteeAccess(i, "none", "dbs")' 
+                          )
+                          br
+                          label.hard-escrow-settings
+                            | No Rights
+                      br
+                    .row(
+                      *ngIf='order.value.trusteeAccess == "approve" && order.value.accountChecked'
+                    )
+                      .col-sm-12.col-md-12.col-lg-12
+                        label
+                          | Approval Threshold
+                    .row(
+                      *ngIf='order.value.trusteeAccess == "approve" && order.value.accountChecked'
+                    )
+                      .col
+                        input(
+                          type='number',
+                          formControlName='trusteeThresholdAmt',
+                          [value]='order.value.trusteeThresholdFreq == "no-limit" ? 0 : order.value.trusteeThresholdAmt',
+                          (change)='trusteeThresholdAmt(i, $event, "dbs")', 
+                          [attr.disabled]='order.value.trusteeThresholdFreq == "no-limit" ? true : null'
+                        )
+                      .col
+                        select#approve-threshold-freq.form-control.form-control-sm(
+                          formControlName='trusteeThresholdFreq',
+                          style='height:24px',
+                          (change)='trusteeThresholdFreq(i, $event, "dbs")' 
+                        )
+                          option(
+                            value='per-day',
+                            [selected]='order.value.trusteeThresholdFreq == "per-day"'
+                          ) Per Day
+                          option(
+                            value='per-month',
+                            [selected]='order.value.trusteeThresholdFreq == "per-month"'
+                          ) Per Month
+                          option(
+                            value='per-transaction',
+                            [selected]='order.value.trusteeThresholdFreq === "per-transaction"'
+                          ) Per Transaction
+                          option(
+                            value='no-limit',
+                            [selected]='order.value.trusteeThresholdFreq == "no-limit"'
+                          ) No limit
+                      br
+                      br
+                    .row(*ngIf='order.value.accountChecked')
+                      .col-sm-12.col-md-10.col-lg-10
+                        label
+                          | Disable Admin Approval
+                      .col-sm-12.col-md-2.col-lg-2
+                        input(
+                          type='checkbox',
+                          name='dbsAdminDisableCheckBox{{i}}',
+                          (click)='adminDisable(i, $event, "dbs")', 
+                          [checked]='order.value.disableAdmin'
+                        )
+                      br
+                    .row(*ngIf='order.value.accountChecked')
+                      .col-sm-12.col-md-10.col-lg-10
+                        label
+                          | Enable IMPS
+                      .col-sm-12.col-md-2.col-lg-2
+                        input(
+                          type='checkbox',
+                          name='dbsEnableIMPSCheckBox{{i}}',
+                          (click)='enableIMPS(i, $event, "dbs")', 
+                          [checked]='order.value.isIMPS'
+                        )
+                      br
+                    .div(*ngIf='order.value.accountChecked')
+                      .row
+                        .col-sm-12.col-md-10.col-lg-10
+                          label
+                            | Payout Mode
+                      .row.pl-4
+                        .col.float-left
+                          input(
+                            type='radio',
+                            name='dbsPayoutMode{{i}}',
+                            [checked]='order.value.payoutMode == "api"',
+                            (click)='updatePayoutMode(i, "api", "dbs")' 
+                          ) 
+                          br
+                          label.hard-escrow-settings
+                            | API
+                        br
+          .card.border.rounded.float-left.shadow-lg.mb-5.bg-white.rounded.bank-card
+            .card-header(style='display:block')
+              .row
+                .col-sm-12.col-md-6.col-lg-6
+                  label(for='axisCheckbox') 
+                    | Axis Bank
+                .col-sm-12.col-md-6.col-lg-6
+                  input(
+                    type='checkbox',
+                    #checkbox,
+                    name='axisCheckbox',
+                    formControlName='axisCheckbox',
+                    (change)='updateCheckBoxVal("axisCheckbox", $event)', 
+                    [disabled]='readOnly ? false : null',
+                    style='float:right'
+                  )
+            .row(*ngIf='bankForm.controls.axisCheckbox.value' style='padding:10%')
+              .col-sm-12.col-md-6.col-lg-6
+                .row
+                  input(
+                    type='radio',
+                    name='axisAccountTypeSelect',
+                    [checked]='axisAccountType === "global"',
+                    (click)='changeAxisAccountType("global")'
+                  )
+                  label(for='axisAccountTypeSelect')
+                    | &nbsp;&nbsp; NCOME Escrow
+                .row
+                  input(
+                    type='radio',
+                    name='axisAccountTypeSelect',
+                    [checked]='axisAccountType == "custom"',
+                    (click)='changeAxisAccountType("custom")'
+                  )
+                  label(for='axisAccountTypeSelect')
+                    | &nbsp;&nbsp; Merchant Escrow
+                  .col-sm-12.col-md-6.col-lg-6
+              br
+              .col-sm-12.col-md-6.col-lg-6
+                .row(
+                  *ngIf='bankForm.controls.axisCheckbox.value && axisAccountType == "custom"'
+                )
+                  button.btn.ws-wrap.castlerButtonColor(
+                    type='button',
+                    (click)='createAccount("axis")',
+                    style='margin:auto'
+                  )
+                    span + Add Account
+                  br
+                  br
+                  br
+              .card.w-100.p-3.mt-2(*ngIf='bankForm.controls.axisCheckbox.value')
+                .h4 Select Account
+                br
+                div.bank-list
+                  div(
+                    formArrayName='axisBanksFA',
+                    *ngFor='let order of axisBankFormArray.controls; let i = index'
+                  )
+                    .row
+                      .col-sm-12.col-md-12.col-lg-12
+                        .badge.badge-light
+                          .ml-2.hard-escrow-list(*ngIf='axisAccountType == "custom"')
+                            a(
+                              [routerLink]='',
+                              (click)='editAccount(axisBanks[i], "axis")' 
+                            ) {{ i + 1 }}.{{ axisBanks[i].accountNo }}
+                          .ml-2.hard-escrow-list(
+                            *ngIf='axisAccountType == "global"'
+                          )
+                            a {{ i + 1 }}.{{ axisBanks[i].accountNo }}
+                          input(
+                            type='checkbox',
+                            (change)='updateCheckBoxAxisBanks(i, $event)',
+                            [checked]='order.value.accountChecked',
+                            style='float:right;'
+                          )
+                      br
+                    .div(*ngIf='order.value.accountChecked')
+                      .row
+                        .col-sm-12.col-md-12.col-lg-12
+                          label
+                            | Trustee Access
+                      .row
+                        .col-sm-12.col-md-4.col-lg-4
+                          input(
+                            type='radio',
+                            name='axisTrusteeAccessCheckBox{{i}}',
+                            [checked]='order.value.trusteeAccess == "view"',
+                            (click)='updateTrusteeAccess(i, "view", "axis")' 
+                          ) 
+                          br
+                          label.hard-escrow-settings
+                            | View
+                        .col-sm-12.col-md-4.col-lg-4
+                          input(
+                            type='radio',
+                            name='axisTrusteeAccessCheckBox{{i}}',
+                            [checked]='order.value.trusteeAccess == "approve"',
+                            (click)='updateTrusteeAccess(i, "approve", "axis")' 
+                          ) 
+                          br
+                          label.hard-escrow-settings
+                            | Approve
+                        .col-sm-12.col-md-4.col-lg-4
+                          input(
+                            type='radio',
+                            name='axisTrusteeAccessCheckBox{{i}}',
+                            [checked]='order.value.trusteeAccess == "none"',
+                            (click)='updateTrusteeAccess(i, "none", "axis")' 
+                          )
+                          br
+                          label.hard-escrow-settings
+                            | No Rights
+                      br
+                    .row(
+                      *ngIf='order.value.trusteeAccess == "approve" && order.value.accountChecked'
+                    )
+                      .col-sm-12.col-md-12.col-lg-12
+                        label
+                          | Approval Threshold
+                    .row(
+                      *ngIf='order.value.trusteeAccess == "approve" && order.value.accountChecked'
+                    )
+                      .col
+                        input(
+                          type='number',
+                          formControlName='trusteeThresholdAmt',
+                          [value]='order.value.trusteeThresholdFreq == "no-limit" ? 0 : order.value.trusteeThresholdAmt',
+                          (change)='trusteeThresholdAmt(i, $event, "axis")', 
+                          [attr.disabled]='order.value.trusteeThresholdFreq == "no-limit" ? true : null'
+                        )
+                      .col
+                        select#approve-threshold-freq.form-control.form-control-sm(
+                          formControlName='trusteeThresholdFreq',
+                          style='height:24px',
+                          (change)='trusteeThresholdFreq(i, $event, "axis")' 
+                        )
+                          option(
+                            value='per-day',
+                            [selected]='order.value.trusteeThresholdFreq == "per-day"'
+                          ) Per Day
+                          option(
+                            value='per-month',
+                            [selected]='order.value.trusteeThresholdFreq == "per-month"'
+                          ) Per Month
+                          option(
+                            value='per-transaction',
+                            [selected]='order.value.trusteeThresholdFreq === "per-transaction"'
+                          ) Per Transaction
+                          option(
+                            value='no-limit',
+                            [selected]='order.value.trusteeThresholdFreq == "no-limit"'
+                          ) No limit
+                      br
+                      br
+                    .row(*ngIf='order.value.accountChecked')
+                      .col-sm-12.col-md-10.col-lg-10
+                        label
+                          | Disable Admin Approval
+                      .col-sm-12.col-md-2.col-lg-2
+                        input(
+                          type='checkbox',
+                          name='axisAdminDisableCheckBox{{i}}',
+                          (click)='adminDisable(i, $event, "axis")', 
+                          [checked]='order.value.disableAdmin'
+                        )
+                      br
+                    .row(*ngIf='order.value.accountChecked')
+                      .col-sm-12.col-md-10.col-lg-10
+                        label
+                          | Enable IMPS
+                      .col-sm-12.col-md-2.col-lg-2
+                        input(
+                          type='checkbox',
+                          name='axisEnableIMPSCheckBox{{i}}',
+                          (click)='enableIMPS(i, $event, "axis")', 
+                          [checked]='order.value.isIMPS'
+                        )
+                      br
+
+        
+  .form-group(*ngIf='!readOnly')
+    button.btn.castlerButtonColor((click)='onSubmit()', *ngIf='merchantId') Update
+    span &nbsp;&nbsp;
+  br
+.flex-container.flex-row(*ngIf='loadingData$ | async')
+  .align-self-center Please wait...

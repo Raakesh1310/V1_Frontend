@@ -1,0 +1,44 @@
+.d-flex.align-items-center
+    .form-group
+        .d-flex-column.mr-2
+            label(for="dateRange") Date Range
+            br
+            select.form-control.mr-2.select-custom-width([(ngModel)]="selectedRange",[ngModelOptions]="{standalone: true}",(change)="onDateRangeChange($event.target.value)")
+                option(value="1d") Yesterday 
+                option(value="1w") Last Week 
+                option(value="1m") Last Month
+                option(value='custom') Custom
+    .form-group 
+        .d-flex-column.mr-2 
+            label(for="startDate") Start Date
+            input#start-date.mt-1.form-control(
+                type='text',
+                name='sd',
+                placeholder='DD/MM/YYYY',
+                autocomplete='off',
+                ngbDatepicker,
+                [(ngModel)]="startDate",
+                [ngModelOptions]="{standalone: true}",
+                outsideDays='hidden',
+                #sd='ngbDatepicker',
+                (click)='sd.toggle()',
+                (dateSelect)="onDateSelect('start', $event)",
+                [maxDate]='maxDate'
+            )
+    .form-group 
+        .d-flex-column
+            label(for="endDate") End Date
+            input#start-date.mt-1.form-control(
+                type='text',
+                name='ed',
+                placeholder='DD/MM/YYYY',
+                autocomplete='off',
+                ngbDatepicker,
+                [(ngModel)]="endDate",
+                [ngModelOptions]="{standalone: true}",
+                outsideDays='hidden',
+                #ed='ngbDatepicker',
+                (click)='ed.toggle()',
+                (dateSelect)="onDateSelect('end', $event)",
+                [maxDate]='maxDate'
+            )

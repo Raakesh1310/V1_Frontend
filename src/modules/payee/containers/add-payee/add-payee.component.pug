@@ -1,0 +1,32 @@
+sbpro-layout-dashboard([light]='true', *ngIf='showLeftAndTopNav')
+    router-outlet
+        sbpro-dashboard-head(icon='book', title='Add New Payee')
+        .container-fluid.mt-n10.responsiveForm
+            sbpro-card-navigation(
+                sbproTocItem='Tabs',
+                [navNames]='["Single Payee","Multiple Payees"]',
+                [templates]='[singlePayee,multiplePayees]'
+            )
+                ng-template(#singlePayee)
+                    sbpro-add-payee
+                ng-template(#multiplePayees)
+                    sbpro-multiple-payees
+        //.container-fluid.mt-n10.responsiveForm
+        //  .row
+        //    .col-lg-12
+        //      sbpro-add-payee
+
+sbpro-dashboard-head(icon='book', title='Add New Payee', *ngIf= '!showLeftAndTopNav')
+.container-fluid.mt-n10.responsiveForm(*ngIf= '!showLeftAndTopNav')
+    sbpro-card-navigation(
+            sbproTocItem='Tabs',
+            [navNames]='["Single Payee","Multiple Payees"]',
+            [templates]='[singlePayee,multiplePayees]'
+    )
+        ng-template(#singlePayee)
+            sbpro-add-payee([merchantId]='merchantId', (emitCloseModal)='modalEmit($event)')
+        ng-template(#multiplePayees)
+            sbpro-multiple-payees([modal] = 'modal', [merchantId]='merchantId')
+
+
+

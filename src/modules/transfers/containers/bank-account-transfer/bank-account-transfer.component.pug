@@ -1,0 +1,25 @@
+.flex-container
+  sbpro-dashboard-head(
+    icon='send',
+    title='Transfers List',
+    description='Transfers List'
+  )
+  .container-fluid.mt-n10.responsiveForm.flex-grow-1
+    //.row.h-100
+    //  .col-lg-12.h-100
+    //    sbpro-all-fund-transfers(sbproTocItem='Default Form Controls')
+    sbpro-card-navigation(
+      sbproTocItem='Tabs',
+      [navNames]='["Single Transfers", "Bulk Transfers"]',
+      [templates]='[singleTransferAll, bulkTransferAll]',
+      [selectedIndexForFade] = 'selectedIndexForFade',
+      [selectedIndex] = 'selectedIndexForFade',
+    )
+      ng-template(#singleTransferAll)
+        sbpro-bank-transfers(
+          sbproTocItem='Default Form Controls',
+          [readOnly]='readOnly',
+          [isAdmin]='isAdmin'
+        )
+      ng-template(#bulkTransferAll)
+        sbpro-bulk-table-list([readOnly]='readOnly', [connectedBanking]='true')

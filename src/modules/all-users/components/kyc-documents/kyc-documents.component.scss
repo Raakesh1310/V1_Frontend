@@ -1,0 +1,42 @@
+@import 'styles/variables.scss';
+
+.lineCSS{
+    height: 2px;
+    background: rgba(115, 92, 10, 0.17);
+}
+.card-title{
+    height: 25px;
+    left: 42px;
+    top: 14.28px;
+    
+    font-family: Poppins;
+    font-style: normal;
+    font-weight: 500;
+    font-size: 30.2011px;
+    line-height: 45px;
+    letter-spacing: 0.02em;
+    padding-left: 0.6rem;
+    color: rgba(103, 60, 18, 0.6);  
+}
+.card{
+    width: 600px; 
+    height: 300px;
+    background: #FCF8F1
+}
+.titleFont{
+    padding-top: 0.2rem;
+    color: rgba(103, 60, 18, 0.6);  
+}
+.contentFont{
+    color: #673C12;
+}
+label{
+    padding-top: 1rem;
+}
+p{
+    padding-top: 1rem;
+}
+
+input[type="file"] {
+  display: none;
+}

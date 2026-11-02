@@ -1,0 +1,398 @@
+#boxes::-webkit-scrollbar {
+  width: 5px; /* width of the entire scrollbar */
+  height: 5px; /* height of the entire scrollbar */
+}
+
+#boxes::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.02); /* color of the tracking area */
+}
+
+#boxes::-webkit-scrollbar-thumb {
+  background-color: #575653; /* color of the scroll thumb */
+  border-radius: 22px; /* roundness of the scroll thumb */
+}
+
+.rightSideWidthHeight {
+  max-width: 480px;
+  height: 500px;
+  width: 100%;
+}
+
+.promotersText {
+  font-family: Poppins, sans-serif;
+  font-style: normal;
+  font-weight: 600;
+  font-size: 20px;
+  letter-spacing: 0.02em;
+  color: #3E2808;
+}
+
+.flex-display {
+  display: flex;
+  flex-direction: row;
+}
+
+.flex-display-column {
+  display: flex;
+  flex-direction: column;
+}
+
+.scrollBoxWidthHeight {
+  height: 320px;
+  max-width: 480px;
+  width: 100%;
+}
+
+.scrollBoxesBefore {
+  position: relative;
+  max-width: 470px;
+  width: 100%;
+  height: auto;
+  background: rgba(254, 230, 193, 0.28);
+  border-radius: 5.37037px;
+  padding-top: 20px;
+  padding-bottom: 20px;
+  padding-left: 60px;
+  padding-right: 8px;
+}
+
+.scrollBoxesAfter {
+  position: relative;
+  max-width: 470px;
+  width: 100%;
+  height: auto;
+  background: rgba(254, 230, 193, 0.28);
+  border-radius: 5.37037px;
+  padding-top: 20px;
+  padding-bottom: 20px;
+  padding-left: 60px;
+  padding-right: 8px;
+}
+
+.orangeBorder {
+  cursor: pointer;
+  border-style: solid;
+  border-width: medium;
+  border-color: #FFAB2D;
+  color: #FFAB2D;
+  width: 150px;
+  height: 30px;
+  text-align: center;
+  font-size: 14px
+}
+
+
+@media screen and (max-width: 717px) {
+
+  .rightSideWidthHeight {
+    max-width: 350px;
+    height: 600px;
+    width: 100%;
+  }
+
+  .inputBoxStyle {
+    background: #F1F1F1;
+    height: 42px;
+    width: 300px;
+    border: none;
+  }
+
+  .scrollBoxWidthHeight {
+    height: 400px;
+    max-width: 400px;
+    width: 100%;
+  }
+
+  .orangeBorder {
+    cursor: pointer;
+    border-style: solid;
+    border-width: medium;
+    border-color: #FFAB2D;
+    color: #FFAB2D;
+    width: 180px;
+    height: 30px;
+    text-align: center;
+    font-size: 14px
+  }
+}
+
+@media screen and (max-width: 666px) {
+
+  .rightSideWidthHeight {
+    max-width: 320px;
+    height: 650px;
+    width: 100%;
+  }
+
+  .scrollBoxesDinText{
+    margin-top: 8px;
+  }
+
+  .scrollBoxWidthHeight {
+    height: 380px;
+    max-width: 350px;
+    width: 100%;
+  }
+
+  .orangeBorder {
+    cursor: pointer;
+    border-style: solid;
+    border-width: medium;
+    border-color: #FFAB2D;
+    color: #FFAB2D;
+    width: 180px;
+    height: 30px;
+    text-align: center;
+    font-size: 12px
+  }
+
+  .flex-display {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .scrollBoxesBefore {
+    position: relative;
+    max-width: 340px;
+    width: 100%;
+    height: auto;
+    background: rgba(254, 230, 193, 0.28);
+    border-radius: 5.37037px;
+    padding-top: 20px;
+    padding-bottom: 20px;
+    padding-left: 60px;
+    padding-right: 8px;
+  }
+
+  .scrollBoxesAfter {
+    position: relative;
+    max-width: 340px;
+    width: 100%;
+    height: auto;
+    background: rgba(254, 230, 193, 0.28);
+    border-radius: 5.37037px;
+    padding-top: 20px;
+    padding-bottom: 20px;
+    padding-left: 60px;
+    padding-right: 8px;
+  }
+}
+
+@media screen and (max-width: 550px) {
+
+  .scrollBoxWidthHeight {
+    height: 380px;
+    max-width: 290px;
+    width: 100%;
+  }
+
+  .scrollBoxesDinText{
+    margin-top: 8px;
+  }
+
+  .rightSideWidthHeight {
+    max-width: 300px;
+    height: 650px;
+    width: 100%;
+  }
+
+  .scrollBoxesBefore {
+    position: relative;
+    max-width: 280px;
+    width: 100%;
+    height: auto;
+    background: rgba(254, 230, 193, 0.28);
+    border-radius: 5.37037px;
+    padding-left: 60px;
+    padding-top: 20px;
+    padding-bottom: 20px;
+    padding-right: 8px;
+  }
+
+  .scrollBoxesAfter {
+    position: relative;
+    max-width: 280px;
+    width: 100%;
+    height: auto;
+    background: rgba(254, 230, 193, 0.28);
+    border-radius: 5.37037px;
+    padding-left: 60px;
+    padding-top: 20px;
+    padding-bottom: 20px;
+    padding-right: 8px;
+  }
+}
+
+.greenBorder {
+  border-style: solid;
+  border-width: medium;
+  border-color: #15AD1C;
+  max-width: 160px;
+  width: 100%;
+  height: auto;
+}
+
+
+.scrollBoxesIndex {
+  position: absolute;
+  top: 5px;
+  left: 10px;
+  font-family: Poppins, sans-serif;
+  font-style: normal;
+  font-weight: normal;
+  font-size: 50px;
+  text-align: center;
+  letter-spacing: 0.02em;
+  color: rgba(62, 40, 8, 0.43);
+}
+
+.scrollBoxesNameText {
+  font-family: Poppins, sans-serif;
+  font-style: normal;
+  font-weight: normal;
+  font-size: 16px;
+  letter-spacing: 0.02em;
+  color: #3E2808;
+}
+
+.scrollBoxesDinText {
+  font-family: Poppins, sans-serif;
+  font-style: normal;
+  font-weight: 500;
+  font-size: 14px;
+  letter-spacing: 0.07em;
+  color: #3E2808;
+}
+
+.scrollBoxesPanText {
+  font-family: Poppins, sans-serif;
+  font-style: normal;
+  font-weight: normal;
+  font-size: 13px;
+  letter-spacing: 0.02em;
+  color: #3E2808;
+}
+
+
+.labelTexts {
+  font-family: Poppins, sans-serif;
+  font-style: normal;
+  font-weight: 500;
+  font-size: 22px;
+  letter-spacing: 0.02em;
+  color: #3E2808;
+}
+
+.yellowBoxDetails {
+  color: rgba(86, 66, 37, 0.49);
+  font-size: 18px;
+}
+
+.yellowBoxHeadings {
+  font-size: 16px;
+  color: #564225;
+}
+
+.continueBtn {
+  margin: 6px;
+  width: 90px;
+  height: 30px;
+  background: #F79A0E;
+  color: white;
+  border: none;
+}
+
+.bottomLeft {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+}
+
+.bottomRight {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+}
+
+.myanchor {
+  text-decoration: none;
+}
+
+.arrowOrange {
+  fill: rgba(255, 92, 0, 0.6);
+}
+
+.arrowBlack {
+  fill: rgba(0, 0, 0, 0.28);
+}
+
+input[type="file"] {
+  display: none;
+}
+
+.chip {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  padding-left: 10px;
+  padding-right: 10px;
+  height: 25px;
+  width: 80px;
+  font-size: 12px;
+  border-radius: 25px;
+}
+
+.brownBackground {
+  background-color: rgba(0, 0, 0, 0.06);
+}
+
+.whiteBackground {
+  background-color: white;
+}
+
+.closeBtn {
+  padding-left: 10px;
+  color: #888;
+  font-weight: bold;
+  float: right;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.promoterBoxClose {
+  position: absolute;
+  top: 0;
+  right: 20px;
+  font-size: 30px;
+  cursor: pointer;
+}
+
+.closeBtn:hover {
+  color: #000;
+}
+
+.inputBoxStyle {
+  background: #F1F1F1;
+  height: 42px;
+  width: 400px;
+  border: none;
+}
+
+.promotersEmptyText {
+  font-family: Poppins, sans-serif;
+  font-style: normal;
+  font-weight: 500;
+  font-size: 25px;
+  letter-spacing: 0.02em;
+  color: rgba(0, 0, 0, 0.1);
+}
+
+.marginZero {
+  margin: 0 !important;
+}
+
+.no-padding{
+    padding-left: 0px !important;
+    padding-right: 0px !important;
+}

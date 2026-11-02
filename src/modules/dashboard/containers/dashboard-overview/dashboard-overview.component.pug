@@ -1,0 +1,111 @@
+//- sbpro-dashboard-head(icon='activity', title='Dashboard', description='')
+//- .container-fluid.mt-n10
+div(*ngIf='isOwner')
+    sbpro-alert(classes='alert-info', *ngFor='let i of invites')
+        span.click.blue((click)='acceptInvite(i.merchantUserId)') Accept &nbsp;&nbsp;
+        span.click.red((click)='cancelInvite(i.merchantUserId)') Reject
+        | &nbsp;&nbsp;&nbsp; You have an Invitation from "{{ i.merchant.title }}" for the role of "{{ i.role[0] }}"
+
+div(*ngIf='!isMerchantVerified')
+    sbpro-alert(classes='alert-info')
+        | Activate your account - Complete your KYC to start using our products.
+        | Fill the KYC form&nbsp;
+        u.blue.click((click)='redirectKYC()') here
+
+ng-template(#all)
+    sbpro-dashboard-charts(
+        [bankNames]='banks',
+        [cb] = 'cb'
+    )
+sbpro-card-navigation(
+    *ngIf='!isAdmin && !connectedBanking',
+    sbproTocItem='Tabs',
+    [navNames]='navNames',
+    [templates]='templateRefs',
+    navType = 'pill'
+)
+    ng-template(#all)
+        sbpro-dashboard-charts(
+            [bankNames]='banks',
+            [cb] = 'cb'
+        )
+    ng-template(#icici)
+        sbpro-dashboard-charts([bankNames]='["icici"]',[cb] = 'cb')
+    ng-template(#rbl)
+        sbpro-dashboard-charts([bankNames]='["rbl"]',[cb] = 'cb')
+    ng-template(#yes)
+        sbpro-dashboard-charts([bankNames]='["yes_bank"]',[cb] = 'cb')
+    ng-template(#idfc)
+        sbpro-dashboard-charts([bankNames]='["idfc"]',[cb] = 'cb')
+    ng-template(#ibl)
+        sbpro-dashboard-charts([bankNames]='["ibl"]',[cb] = 'cb')
+    ng-template(#hdfc)
+        sbpro-dashboard-charts([bankNames]='["hdfc"]',[cb] = 'cb')
+    ng-template(#dbs)
+        sbpro-dashboard-charts([bankNames]='["dbs"]',[cb] = 'cb')
+    ng-template(#axis)
+        sbpro-dashboard-charts([bankNames]='["axis"]',[cb] = 'cb')
+
+ng-template(#all)
+    sbpro-dashboard-charts(
+        [bankNames]='banks',
+        [cb] = 'cb'
+    )
+sbpro-card-navigation(
+    *ngIf='!isAdmin && connectedBanking',
+    sbproTocItem='Tabs',
+    [navNames]='navNames',
+    [templates]='templateRefs',
+    navType = 'pill'
+)
+    ng-template(#all)
+        sbpro-dashboard-charts(
+            [bankNames]='banks',
+            [cb] = 'cb'
+        )
+    ng-template(#icici)
+        sbpro-dashboard-charts([bankNames]='["icici"]',[cb] = 'cb')
+    ng-template(#rbl)
+        sbpro-dashboard-charts([bankNames]='["rbl"]',[cb] = 'cb')
+    ng-template(#yes)
+        sbpro-dashboard-charts([bankNames]='["yes_bank"]',[cb] = 'cb')
+    ng-template(#idfc)
+        sbpro-dashboard-charts([bankNames]='["idfc"]',[cb] = 'cb')
+    ng-template(#ibl)
+        sbpro-dashboard-charts([bankNames]='["ibl"]',[cb] = 'cb')
+    ng-template(#hdfc)
+        sbpro-dashboard-charts([bankNames]='["hdfc"]',[cb] = 'cb')
+    ng-template(#dbs)
+        sbpro-dashboard-charts([bankNames]='["dbs"]',[cb] = 'cb')
+    ng-template(#axis)
+        sbpro-dashboard-charts([bankNames]='["axis"]',[cb] = 'cb')
+
+sbpro-card-navigation(
+    *ngIf='isAdmin',
+    sbproTocItem='Tabs',
+    [navNames]='["All Banks", "ICICI", "RBL", "YES", "IDFC", "INDUSIND", "HDFC", "DBS", "AXIS"]',
+    [templates]='[all, icici, rbl, yes, idfc, ibl, hdfc, dbs, axis]'
+)
+    ng-template(#all)
+        sbpro-dashboard-charts(
+            [bankNames]='["icici", "rbl", "yes_bank", "idfc", "ibl", "hdfc","dbs","axis"]'
+        )
+    ng-template(#icici)
+        sbpro-dashboard-charts([bankNames]='["icici"]')
+    ng-template(#rbl)
+        sbpro-dashboard-charts([bankNames]='["rbl"]')
+    ng-template(#yes)
+        sbpro-dashboard-charts([bankNames]='["yes_bank"]')
+    ng-template(#idfc)
+        sbpro-dashboard-charts([bankNames]='["idfc"]')
+    ng-template(#ibl)
+        sbpro-dashboard-charts([bankNames]='["ibl"]')
+    ng-template(#hdfc)
+        sbpro-dashboard-charts([bankNames]='["hdfc"]')
+    ng-template(#dbs)
+        sbpro-dashboard-charts([bankNames]='["dbs"]')
+    ng-template(#axis)
+        sbpro-dashboard-charts([bankNames]='["axis"]')
+
+    //sbpro-dashboard-cards
+    //sbpro-dashboard-tables

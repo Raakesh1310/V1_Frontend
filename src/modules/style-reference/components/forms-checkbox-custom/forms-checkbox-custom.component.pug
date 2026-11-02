@@ -1,0 +1,42 @@
+sbpro-card
+    .card-header Custom Checkboxes &amp; Radio
+    .card-body
+        h6.small.text-muted.font-weight-500 Bootstrap Custom Checkboxes:
+        .sbp-preview.mb-4
+            .sbp-preview-content
+                .custom-control.custom-checkbox
+                    input#customCheck1.custom-control-input(type='checkbox')
+                    label.custom-control-label(for='customCheck1') Custom Checkbox 1
+                .custom-control.custom-checkbox
+                    input#customCheck2.custom-control-input(type='checkbox')
+                    label.custom-control-label(for='customCheck2') Custom Checkbox 2
+                .custom-control.custom-checkbox
+                    input#customCheck3.custom-control-input(type='checkbox', disabled)
+                    label.custom-control-label(for='customCheck3') Custom Checkbox (Disabled)
+
+            .sbp-preview-code
+                sbpro-code-sample(
+                    [codeSamples]='codeSamples',
+                )
+
+            .sbp-preview-text.
+                Bootstrap's custom checkbox and radio styling have been modified for the
+                SB Admin Pro theme.
+        
+        h6.small.text-muted.font-weight-500 Bootstrap Custom Radio:
+        .sbp-preview.mb-4
+            .sbp-preview-content
+                .custom-control.custom-radio
+                    input#customRadio1.custom-control-input(type='radio', name='customRadio')
+                    label.custom-control-label(for='customRadio1') Toggle this custom radio
+                .custom-control.custom-radio
+                    input#customRadio2.custom-control-input(type='radio', name='customRadio')
+                    label.custom-control-label(for='customRadio2') Or toggle this other custom radio
+                .custom-control.custom-radio
+                    input#customRadio3.custom-control-input(type='radio', name='customRadio', disabled)
+                    label.custom-control-label(for='customRadio3') This radio is disabled
+
+            .sbp-preview-code
+                sbpro-code-sample(
+                    [codeSamples]='codeSamplesRadio',
+                )

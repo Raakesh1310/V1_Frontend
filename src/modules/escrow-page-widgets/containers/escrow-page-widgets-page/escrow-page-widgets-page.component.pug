@@ -1,0 +1,31 @@
+//- label Title for this section
+//- span.text-danger *
+//- input.form-control.form-control-sm(
+//-   type='text',
+//-   (change)='updateTitle($event)',
+//-   placeholder='Give this section a title',
+//-   [readOnly]='!titleEditable',
+//-   [value]='title'
+//- )
+div(*ngIf='livePag')
+  h3 {{ title }}
+  br
+
+.widget-list(
+  cdkDropList,
+  [cdkDropListDisabled]='livePage',
+  (cdkDropListDropped)='drop($event)'
+)
+  div(
+    [class.widget-item]='!livePage',
+    [class.widget-item-live]='livePage',
+    *ngFor='let field of _fields; let index',
+    cdkDrag
+  )
+    ng-template(#viewContainer)
+
+div(*ngIf='!livePage')
+  .form-group
+    br
+    //- button.btn.btn-light((click)='addField()', *ngIf='data.index === 0') + Add Field
+    button.btn.btn-light((click)='openFieldModal()', *ngIf='data.index !== 0') + Add Field

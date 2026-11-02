@@ -1,0 +1,268 @@
+sbpro-card([headerActions]='true')
+  .card-header(*ngIf='apiLink')
+    | E-sign Form
+    button.btn.btn-icon.btn-link.btn-xl((click)='closeModal()')
+      i-feather(name='x-circle')
+  .card-header(*ngIf='!apiLink')
+  .card-body
+    div(*ngIf='errors && errors.length > 0')
+      sbpro-alert(classes='alert-danger', [dismissable]='true')
+        | {{ errors[0] }}
+
+    .row 
+      .col
+        .form-group 
+          label(for='orderName') Agreement Name
+          span.text-danger *
+          input#orderName.form-control(type='text', [(ngModel)]='orderName')
+
+    .row
+      .mt-1.col-xl-6.col-lg-6.col-md-6.col-sm-12
+        p Upload PDF document to be signed.
+        .input-group(*ngIf='!document')
+          .custom-file
+            input#inputGroupFile01.custom-file-input(
+              type='file',
+              aria-describedby='inputGroupFileAddon01',
+              (change)='uploadFile($event)'
+            )
+            label.custom-file-label(for='inputGroupFile01') Choose File
+        b(*ngIf='document')
+          p Document ID: {{ document.documentId }}
+          p Document Name: {{ document.name }}
+      .mt-1.col-xl-6.col-lg-6.col-md-6.col-sm-12
+        p Select Branch
+        .form-group
+          select#branch.form-control([(ngModel)]='selectedBranch')
+            option(*ngFor='let op of branchList', [value]='op.branch_uuid') {{ op.name }}
+
+    br
+    br
+
+    h4 E-Stamp Details
+    hr
+
+    input(
+      type='checkbox',
+      name='estampCheckbox',
+      #estamp,
+      (click)='estampAction(estamp)'
+    )
+    label(for='estampCHeckbox') &nbsp;&nbsp; Document to be E-Stamped
+
+    div(*ngIf='estampRequired')
+      p
+        input(
+          type='checkbox',
+          name='notaryCheckbox',
+          #notary,
+          (click)='notaryAction(notary)'
+        )
+        label(for='notaryCheckbox') &nbsp;&nbsp; Document to be notarized
+      form([formGroup]='estampForm')
+        .row
+          .col-12
+            .form-group
+              label(for='frm-cntrl-firstParty') First party&apos;s name
+              span.text-danger *
+              input#frm-cntrl-firstParty.form-control.form-control-sm(
+                type='text',
+                formControlName='firstPartyName',
+                placeholder='First party\'s name'
+              )
+          .col-12
+            .form-group
+              label(for='frm-cntrl-secondParty') Second party&apos;s name
+              span.text-danger *
+              input#frm-cntrl-secondParty.form-control.form-control-sm(
+                type='text',
+                formControlName='secondPartyName',
+                placeholder='Second party\'s name'
+              )
+          .mt-1.col-xl-8.col-lg-8.col-md-8.col-sm-12
+            .form-group
+              label(for='frm-cntrl-stampDutyPaidBy') Stamp duty paid by
+              span.text-danger *
+              input#frm-cntrl-stampDutyPaidBy.form-control.form-control-sm(
+                type='text',
+                formControlName='stampDutyPaidBy',
+                placeholder='Payer name'
+              )
+          .mt-1.col-xl-4.col-lg-4.col-md-4.col-sm-12
+            .form-group
+              label(for='frm-cntrl-stampDutyValue') Stamp duty value
+              span.text-danger *
+              input#frm-cntrl-stampDutyValue.form-control.form-control-sm(
+                type='text',
+                formControlName='stampDutyValue',
+                placeholder='Amount'
+              )
+          .mt-1.col-xl-8.col-lg-8.col-md-8.col-sm-12
+            .form-group
+              label(for='frm-cntrl-purposeOfStampDuty') Purpose of Stamp Duty
+              span.text-danger *
+              select#articpurposeOfStampDutyleNumber.form-control.form-control-sm(
+                formControlName='purposeOfStampDuty'
+              )
+                option Agreement
+          .mt-1.col-xl-4.col-lg-4.col-md-4.col-sm-12
+            .form-group
+              label(for='frm-cntrl-cpoies') No of copies
+              span.text-danger *
+              input#frm-cntrl-cpoies.form-control.form-control-sm(
+                type='text',
+                formControlName='NoOfCopies',
+                placeholder='copies'
+              )
+          .mt-1.col-xl-8.col-lg-8.col-md-8.col-sm-12
+            .form-group
+              label(for='articleNumber') Article Number
+              span.text-danger *
+              select#articleNumber.form-control.form-control-sm(
+                formControlName='articleNumber'
+              )
+                option Article No - 5
+          .mt-1.col-xl-4.col-lg-4.col-md-4.col-sm-12
+            .form-group
+              label(for='frm-cntrl-considerationPrice') Consideration Price
+              span.text-danger *
+              input#frm-cntrl-considerationPrice.form-control.form-control-sm(
+                type='text',
+                formControlName='considerationPrice',
+                placeholder='amount'
+              )
+    br
+    br
+
+    h4 Signing Details
+    hr
+
+    p
+      input(
+        type='checkbox',
+        name='esignCheckbox',
+        #esign,
+        (click)='esignAction(esign)'
+      )
+      label(for='esignCHeckbox') &nbsp;&nbsp; Document to be E-Signed
+    div(*ngIf='esignRequired')
+      .row
+        .mt-1.col-xl-8.col-lg-8.col-md-8.col-sm-12
+          .form-group
+            label(for='method') Method
+            span.text-danger *
+            select#method.form-control.form-control-sm(
+              [(ngModel)]='method',
+              [disabled]='signers.length !== 0',
+              (change)='setmethod($event.target.value)'
+            )
+              option AADHAAR
+              option ELECTRONIC
+        .mt-1.col-xl-4.col-lg-4.col-md-4.col-sm-12
+          .form-group
+            label(for='pages') Pages to be signed
+            span.text-danger *
+            select#pages.form-control.form-control-sm(
+              (change)='setpages($event.target.value)'
+            )
+              option ALL
+              option FIRST
+              option LAST
+
+      form([formGroup]='esignForm')
+        .row
+          .mt-1.col-xl-3.col-lg-3.col-md-3.col-sm-12
+            .form-group
+              label(for='frm-cntrl-name') Name of signer
+              span.text-danger *
+              input#frm-cntrl-name.form-control.form-control-sm(
+                type='text',
+                formControlName='name',
+                placeholder='Name of signer'
+              )
+          .mt-1.col-xl-3.col-lg-3.col-md-3.col-sm-12
+            .form-group
+              label(for='frm-cntrl-email') Email of signer
+              span.text-danger *
+              input#frm-cntrl-email.form-control.form-control-sm(
+                type='text',
+                formControlName='email',
+                placeholder='email'
+              )
+          .mt-1.col-xl-3.col-lg-3.col-md-3.col-sm-12
+            .form-group
+              label(for='signPosition') Sign position
+              span.text-danger *
+              select#signPosition.form-control.form-control-sm(
+                formControlName='signPosition'
+              )
+                option(*ngFor='let signer of signingPositions')
+                  p {{signer}}
+
+          .mt-1.col-xl-2.col-lg-2.col-md-2.col-sm-12
+            .form-group
+              label(for='signing_type') Add as
+              span.text-danger *
+              select#signing_type.form-control.form-control-sm(
+                formControlName='signing_type'
+              )
+                option party
+                option witness
+          .mt-1.col-xl-1.col-lg-1.col-md-1.col-sm-12
+            .form-group
+              .label.hidden(for='addbutton') Add
+              button#addbutton.btn.btn-secondary((click)='addSigner()') Add
+        .row(*ngIf='signers?.length > 0')
+          .table-responsive.pp-table-container
+            br
+            br
+            table.table
+              thead
+                tr
+                  th(scope='col')
+                    span S.No.
+                  th(scope='col')
+                    span Signer Name
+                  th(scope='col')
+                    span Signer Email
+                  th(scope='col')
+                    span Sign Position
+                  th(scope='col')
+                    span Added As
+                  th(scope='col')
+                    span
+
+              tbody
+                tr(*ngFor='let signer of signers; let i = index')
+                  td
+                    | {{ i + 1 }}
+                  td
+                    span {{ signer.name }}
+                  td
+                    span {{ signer.email }}
+                  td
+                    span {{ signer.signPosition }}
+                  td
+                    span {{ signer.signing_type }}
+                  td
+                    button.my-1.mr-2.btn.btn-transparent-dark.btn-icon.btn-sm(
+                      type='button',
+                      (click)='removeSigner(i)'
+                    )
+                      i-feather(name='trash-2')
+
+    sbpro-app-button(
+      (click)='onSubmit()',
+      [loading]='submitting',
+      text='Create Agreement',
+      loadingText='Creating',
+      *ngIf='!apiLink'
+    )
+
+  .card-footer(*ngIf='apiLink')
+    sbpro-app-button.float-right(
+      (click)='onSubmit()',
+      [loading]='submitting',
+      text='Create Agreement',
+      loadingText='Creating'
+    )

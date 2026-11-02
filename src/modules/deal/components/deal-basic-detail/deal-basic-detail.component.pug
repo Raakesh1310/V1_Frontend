@@ -1,0 +1,84 @@
+
+
+div(*ngIf='viewMode')
+  .row 
+    .col-sm-12.col-md-6
+      .form-group
+        label Deal ID
+        span.form-control.no-border.pl-0(
+          [ngClass]='{ "non-editable": true }',
+        ) 
+          b {{ deal.dealId }}
+
+    .col-sm-12.col-md-6
+      .form-group
+        label Creation Date
+        span.form-control.no-border.pl-0
+          b {{ deal.createdAt | date: "d MMM yyyy" }}
+      
+
+  .row 
+    .col-sm-12.col-md-6 
+      .form-group
+        label Escrow ID
+        span.form-control.no-border.pl-0
+          b {{ deal.accountId }}
+      
+
+    .col-sm-12.col-md-6 
+      .form-group
+        label Available Balance
+        span.form-control.no-border.pl-0
+          b(*ngIf='deal.account && deal.account.balance') {{deal.account.balance}}
+          b(*ngIf='!deal.account ||  !deal.account.balance') --
+
+  .row 
+    .col-sm-12.col-md-6 
+      .form-group
+        label IFSC
+        span.form-control.no-border.pl-0
+          b(*ngIf='deal.account && deal.account.ifsc') {{deal.account.ifsc}}
+          b(*ngIf='!deal.account ||  !deal.account.ifsc') --
+      
+
+    .col-sm-12.col-md-6 
+      .form-group
+        label Status
+        span.form-control.no-border.pl-0
+          b {{deal.status}}
+
+  .row 
+    .col-sm-12.col-md-6
+      .form-group 
+        label Purpose
+        span.form-control.no-border.pl-0
+          b {{deal.purpose}}
+    .col-sm-12.col-md-6(*ngIf='isSuperAdmin')
+      .form-group 
+        label Created By
+        span.form-control.no-border.pl-0
+          b {{deal.createdBy}}
+    
+  
+  .form-group 
+    button.btn((click)='goBack()', class='castlerButtonColor') Back
+
+div(*ngIf='!viewMode')
+  form([formGroup]='dealForm')
+    .form-group
+      label Purpose
+      select#purpose.form-control
+        option Security Deposit
+  form
+    .form-group
+      label Your Role
+      select#role.form-control(
+        [(ngModel)]='myRole',
+        [ngModelOptions]='{ standalone: true }',
+        (change)='emitRole()'
+      )
+        option Landlord
+        option Tenant
+
+  .form-group(*ngIf='!viewMode')
+    button.btn((click)='submitBasicDetail()', class='castlerButtonColor') {{ (tabCount === 0 && !isEditDeal) ? "Next" : "Update" }}

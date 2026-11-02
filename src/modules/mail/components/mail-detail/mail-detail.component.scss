@@ -1,0 +1,12 @@
+@import 'styles/variables.scss';
+
+.custom {
+  text-overflow: ellipsis;
+  overflow: hidden;
+  width: 100%;
+  white-space: nowrap;
+}
+
+.custom-control {
+  height: unset;
+}

@@ -1,0 +1,9 @@
+.modal-header
+  button.close(
+    type='button',
+    aria-label='Close',
+    (click)='activeModal.dismiss("Cross click")'
+  )
+    span(aria-hidden='true') &times;
+.modal-body
+  | STUFF HERE

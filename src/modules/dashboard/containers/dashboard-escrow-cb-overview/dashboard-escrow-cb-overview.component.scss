@@ -1,0 +1,13 @@
+:host ::ng-deep .card-body {
+    padding: 0 !important;
+  }
+
+:host ::ng-deep .card.mb-4 {
+   margin-bottom: 0 !important;
+  }
+
+:host ::ng-deep .nav-pills .nav-link.active, .nav-pills .show > .nav-link {
+    color: #417505;
+    background-color: transparent;
+    border: #417505 1px solid;
+}

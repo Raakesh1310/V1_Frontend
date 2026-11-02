@@ -1,0 +1,214 @@
+form
+  .d-flex.mb-2
+    input#search-box.mt-1.form-control.w-50.mr-2(
+      style='max-width:100%',
+      type='text',
+      name='s',
+      placement='top',
+      ngbPopover='Search',
+      autocomplete='off',
+      placeholder='Search',
+      [(ngModel)]='searchTerm',
+      (change)='updateDownloadLink()'
+    )
+    select#statusList.mt-1.form-control.w-25.mr-2(
+      *ngIf='isAdmin',
+      name='status',
+      [(ngModel)]='selectedStatus',
+      (ngModelChange)='selectedStatusChanged($event)'
+    )
+      option(value='') Select Status
+      option(*ngFor='let st of statusList', [ngValue]='st') {{ st }}
+
+    button.btn.ml-3.ws-nowrap.mt-1.mb-2.castlerButtonColor(
+      type='submit',
+      (click)='filterData()'
+    )
+      fa-icon.d-flex.flex-row.align-items-center([icon]='["fas", "search"]')
+    button.btn.btn-link.mt-1.mb-1.mr-2.logoColor(
+      type='button',
+      (click)='ngOnInit()'
+    )
+      | Clear
+    select#statusList.mt-1.form-control.w-25.ml-2(
+      *ngIf='isAdmin',
+      name='action',
+      (change)='openModal(alert, $event)'
+    )
+      option(value='') Take Action
+      option(*ngFor='let st of actionList', [ngValue]='st') {{ st }}
+
+    .justify-content-end.pl-2.ml-2
+      a.btn.mt-1.mb-1.btn-success.ws-nowrap.btn-icon(
+        style='color: white',
+        type='button',
+        target='_blank',
+        [href]='downloadLink'
+      )
+        fa-icon.d-flex.flex-row.align-items-center(
+          [icon]='["fas", "arrow-down"]'
+        )
+  .d-flex.mb-2(*ngIf='vpaList.length > 0')
+    .flex-row
+      small.mb-2.mt-2 Showing {{ (page - 1) * 10 + 1 }} to {{ (page - 1) * 10 + vpaList.length }} of {{ total }}
+.table-responsive.pp-table-container.table-responsive-sm
+  table.table
+    thead
+      tr
+        th(*ngIf='isAdmin', scope='col', sbSortable='date', (sort)='onSort($event)')
+          span.ws-nowrap Merchant Name
+          sb-sort-icon(
+            *ngIf='sortedColumn === "date"',
+            [direction]='sortedDirection'
+          )
+        th(scope='col', sbSortable='time', (sort)='onSort($event)')
+          span Creation Date
+          sb-sort-icon(
+            *ngIf='sortedColumn === "time"',
+            [direction]='sortedDirection'
+          )
+        th(scope='col', sbSortable='event', (sort)='onSort($event)')
+          span Linked Escrow Name
+          sb-sort-icon(
+            *ngIf='sortedColumn === "date"',
+            [direction]='sortedDirection'
+          )
+        th(scope='col', sbSortable='event', (sort)='onSort($event)')
+          span.ws-nowrap Linked Escrow ID
+          sb-sort-icon(
+            *ngIf='sortedColumn === "event"',
+            [direction]='sortedDirection'
+          )
+        th(scope='col', sbSortable='time', (sort)='onSort($event)')
+          span.ws-nowrap UPI ID
+          sb-sort-icon(
+            *ngIf='sortedColumn === "time"',
+            [direction]='sortedDirection'
+          )
+        th(scope='col', sbSortable='event', (sort)='onSort($event)')
+          span QR
+          sb-sort-icon(
+            *ngIf='sortedColumn === "date"',
+            [direction]='sortedDirection'
+          )
+        th(*ngIf='isAdmin', scope='col', sbSortable='time', (sort)='onSort($event)')
+          span.ws-nowrap Status
+          sb-sort-icon(
+            *ngIf='sortedColumn === "time"',
+            [direction]='sortedDirection'
+          )
+        th(*ngIf='isAdmin', scope='col', sbSortable='time', (sort)='onSort($event)')
+          span.ws-nowrap 
+            input.ml-2.pt-5(
+              type='checkbox',
+              [(ngModel)]='isChecked',
+              (change)='selectAll($event)'
+            )
+          sb-sort-icon(
+            *ngIf='sortedColumn === "time"',
+            [direction]='sortedDirection'
+          )
+
+    tbody(*ngIf='vpaList.length == 0')
+      tr
+        td No Entries Found
+
+    tbody(*ngIf='vpaList.length > 0')
+      tr(*ngFor='let vpa of vpaList')
+        td(*ngIf='isAdmin')
+          a.nav-link.p-0.tableClickEntryColor(
+            href='javascript:void(0);',
+            (click)='viewMerchantDetails(vpa.merchantId)'
+          )
+            ngb-highlight([result]='vpa.merchantName')
+        td
+          ngb-highlight([result]='vpa.createdAt | date: "d MMM yyyy" || "--"')
+        td {{ vpa.accountName }}
+        td(*ngIf='vpa.accountId')
+          a.nav-link.p-0.tableClickEntryColor(
+            href='javascript:void(0);',
+            (click)='viewDetails(vpa.accountId)'
+          )
+            ngb-highlight([result]='vpa.accountId')
+        td(*ngIf='!vpa.accountId')
+          | --
+        td {{ vpa.vpa }}
+        td
+          button.btn.btn-sm.btn-primary(
+            *ngIf='vpa.accountId',
+            type='button',
+            (click)='showQRCode(vpa)'
+          ) View QR
+        td(*ngIf='isAdmin') {{ vpa.status }}
+        th(
+          *ngIf='isAdmin',
+          scope='col',
+          sbSortable='time',
+          style='text-align : center'
+        )
+          input(
+            *ngIf='vpa.status === "Pending"',
+            type='checkbox',
+            [(ngModel)]='isChecked ? true : vpa.isSelected',
+            (change)='checkValue($event, vpa)'
+          )
+
+  .d-flex.justify-content-between.p-2
+    ngb-pagination(
+      [collectionSize]='total',
+      [maxSize]='5',
+      [(page)]='page',
+      [pageSize]='pageSize',
+      [rotate]='true',
+      [ellipses]='false',
+      (pageChange)='pageChange($event)',
+      [boundaryLinks]='true'
+    )
+
+ng-template(#detailsTemplate)
+  sbpro-card([headerActions]='true')
+  #screen.div(style='background-color: white') 
+    .card-header.logoColor
+      | QR Code
+      img([src]="'/assets/img/Bhim-Upi-Logo.png'",alt='bhim-upi-logo',style="float: right; width: 150px; height: auto; margin-left: 10px;")
+    #screen.card-body.text-center.bg-white
+      small
+        small Powered By
+      p
+        img([src]='rbl', alt='RBL', height='50')
+      br
+      img#qrcode.svgIcon([src]='qrCode')
+      br
+      .bold 
+        img([src]="'/assets/img/fast-forward-logo.png'",alt='fast-forward-logo',style="width: 25px; height: auto; margin-right: 10px;")
+        | Scan and Pay using any UPI App
+        .d-flex.justify-content-around.align-items-center(style='height: 70px;')
+          img.p-1.m-0([src]='paytm', alt='Paytm', width='100px')
+          img.p-1.m-0([src]='phonepe', alt='PhonePe', width='150px')
+          img.p-1.m-0([src]='gpay', alt='GPay', width='95px')
+      br
+      strong {{ merchantName }}
+      br
+    .card-footer
+      span
+        button.btn.btn-sm.btn-success.float-right((click)='downloadQR(vpa)') Download QR
+        span.float-right &nbsp;&nbsp;
+        button.btn.btn-sm.btn-danger.float-right((click)='onCancel()') Close
+    span.float-right &nbsp;&nbsp;
+
+ng-template(#alert)
+  .flex-display-column(style='background: #FFFBF4')
+    .bold.mt-5 Are you sure you want to {{ selectedStatus }} ?
+    .flex-display.mb-5.mt-3
+      button.btn.btn-light.mr-3(type='button', (click)='closeModal()') No, Go Back
+      button.btn(
+        type='button',
+        [disabled]='disableStatusButton',
+        [ngClass]='selectedStatus === "Activate" || selectedStatus === "activate" ? "btnColorGreen" : "btnColorRed"',
+        (click)='sendSingleApprovals()'
+      ) {{ disableStatusButton ? "Loading..." : "Yes," }}
+        | &nbsp;
+        div(*ngIf='!disableStatusButton') {{ selectedStatus === "Activate" || selectedStatus === "activate" ? "Activate" : "Deactivate" }}
+
+ngx-spinner
+  p(style='font-size: 20px; color: white') Please wait...

@@ -1,0 +1,18 @@
+
+.form-group
+  label(for='aadhaar') AADHAAR
+  span.linker.float-right(*ngIf='!livePage')
+    i-feather(name='trash-2', (click)='rmField()')
+  span.text-danger(*ngIf='required') *
+  span.ml-1(*ngIf='verified')
+    i-feather.text-success(name='check-circle')
+  input.form-control.form-control-sm(
+    [id]='aadhaar',
+    type='number',
+    placeholder='AADHAAR',
+    (change)='onChange()',
+    #defInput,
+    [value]='value',
+    [class.disabled]='!livePage'
+  )
+  span.text-danger(*ngIf='errors.length > 0') {{ errors[0] }}

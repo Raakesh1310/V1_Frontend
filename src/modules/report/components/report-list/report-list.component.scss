@@ -1,0 +1,25 @@
+@import 'styles/variables.scss';
+
+.select-custom-width {
+    flex: 0 0 60%; /* Takes 60% of the width, but can shrink to 50% */
+  }
+  
+  .btn-custom-width {
+    flex: 0 0 20%; /* Takes 40% of the width */
+  }
+
+  .ngb-datepicker {
+    z-index: 1055; /* Higher than Bootstrap modal's z-index */
+  }
+
+  .checkbox-group {
+    display: flex;
+    // justify-content: space-between;
+    gap: 35px;
+    align-items: center;
+    width: 100%; /* or adjust as per your modal's width */
+  }
+  
+  .checkbox-group label {
+    margin-right: 10px;
+  }

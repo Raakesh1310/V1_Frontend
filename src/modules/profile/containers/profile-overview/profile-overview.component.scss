@@ -1,0 +1,18 @@
+@import 'styles/variables.scss';
+
+.link {
+  padding: 2% 20%;
+  cursor: pointer;
+}
+
+.link:hover {
+  background-color: rgb(208, 217, 245);
+}
+
+.row {
+  width: 100%;
+}
+
+.active {
+  border-bottom: 2px solid blueviolet;
+}

@@ -1,0 +1,45 @@
+center(*ngIf='loading')
+  | Please Wait...
+div(*ngIf='account && !loading')
+  .table-responsive.pp-table-container
+    span
+      h5 
+        | Linked Payees
+    table.table
+      thead
+        tr
+          th
+            span Payee ID
+          th
+            span Payee Name
+          th
+            span Bank Account No.
+          th
+            span IFSC
+          th
+            span email
+          th
+            span mobile
+          th
+            span share
+
+      tbody(*ngIf='account.payeesInfo.length == 0')
+        tr
+          td No Entries Found
+      tbody(*ngIf='account.payeesInfo.length > 0')
+        tr(*ngFor='let payee of account.payeesInfo; index as i')
+          td
+            ngb-highlight([result]='payee.payeeId')
+          td
+            ngb-highlight([result]='payee.accountHolder')
+
+          td
+            ngb-highlight([result]='payee.accountNumber')
+          td
+            ngb-highlight([result]='payee.ifscCode')
+          td
+            ngb-highlight([result]='payee.email')
+          td
+            ngb-highlight([result]='payee.mobile')
+          td 
+            | {{ getPayee(payee.payeeId).share }} {{ account.shareUnit }}

@@ -1,0 +1,15 @@
+@import 'styles/variables.scss';
+
+.custom-button {
+  width: 30%;
+}
+
+@media only screen and (max-width: 648px) {
+  .custom-button {
+    width: 100%;
+  }
+}
+
+#uploadDocs {
+  display: none;
+}

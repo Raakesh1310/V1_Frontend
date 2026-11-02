@@ -1,0 +1,740 @@
+.alert.alert-danger.alert-dismissible.fade.show(
+	role='alert',
+	*ngIf='errors.length > 0'
+)
+	| {{ errors[0] }}
+	button.close(
+		type='button',
+		(click)='errors = []',
+		data-dismiss='alert',
+		aria-label='Close'
+	)
+		span(aria-hidden='true') ×
+form(autocomplete='off', [formGroup]='settingsForm')
+	.form-group(*ngIf='merchantId')
+		.col-sm-12.col-md-3.col-lg-3
+			label.font-weight-bold.text-black(for='mode-of-operation')
+				| Mode of Operation
+				span.text-danger *
+			select#mode-of-operation.form-control.form-control-sm(
+				formControlName='mode',
+				(change)='onModeChange()',
+				required
+			)
+				option(value='Portal') Portal
+				option(value='API') API
+		br
+		.form-group(*ngIf='merchantMode == "API"')
+			.col-sm-12.col-md-12.col-lg-12
+				label.font-weight-bold.text-black
+					| API Webhooks
+				.row
+					.col-sm-6.col-md-3.col-lg-3
+						label.font-weight-bold.text-black(for='mode-of-operation')
+						| Type of Authentication
+						span.text-danger *
+					.col-sm-6.col-md-3.col-lg-3
+						select#mode-of-operation.form-control.form-control-sm(
+							formControlName='webHookAuthType',
+							(change)='onWebHookAuthChange()',
+							required
+						)
+							option(value='basic') Basic Authentication
+							option(value='token') Token
+				br
+				.row
+					.col-sm-12.col-md-6.col-lg-6
+						label(for='transfer-webhook-url')
+							| Transfer Webhook URL
+					.col-sm-12.col-md-3.col-lg-3(*ngIf='webHookAuthType == "token"')
+						label(for='transfer-webhook-token')
+							| Transfer Webhook Token
+					.col-sm-12.col-md-3.col-lg-3(*ngIf='webHookAuthType == "basic"')
+						label(for='transfer-basic-user')
+							| Transfer Basic User*
+					.col-sm-12.col-md-3.col-lg-3(*ngIf='webHookAuthType == "basic"')
+						label(for='transfer-basic-pass')
+							| Transfer Basic Password*
+				.row
+					.col-sm-12.col-md-6.col-lg-6
+						input#monthly-fee.form-control.form-control-sm(
+							type='transfer-webhook-url',
+							formControlName='transferHookURL'
+						)
+					.col-sm-12.col-md-3.col-lg-3(*ngIf='webHookAuthType == "token"')
+						input#monthly-fee.form-control.form-control-sm(
+							type='password',
+							formControlName='transferHookToken'
+						)
+					.col-sm-12.col-md-3.col-lg-3(*ngIf='webHookAuthType == "basic"')
+						input#monthly-fee.form-control.form-control-sm(
+							type='text',
+							formControlName='transferHookBasicAuthUser'
+						)
+					.col-sm-12.col-md-3.col-lg-3(*ngIf='webHookAuthType == "basic"')
+						input#monthly-fee.form-control.form-control-sm(
+							type='password',
+							formControlName='transferHookBasicAuthPass'
+						)
+				br
+				.row
+					.col-sm-12.col-md-6.col-lg-6
+						label(for='deposit-webhook-url')
+							| Deposit Webhook URL
+					.col-sm-12.col-md-3.col-lg-3(*ngIf='webHookAuthType == "token"')
+						label(for='deposit-webhook-token')
+							| Deposit Webhook Token
+					.col-sm-12.col-md-3.col-lg-3(*ngIf='webHookAuthType == "basic"')
+						label(for='deposit-basic-user')
+							| Deposit Basic User*
+					.col-sm-12.col-md-3.col-lg-3(*ngIf='webHookAuthType == "basic"')
+						label(for='deposit-basic-pass')
+							| Deposit Basic Password*
+				.row
+					.col-sm-12.col-md-6.col-lg-6
+						input#monthly-fee.form-control.form-control-sm(
+							type='deposit-webhook-url',
+							formControlName='depositHookURL'
+						)
+					.col-sm-12.col-md-3.col-lg-3(*ngIf='webHookAuthType == "token"')
+						input#monthly-fee.form-control.form-control-sm(
+							type='password',
+							formControlName='depositHookToken'
+						)
+					.col-sm-12.col-md-3.col-lg-3(*ngIf='webHookAuthType == "basic"')
+						input#monthly-fee.form-control.form-control-sm(
+							type='text',
+							formControlName='depositHookBasicAuthUser'
+						)
+					.col-sm-12.col-md-3.col-lg-3(*ngIf='webHookAuthType == "basic"')
+						input#monthly-fee.form-control.form-control-sm(
+							type='password',
+							formControlName='depositHookBasicAuthPass'
+						)
+			br
+			.col-sm-12.col-md-6.col-lg-6
+				.row
+					.col-sm-12.col-md-9.col-lg-9
+						label(for='escorwQRCheckBox') 
+							| Enable Webhook Encryption
+					.col-sm-12.col-md-3.col-lg-3
+						input(
+							type='checkbox',
+							#checkbox,
+							name='webhookEncryptionEnabled',
+							formControlName='webhookEncryptionEnabled',
+							(change)='updateCheckBoxVal("webhookEncryptionEnabled", $event)' 
+						)
+				.row(*ngIf='settingsForm.get("webhookEncryptionEnabled").value') 
+					.col-sm-12.col-md-9.col-lg-9
+						label
+							| Encryption Key :
+						button.ml-2.btn-md.castlerButtonColor.rounded(*ngIf='!whKeyGenerated',type ='button',(click) = 'generateEncryptionKey(32)') Generate
+						label.ml-2(*ngIf='!whKeyGenerated')
+							| / Input 
+				.row(*ngIf='settingsForm.get("webhookEncryptionEnabled").value')
+					.col-sm-12.col-md-9.col-lg-9
+						input.form-control.form-control-sm(
+							*ngIf='whKeyGenerated',
+							type='text',
+							formControlName='webhookEncryptionKey',
+							readonly
+						)
+						input.form-control.form-control-sm(
+							*ngIf='!whKeyGenerated',
+							type='text',
+							formControlName='webhookEncryptionKey'
+						)
+						span.text-danger(*ngIf='webhookEncryptionKey?.errors?.exactLength')
+							| Enter exactly 32 characters random key. You have entered {{ webhookEncryptionKey?.errors?.exactLength?.actualLength }} characters.
+						span.text-danger(*ngIf='webhookEncryptionKey?.hasError("noSpace")')
+							| No spaces allowed in this field.
+					.col-sm-12.col-md-3.col-lg-3(*ngIf='!whKeyHashed')
+						i-feather.justify-content-center(*ngIf='whKeyGenerated && !isCopied', name = 'copy',(click)='copyToClipboard(webhookEncryptionKey.value,"Encryption Key Copied")')
+						i-feather.justify-content-center(*ngIf='whKeyGenerated && isCopied', name = 'check-circle')
+						span.ml-2(*ngIf='whKeyGenerated')
+							| {{ isCopied ? 'Copied!' : 'Copy' }}
+				br
+				.row(*ngIf='settingsForm.get("webhookEncryptionEnabled").value')
+					.col-sm-12.col-md-9.col-lg-9
+						label
+							| Encryption IV :
+					.col-sm-12.col-md-9.col-lg-9
+						input.form-control.form-control-sm(
+							*ngIf='ivGenerated',
+							type='text',
+							formControlName='webhookEncryptionIv',
+							readonly
+						)
+						input.form-control.form-control-sm(
+							*ngIf='!ivGenerated',
+							type='text',
+							formControlName='webhookEncryptionIv'
+						)
+						span.text-danger(*ngIf='webhookEncryptionIv?.errors?.exactLength')
+							| Enter exactly 16 characters random key. You have entered {{ webhookEncryptionIv?.errors?.exactLength?.actualLength }} characters.
+						span.text-danger(*ngIf='webhookEncryptionIv?.hasError("noSpace")')
+							| No spaces allowed in this field.
+		br
+		.form-group(*ngIf='isAuthorized && merchantMode == "API" && !xApiKeyExist && !xApiKeyValue',[hidden]='xApiKeyValue')
+			.col-sm-12.col-md-6.col-lg-6
+				span.font-weight-bold.text-black.m-2 X-API Key:
+				button.btn.castlerButtonColor.rounded(type ='button',(click) = 'generateXapiKey()') Generate
+		.form-group(*ngIf='merchantMode == "API" && !xApiKeyExist && xApiKeyValue')
+			.col-sm-12.col-md-6.col-lg-6
+				span.font-weight-bold.text-black.mr-2 X-API Key:
+				span.align-items-center.mr-2 {{xApiKeyValue}}
+				i-feather.justify-content-center.mt-4(name = 'copy',(click)='copyToClipboard(xApiKeyValue,"X-API Copied")')
+			.col-sm-12.col-md-6.col-lg-6(*ngIf='xApiKeyGeneratedAt')
+				span.text-black.mr-2 Generated On:
+				span.align-items-center.mr-2 {{xApiKeyGeneratedAt | date:'medium'}}
+		.form-group(*ngIf='isAuthorized && merchantMode == "API" && xApiKeyExist')
+			.col-sm-12.col-md-6.col-lg-6
+				span.font-weight-bold.text-black.mr-2 X-API Key:
+				span.align-items-center.mr-2 {{xApiKeyValue}}
+			.col-sm-12.col-md-6.col-lg-6(*ngIf='xApiKeyGeneratedAt')
+				span.text-black.mr-2 Generated On:
+				span.align-items-center.mr-2 {{xApiKeyGeneratedAt | date:'medium'}}
+		br
+		.form-group(*ngIf='merchantMode == "API"')
+			.col-sm-12.col-md-6.col-lg-6
+				label.font-weight-bold.text-black
+					| Documents
+				.row
+					.col-sm-12.col-md-9.col-lg-9
+						label(for='accountDocumentMandatoryCheckbox') 
+							| Upload Document mandatory in Create Escrow via API
+					.col-sm-12.col-md-3.col-lg-3
+						input#accountDocumentMandatoryCheckbox(
+							type='checkbox',
+							#checkbox,
+							name='accountDocumentMandatoryCheckbox',
+							formControlName='accountDocumentMandatoryForAPI'
+						)
+
+		br
+
+		.form-group(*ngIf='merchantId')
+			.col-sm-12.col-md-6.col-lg-6
+				label.font-weight-bold.text-black
+					| Digital Escrows
+				.row
+					.col-sm-12.col-md-9.col-lg-9
+						label(for='isAccAddCheckbox') 
+							| Allow Escrow Creation Access
+					.col-sm-12.col-md-3.col-lg-3
+						input#isAccAddCheckbox(
+							type='checkbox',
+							#checkbox,
+							name='isAccAddCheckbox',
+							formControlName='isAccAddCheckbox',
+							(change)='updateCheckBoxVal("isAccAddCheckbox", $event)' 
+						)
+				.row(*ngIf='isAccountAdditionAllowed()')
+					.col-sm-12.col-md-9.col-lg-9
+						label(for='noAccAllowed') 
+							| Enter number of Escrows Allowed
+					.col-sm-12.col-md-3.col-lg-3
+						input#noAccAllowed(
+							type='text',
+							name='noAccAllowed',
+							formControlName='noAccAllowed'
+						)
+			br
+			.form-group(*ngIf='merchantId')
+				.col-sm-12.col-md-6.col-lg-6
+					label.font-weight-bold.text-black
+						| IDFC White-Label
+					.row
+						.col-sm-12.col-md-9.col-lg-9
+							label(for='idfcWhiteLabelCheckBox') 
+								| IDFC White-Labelled Merchant 
+						.col-sm-12.col-md-3.col-lg-3
+							input(
+								type='checkbox',
+								#checkbox,
+								name='idfcWhiteLabelCheckBox',
+								formControlName='idfcWhiteLabelCheckBox',
+								(change)='updateCheckBoxVal("idfcWhiteLabelCheckBox", $event)' 
+							)
+			.form-group(*ngIf='settingsForm.get("idfcWhiteLabelCheckBox").value')
+				.col-sm-12.col-md-6.col-lg-6
+					label.font-weight-bold.text-black
+						| IDFC Deal Id 
+					.row
+						.col-sm-12.col-md-9.col-lg-9
+							label(for='idfcDealId') 
+								| Deal Id  
+						.col-sm-12.col-md-3.col-lg-3
+							input(
+								type='text',
+								name='idfcDealId',
+								formControlName='idfcDealId'
+							)
+			br
+			.form-group(*ngIf='merchantId')
+				.col-sm-12.col-md-6.col-lg-6
+					label.font-weight-bold.text-black
+						| Notifications
+					.row
+						.col-sm-12.col-md-9.col-lg-9
+							label(for='transferNotificationCheckBox') 
+								| Disable Transfer Notifications
+						.col-sm-12.col-md-3.col-lg-3
+							input(
+								type='checkbox',
+								#checkbox,
+								name='transferNotificationCheckBox',
+								formControlName='transferNotificationCheckBox',
+								(change)='updateCheckBoxVal("transferNotificationCheckBox", $event)' 
+							)
+					.row
+						.col-sm-12.col-md-9.col-lg-9
+							label(for='payeeNotificationCheckBox') 
+								| Disable Payee Related Notifications
+						.col-sm-12.col-md-3.col-lg-3
+							input(
+								type='checkbox',
+								#checkbox,
+								name='payeeNotificationCheckBox',
+								formControlName='payeeNotificationCheckBox',
+								(change)='updateCheckBoxVal("payeeNotificationCheckBox", $event)' 
+							)
+					.row
+						.col-sm-12.col-md-9.col-lg-9
+							label(for='depositNotificationCheckBox') 
+								| Disable Deposit Related Notifications
+						.col-sm-12.col-md-3.col-lg-3
+							input(
+								type='checkbox',
+								#checkbox,
+								name='depositNotificationCheckBox',
+								formControlName='depositNotificationCheckBox',
+								(change)='updateCheckBoxVal("depositNotificationCheckBox", $event)' 
+							)
+					.row
+						.col-sm-12.col-md-9.col-lg-9
+							label(for='depositNotificationCheckBox') 
+								| Disable Account Related Notifications
+						.col-sm-12.col-md-3.col-lg-3
+							input(
+								type='checkbox',
+								#checkbox,
+								name='accountNotificationCheckBox',
+								formControlName='accountNotificationCheckBox',
+								(change)='updateCheckBoxVal("accountNotificationCheckBox", $event)' 
+							)
+			br
+			.form-group(*ngIf='merchantId')
+				.col-sm-12.col-md-6.col-lg-6
+					label.font-weight-bold.text-black
+						| Connected Banking
+					.row
+						.col-sm-12.col-md-9.col-lg-9
+							label(for='connectedBankingCheckBox') 
+								| Enable Connected Banking 
+						.col-sm-12.col-md-3.col-lg-3
+							input(
+								type='checkbox',
+								#checkbox,
+								name='connectedBankingCheckBox',
+								formControlName='connectedBankingCheckBox',
+								(change)='updateCheckBoxVal("connectedBankingCheckBox", $event)' 
+							)
+			.form-group(*ngIf='merchantId')
+				.col-sm-12.col-md-6.col-lg-6
+					label.font-weight-bold.text-black
+						| Refresh Balance
+					.row
+						.col-sm-12.col-md-9.col-lg-9
+							label(for='connectedBankingCheckBox') 
+								| User will be able to fetch balance by clicking on refresh button
+						.col-sm-12.col-md-3.col-lg-3
+							input(
+								type='checkbox',
+								#checkbox,
+								name='refreshBalanceCheckBox',
+								formControlName='refreshBalanceCheckBox',
+								(change)='updateCheckBoxVal("refreshBalanceCheckBox", $event)' 
+							)
+			br
+			.form-group(*ngIf='merchantId')
+				.col-sm-12.col-md-6.col-lg-6
+					label.font-weight-bold.text-black
+						| Bank Verification
+					.row
+						.col-sm-12.col-md-9.col-lg-9
+							label(for='bankVerification') 
+								| Verify bank account while adding payee
+						.col-sm-12.col-md-3.col-lg-3
+							input#bankVerification(
+								type='checkbox',
+								#checkbox,
+								name='bankVerification',
+								formControlName='bankVerification',
+								(change)='updateCheckBoxVal("bankVerification", $event)' 
+							)
+			br
+			.form-group(*ngIf='merchantId')
+				.col-sm-12.col-md-6.col-lg-6
+					label.font-weight-bold.text-black
+						| Escrow Page Payments
+					.row
+						.col-sm-12.col-md-9.col-lg-9
+							label(for='escrowPagePG') 
+								| Enable escrow page payments
+						.col-sm-12.col-md-3.col-lg-3
+							input#escrowPagePG(
+								type='checkbox',
+								#checkbox,
+								name='escrowPagePG',
+								formControlName='escrowPagePG',
+								(change)='updateCheckBoxVal("escrowPagePG", $event)' 
+							)
+					.row(*ngIf='isEscrowPageAllowed()')
+						.col-sm-12.col-md-9.col-lg-9
+							label(for='pineMerchantId') 
+								|  Pine Merchant Id 
+								span.text-danger *
+						.col-sm-12.col-md-3.col-lg-3
+							input#pineMerchantId(
+								type='text',
+								name='pineMerchantId',
+								formControlName='pineMerchantId'
+							)
+					.row(*ngIf='isEscrowPageAllowed()')
+						.col-sm-12.col-md-9.col-lg-9
+							label(for='merchantAccessCode') 
+								|  Merchant AccessCode 
+								span.text-danger *
+						.col-sm-12.col-md-3.col-lg-3
+							input#merchantAccessCode(
+								type='text',
+								name='merchantAccessCode',
+								formControlName='merchantAccessCode'
+							)
+					.row(*ngIf='isEscrowPageAllowed()')
+						.col-sm-12.col-md-9.col-lg-9
+							label(for='merchantSecretKey') 
+								|  Merchant Secret Key 
+								span.text-danger *
+						.col-sm-12.col-md-3.col-lg-3
+							input#merchantSecretKey(
+								type='password',
+								name='merchantSecretKey',
+								formControlName='merchantSecretKey'
+							)
+					.row(*ngIf='isEscrowPageAllowed()')
+						.col-sm-12.col-md-9.col-lg-9
+							label(for='pgSettlementAccount') 
+								|  Settlement Account No 
+								span.text-danger *
+						.col-sm-12.col-md-3.col-lg-3
+							input#merchantAccessCode(
+								type='text',
+								name='pgSettlementAccount',
+								formControlName='pgSettlementAccount'
+							)
+			br
+			.form-group(*ngIf='merchantId && !isProduction')
+				.col-sm-12.col-md-6.col-lg-6
+					label.font-weight-bold.text-black
+						| Sandbox Simulation
+					.row
+						.col-sm-12.col-md-9.col-lg-9
+							label(for='enableTesting') 
+								| Enable Sandbox Deposit and Transfer Testing
+						.col-sm-12.col-md-3.col-lg-3
+							input#escrowPagePG(
+								type='checkbox',
+								#checkbox,
+								name='enableTesting',
+								formControlName='enableTesting',
+								(change)='updateCheckBoxVal("enableTesting", $event)' 
+							)
+			br
+			.form-group(*ngIf='merchantId')
+				.col-sm-12.col-md-6.col-lg-6
+					label.font-weight-bold.text-black
+						| E-KYC
+					.row
+						.col-sm-12.col-md-9.col-lg-9
+							label(for='enableKYC') 
+								| Enable eKYC
+						.col-sm-12.col-md-3.col-lg-3
+							input#enableKYC(
+								type='checkbox',
+								#checkbox,
+								name='enableKYC',
+								formControlName='enableKYC',
+								(change)='updateCheckBoxVal("enableKYC", $event)' 
+							)
+			br
+			.form-group(*ngIf='merchantId')
+				.col-sm-12.col-md-6.col-lg-6
+					label.font-weight-bold.text-black
+						| Payee Validations
+					.row
+						.col-sm-12.col-md-9.col-lg-9
+							label(for='enablePayeeValidation') 
+								| Enable Payee Validations
+						.col-sm-12.col-md-3.col-lg-3
+							input#enablePayeeValidation(
+								type='checkbox',
+								#checkbox,
+								name='enablePayeeValidation',
+								formControlName='enablePayeeValidation',
+								(change)='updateCheckBoxVal("enablePayeeValidation", $event)' 
+							)     
+			.form-group(*ngIf='merchantId && enablePayeeValidation')
+				.col-sm-12.col-md-6.col-lg-6
+					label.font-weight-bold.text-black
+						| Select Type of Payee Validation  
+					span.text-danger *
+						select.form-control(
+							name='payeeValidationType',
+							formControlName='payeeValidationType',
+							[(ngModel)] = 'payeeValidationType',
+							(change)="payeeValidationTypeChange($event.target.value)"
+						) 
+							option(*ngIf='hasBank("idfc")' value='IDFC_VALIDATION') IDFC 
+							option(value='DIGIO_VALIDATION') DIGIO 
+							option(value='HDFC_VALIDATION') HDFC 
+			.form-group(*ngIf='merchantId && enablePayeeValidation && payeeValidationType==="IDFC_VALIDATION"')
+				.col-sm-12.col-md-6.col-lg-6
+					label.font-weight-bold.text-black
+						| Penny Drop charges Escrow
+					span.text-danger *
+						ng-select(
+							[items]='pennyDropChargesAccounts',
+							bindLabel='name',
+							[(ngModel)]='selectedAccount',
+							formControlName='account',
+							loadingText='Loading...',
+							placeholder='Enter Escrow Name',
+							(change)='updateAccount($event)',
+							[disabled]='submitted',
+							name='account',
+							(search)='fetchAccount($event)'
+						)
+							ng-template(ng-label-tmp='' let-item='item')
+								span(*ngIf='selectedAccount') {{ item.name }} &nbsp;
+									span.fader - {{ item.accountId }}
+							ng-template(
+								ng-option-tmp='',
+								let-item='item',
+								let-search='searchTerm',
+								let-index='index'
+							)
+								span.sup-option {{ item.name }}
+								br
+								span.sub-option {{ item.accountId }}
+
+						div(*ngIf='selectedAccount')
+							.subTextAmount(*ngIf='selectedAccount.balance >= 0')
+								p Available Balance:
+									b &nbsp; Rs. {{ selectedAccount.balance.toFixed(2) }} /-
+
+			.form-group(*ngIf='merchantId && enablePayeeValidation')
+				.col-sm-12.col-md-6.col-lg-6
+					label.font-weight-bold.text-black(for='costPerValidation') 
+						| Cost per Validation (in ₹) 
+					input#frm-cntrl-email.form-control.form-control-sm(
+						type='number',
+						placeholder='Enter the cost to be deduced in each payee validation.',
+						formControlName='costPerValidation',
+						autocomplete='off'
+					)
+			.form-group(*ngIf='merchantId && enablePayeeValidation')
+				.col-sm-12.col-md-6.col-lg-6
+					label.font-weight-bold.text-black(for='minPercentageMatch') 
+						| Percentage Match Required (in %) 
+					input#frm-cntrl-email.form-control.form-control-sm(
+						type='number',
+						placeholder='Percentage match required to validate the account holder name.',
+						formControlName='minPercentageMatch',
+						autocomplete='off'
+					)
+			.form-group(*ngIf='merchantId && enablePayeeValidation')
+				.col-sm-12.col-md-6.col-lg-6
+					label.font-weight-bold.text-black
+						| Enter Email for notification
+					input#frm-cntrl-email.form-control.form-control-sm(
+						type='email',
+						placeholder='Enter email addresses that will receive email notifications regarding Deposits and Transfers in the account (You can enter multiple email addresses separated by a comma.)',
+						formControlName='idfcEmail',
+						[class.is-valid]='idfcEmailControlValid',
+						[class.is-invalid]='idfcEmailControlInvalid',
+						autocomplete='off'
+					)
+					.invalid-feedback(*ngIf='idfcEmailControl.hasError("required")')
+						| Email is required
+					.invalid-feedback(
+						*ngIf='idfcEmailControl.hasError("idfcEmailValidationError")'
+					)
+						| Email {{ invalidEmails.join(", ") }} is not valid.
+			br
+			.form-group(*ngIf='merchantId')
+				.col-sm-12.col-md-6.col-lg-6
+					label.font-weight-bold.text-black
+						| Bulk Payee Transfer
+					.row
+						.col-sm-12.col-md-9.col-lg-9
+							label(for='isBulkPayeeEnabled') 
+								| Enable Bulk Transfer to Registered Payees
+						.col-sm-12.col-md-3.col-lg-3
+							input#escrowPagePG(
+								type='checkbox',
+								#checkbox,
+								name='isBulkPayeeEnabled',
+								formControlName='isBulkPayeeEnabled',
+								(change)='updateCheckBoxVal("isBulkPayeeEnabled", $event)' 
+							)
+		br 
+		.form-group(*ngIf='merchantId')
+			.col-sm-12.col-md-6.col-lg-6(*ngIf='hasBank("rbl") || hasBank("axis")')
+				label.font-weight-bold.text-black
+					| UPI
+				.row
+					.col-sm-12.col-md-9.col-lg-9
+						label(for='upiEnabledCheckbox') 
+							| Enable UPI Collection
+					.col-sm-12.col-md-3.col-lg-3
+						input#isAccAddCheckbox(
+							type='checkbox',
+							#checkbox,
+							name='upiEnabledCheckbox',
+							formControlName='upiEnabledCheckbox',
+							(change)='updateCheckBoxVal("upiEnabledCheckbox", $event)' 
+						)
+				.row(*ngIf='upiCollectEnabled')
+					.col-sm-12.col-md-9.col-lg-9
+						label(for='vpaCount') 
+							| Enter number of vpa
+					.col-sm-12.col-md-3.col-lg-3
+						select#vpaCount-of-operation.form-control.form-control-sm(
+							formControlName='vpaCount',
+							[(ngModel)]='vpaCount'
+						)
+							option(value='5') 5
+							option(value='10') 10
+							option(value='20') 25
+							option(value='50') 50
+							option(value='100') 100
+				.row(*ngIf='upiCollectEnabled')
+					.col-sm-12.col-md-9.col-lg-9
+						label(for='mccCode') 
+							| MCC code
+					.col-sm-12.col-md-3.col-lg-3
+						input#mccCode(type='text' name='mccCode' formControlName='mccCode')
+				.row.mt-3
+					.col-sm-12.col-md-9.col-lg-9
+						label(for='upiPayoutCheckbox') 
+							| Enable UPI Payout
+					.col-sm-12.col-md-3.col-lg-3
+						input#isAccAddCheckbox(
+							type='checkbox',
+							#checkbox,
+							name='upiPayoutCheckbox',
+							formControlName='upiPayoutEnabledCheckbox'
+						)
+
+		br
+		.form-group(*ngIf='merchantId && hasBank("rbl") && upiCollectEnabled')
+			.col-sm-12.col-md-6.col-lg-6
+				label.font-weight-bold.text-black
+					| Escrow QR
+				.row
+					.col-sm-12.col-md-9.col-lg-9
+						label(for='escorwQRCheckBox') 
+							| Enable Escrow QR
+					.col-sm-12.col-md-3.col-lg-3
+						input(
+							type='checkbox',
+							#checkbox,
+							name='escrowQRCheckBox',
+							formControlName='escrowQRCheckBox',
+							(change)='updateCheckBoxVal("escrowQRCheckBox", $event)' 
+						)
+		.form-group(*ngIf='merchantId && (hasBank("icici") || hasBank("idfc"))')
+			.col-sm-12.col-md-6.col-lg-6
+				label.font-weight-bold.text-black
+					| Source Account Validation
+				.row
+					.col-sm-12.col-md-9.col-lg-9
+						label(for='sourceAccountValidation') 
+							| Enable Source Account Validation
+					.col-sm-12.col-md-3.col-lg-3
+						input(
+							type='checkbox',
+							#checkbox,
+							name='sourceAccountValidation',
+							formControlName='sourceAccountValidation',
+							(change)='updateCheckBoxVal("sourceAccountValidation", $event)' 
+						)
+
+		.form-group
+			.col-sm-12.col-md-6.col-lg-6
+				label.font-weight-bold.text-black
+					| Reports Section
+				.row
+					.col-sm-12.col-md-9.col-lg-9
+						label(for='reportSectionEnabled') 
+							| Enable Report Section 
+					.col-sm-12.col-md-3.col-lg-3
+						input(
+							type='checkbox',
+							#checkbox,
+							name='reportSectionEnabled',
+							formControlName='reportSectionEnabled',
+							(change)='updateCheckBoxVal("reportSectionEnabled", $event)' 
+						)
+
+		.form-group(*ngIf='merchantId')
+			.col-sm-12.col-md-6.col-lg-6
+				label.font-weight-bold.text-black
+					| Payee Additon with Trustee Approval 
+				.row
+					.col-sm-12.col-md-9.col-lg-9
+						label(for='payeeAdditionWithTrusteeApproval') 
+							| Enable Payee Addition with Trustee Approval
+					.col-sm-12.col-md-3.col-lg-3
+						input(
+							type='checkbox',
+							#checkbox,
+							name='payeeAdditionWithTrusteeApproval',
+							formControlName='payeeAdditionWithTrusteeApproval',
+							(change)='updateCheckBoxVal("payeeAdditionWithTrusteeApproval", $event)' 
+						)
+			.row.ml-2(*ngIf='settingsForm.get("payeeAdditionWithTrusteeApproval").value')
+				.col-sm-12.col-md-9.col-lg-9
+					input.mr-2(
+						type='radio',
+						name='payeeAuthorizerWithOTP',
+						formControlName='payeeAuthorizerWithOTP',
+						[value]='true',
+						(change)="updateRadioBoxVal('withOTP',$event)"
+					)
+					|
+					label(for='frm-cntrl-cb') With OTP 
+				.col-sm-12.col-md-9.col-lg-9
+					input.mr-2(
+						type='radio',
+						name='payeeAuthorizerWithOTP',
+						formControlName='payeeAuthorizerWithOTP',
+						[value]='false',
+						(change)="updateRadioBoxVal('withoutOTP',$event)"
+					)
+					|
+					label(for='frm-cntrl-cb') Without OTP 
+		br
+		.form-group
+			button.btn.castlerButtonColor((click)='onSubmit()', *ngIf='merchantId') Update
+			span &nbsp;&nbsp;
+			button.btn.castlerButtonColor(
+				(click)='sendOTP()',
+				*ngIf='merchantId && !activated && caFile'
+			)
+				span Activate Merchant
+ngx-spinner
+	p(style = 'font-size: 20px; color: white') Processing. Please wait... 

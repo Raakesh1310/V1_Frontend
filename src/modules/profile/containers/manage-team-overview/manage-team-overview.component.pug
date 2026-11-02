@@ -1,0 +1,10 @@
+sbpro-dashboard-head(
+  icon='book',
+  title='Manage Teams',
+  description='Manage your team here.'
+)
+.container-fluid.mt-n10.responsiveForm
+  sbpro-card
+    .card-header(class='logoColor') Manage Team
+    .card-body
+      sbpro-manage-team([isAdmin]='false')

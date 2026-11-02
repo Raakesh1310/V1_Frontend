@@ -1,0 +1,519 @@
+sbpro-card(*ngIf='innerWidth > 600', [headerActions]='true')
+	.card-header(*ngIf='isModal')
+		| Preview Page
+		button.btn.btn-icon.btn-link.btn-xl.castlerButtonColor1((click)='closer()')
+			i-feather(name='x-circle')
+	.card-body.main.p-0.m-0(style='height:100%')
+		//- .row.header-row
+		//-   .col-lg-4.col-md-4.col-sm-12
+		//-     img.logo([src]='escrowPage.logo' alt='Business Logo' height='50vh') 
+		//-   .col-lg-8.col-md-8.col-sm-12.bussiness-name
+		//-     span {{ escrowPage.businessName }}
+		.container.m-0.p-0(style='height:100%; max-width:100%;')
+			.row.m-0.p-0(style='height:100%; width:100%;') 
+				.col-sm(style='height:100%; padding: 0% 5%; overflow:auto;')
+					.header-row(style='padding-top: 5%')
+						.col-lg-4.col-md-4.col-sm-12
+							img.logo(
+								src='https://myescrow.castler.com/assets/img/Castler_logo.png',
+								alt='Castler Logo',
+								height='50vh'
+							)
+					.opacity.no-scroll(style='padding-top: 10%')
+						.card-body
+							.form-group.title {{ escrowPage.title }}
+								.mt-2(style='height:8px; width:100px; background:#FF9900')
+							form
+								.form-group(*ngFor='let field of productFields')
+									label.label.p-0(style='font-size:25px') {{ field.label }}
+									div(
+										*ngIf='!field.label.includes("Amount")',
+										style='font-size:25px;'
+									) {{ field.value }}
+									div(
+										*ngIf='field.label.includes("Amount")',
+										style='font-size:25px;'
+									) ₹ {{ field.value }}
+				.col-sm(
+					*ngIf='!paymentSuccessful && !paymentFailed && !paymentPending && !loading',
+					style='background:#02042B; height:100%; padding: 0% 5%; overflow:auto;'
+				)
+					.header-row(style='padding-top: 7%; color:white;')
+						.col-lg-8
+							img.logo(src='/assets/img/person-icon-png-transparent.png' alt='Business Logo' height='50vh')
+							span.bussiness-name.float-right(
+								style='color:white;position:absolute; right:-140px'
+							)
+								h3.text-white {{ escrowPage.businessName }}
+						//- .col-lg-8.col-md-8.col-sm-12.bussiness-name.float-right
+						//-   span(style='color:white;')
+							h3.text-white {{ escrowPage.businessName }}
+					.col-sm(style='padding-top: 5%; padding-bottom: 5%;')
+						div(style='border-radius: 25px; background: #222346; color: white; ')
+							h2.pl-4.pt-5(style='color:white;') PAYMENT DETAILS
+							form.pt-2.pl-5([formGroup]='paymentDetailsForm' action='') 
+								.row
+									.form-group(style='width:90%')
+										label(for='account') Select Escrow Name
+										span.text-danger *
+										br
+										ng-select(
+											[items]='accounts',
+											bindLabel='name',
+											[(ngModel)]='selectedAccount',
+											[ngModelOptions]='{ standalone: true }',
+											loadingText='Loading...',
+											placeholder='Enter Escrow Name',
+											(change)='updateAccount()',
+											(search)='searchAccount($event.term)',
+											name='account'
+										)
+											ng-template(ng-label-tmp='' let-item='item')
+												//- span(*ngIf='selectedAccount') {{ item.bank.accountNumber }}
+												span(*ngIf='selectedAccount') {{ item.itemName }}
+											ng-template(
+												ng-option-tmp='',
+												let-item='item',
+												let-search='searchTerm',
+												let-index='index'
+											)
+												//- span.sup-option {{ item.bank.accountNumber }}
+												span.sup-option {{ item.itemName }}
+										span(*ngIf='accountError')
+											span.text-danger {{ accountError }}
+								.row
+									.form-group(style='width:90%')
+										label(for='amount') Amount
+										span.text-danger *
+										br
+										input#amount(
+											type='number',
+											[(ngModel)]='amount',
+											placeholder='Enter amount',
+											formControlName='amount',
+											autocomplete='off',
+											style='width:100%; border-radius:4px',
+											(change)='setButtonText()',
+											name='amount'
+										)
+										span(*ngIf='amountError')
+											span.text-danger {{ amountError }}
+								.row
+									.form-group(style='width:90%')
+										label(for='name') Name
+										span.text-danger *
+										br
+										input#name(
+											type='name',
+											placeholder='Enter name',
+											formControlName='name',
+											autocomplete='off',
+											style='width:100%',
+          									(keydown)='utilityService.onlyAlphaNumeric($event)'
+										)
+										span(*ngIf='nameError')
+											span.text-danger {{ nameError }}
+								.row
+									.form-group(style='width:90%')
+										label(for='email') Email
+										span.text-danger *
+										br
+										input#email(
+											type='email',
+											placeholder='Email',
+											formControlName='email',
+											autocomplete='off',
+											style='width:100%',
+											(change)='validateEmail()'
+										)
+										span(*ngIf='emailError')
+											span.text-danger {{ emailError }}
+								.row
+									.form-group(style='width:90%')
+										label(for='mobile') Mobile Number
+										span.text-danger *
+										br
+										input#mobile(
+											type='number',
+											placeholder='Enter mobile number',
+											formControlName='mobile',
+											autocomplete='off',
+											style='width:100%',
+											(change)='validateMobile()',
+          									(keydown)='validateKeyDownMobile($event)'
+										) 
+										span(*ngIf='mobileError')
+											span.text-danger {{ mobileError }}
+								.row(
+									*ngFor='let field of customerFields.fields.slice(4); index as i'
+								)
+									.form-group(style='width:90%')
+										label.label {{ field.label }}
+										span(*ngIf='field.required').text-danger *
+										br
+										input(
+											type='{{ field.type }}',
+											placeholder='{{ field.label }}',
+											autocomplete='off',
+											style='width:100%',
+											(change)='addValue($event)',
+          									(keydown)='utilityService.onlyAlphaNumeric($event)'
+										) 
+										span(*ngIf='field.type === "pan" && panError')
+											span.text-danger {{ panError }}
+										span(*ngIf='field.type === "aadhaar" && aadhaarError')
+											span.text-danger {{ aadhaarError }}
+										span(*ngIf='field.type === "custom" && customError')
+											span.text-danger {{ customError }}
+								.row
+									.pr-5.mr-2(style='width:100%')
+										.form-group.float-right
+											sbpro-app-button(
+												*ngIf='amount',
+												(click)='submit()',
+												text='Pay ₹ {{amount}}',
+												loadingText='Loading...',
+												[disabled]='updating',
+												[loading]='updating',
+												[btnClass]='{ "btn-block": false, "btn-primary": true, "btn-md": true }'
+											) Pay ₹ {{ amount }}
+											sbpro-app-button(
+												*ngIf='!amount',
+												(click)='submit()',
+												text='Pay ₹ {{amount}}',
+												[disabled]='updating',
+												loadingText='Loading...',
+												[loading]='updating',
+												[btnClass]='{ "btn-block": false, "btn-primary": true, "btn-md": true }'
+											) Pay ₹ 0.00
+				.col-sm(
+					*ngIf='paymentSuccessful || paymentFailed || paymentPending',
+					style='background:#02042B; height:100%; padding: 0% 5% 10% 5%;'
+				)
+					.header-row(style='padding-top: 5%; color:white;')
+						.col-lg-8
+							img.logo(src='/assets/img/person-icon-png-transparent.png' alt='Business Logo' height='50vh')
+							span.bussiness-name.float-right(
+								style='color:white;position:absolute; right:-140px'
+							)
+								h3.text-white {{ escrowPage.businessName }}
+					.col-sm(style='padding-top: 10%;')
+						div(
+							style='border-radius: 25px; background: #222346; color: white; height: 100%; width: 100%'
+						)
+							div(style='padding:5%; text-align:center;')
+								div(style='color:white; font-size:20px; font-weight:700px;')
+									img(
+										*ngIf='paymentSuccessful',
+										src='/assets/img/success.gif',
+										alt='success',
+										width='100',
+										height='100',
+										style='border-radius:50%; margin-bottom:5%'
+									)
+									img(
+										*ngIf='paymentFailed',
+										src='/assets/img/failed.gif',
+										alt='success',
+										width='100',
+										height='100',
+										style='border-radius:50%; margin-bottom:5%'
+									)
+									img(
+										*ngIf='!paymentSuccessful && !paymentFailed && paymentPending',
+										src='/assets/img/pending.gif',
+										alt='success',
+										width='100',
+										height='100',
+										style='border-radius:50%; margin-bottom:5%'
+									)
+									h1(*ngIf='paymentSuccessful || paymentFailed || !paymentPending' style='color:white; font-size:50px; font-weight:900px;') ₹ {{ amount }}
+									h1(
+										*ngIf='paymentSuccessful',
+										style='color:white; font-size:40px; font-weight:800px;'
+									) Payment Successful
+									h1(
+										*ngIf='paymentFailed',
+										style='color:white; font-size:40px; font-weight:800px;'
+									) Payment Failed
+									h1(
+										*ngIf='!paymentSuccessful && !paymentFailed && paymentPending',
+										style='color:white; font-size:40px; font-weight:800px;'
+									) Pending
+									br
+									p(*ngIf='paymentSuccessful') Your payment Id: {{ paymentId }}
+									p(*ngIf='paymentFailed') Your order Id: {{ orderId }}
+									p(*ngIf='!paymentSuccessful && !paymentFailed && paymentPending') Your order Id: {{ orderId }}
+									//- p A confirmation email has been sent to you.
+			.card-footer(*ngIf='isModal')
+				button.modalBtn.btn.float-right.castlerButtonColor((click)='genLink()') Generate Link
+				button.modalBtn.btn.btn-link.float-right.castlerButtonColor1(
+					(click)='closer()'
+				) Edit
+//- sbpro-card(*ngIf='innerWidth <= 600')
+//-   .card-body.main.p-0.m-0(style='height:100%; background:#02042B; color:white;')
+//-     .card-header
+//-       .header-row(style='padding-top: 5%; color:white;')
+//-         .col-lg-4.col-md-4.col-sm-12.float-left
+//-           img.logo([src]='escrowPage.logo' alt='Business Logo' height='50vh')
+//-         .col-lg-8.col-md-8.col-sm-12.bussiness-name.float-right
+//-           span(style='color:white;') {{ escrowPage.businessName }}
+//-     .text-center
+//-       .form-group.title {{ escrowPage.title }}
+//-         .ml-2.mt-2.center(style='height:8px; width:100px; background:#FF9900')
+//-           form.text-center
+//-             .form-group(*ngFor='let field of productFields')
+//-               label.label.p-0(style='font-size:25px') {{ field.label }}
+//-               div(*ngIf='!field.label.includes("Amount")' style='font-size:25px;') {{ field.value }}
+//-               div(*ngIf='field.label.includes("Amount")' style='font-size:25px;') ₹ {{ field.value }}
+div(
+	*ngIf='innerWidth <= 600 && view === 1 && !isLoading',
+	style='height:91%; background:#02042B; color:white; overflow:auto;',
+	[style.max-width.px]='innerWidth'
+)
+	.container.p-0.m-0(style='height:100%; max-width:100%;')
+		.row.p-0.m-0
+			.col.p-0.m-0
+				img.float-left.logo(
+					src='https://myescrow.castler.com/assets/img/Castler_logo.png',
+					alt='Castler Logo',
+					height='40vh'
+				)
+			.col.p-0.m-0
+				span.mt-2.mr-2.float-right(style='color:white;') {{ escrowPage.businessName }}
+				img.mt-2.logo(src='/assets/img/person-icon-png-transparent.png' alt='Business Logo' height='38vh')
+		.pt-5.pr-4.pl-4
+			.form-group(style='text-weight:500px; ')
+				h3.text-white {{ escrowPage.title }}
+				.mt-2(style='height:8px; width:100px; background:#FF9900')
+			.form-group(*ngFor='let field of productFields')
+				label.label.p-0(style='font-size:16px; font-weight:bold !important') {{ field.label }}
+				div(*ngIf='!field.label.includes("Amount")' style='font-size:14px;') {{ field.value }}
+				div(*ngIf='field.label.includes("Amount")' style='font-size:14px;') ₹ {{ field.value }}
+			.form-group.pt-5.pb-2
+				label(style='font-size:15px') Terms & conditions
+				p
+					small
+						small(style='font-weight:400px') You agree to share information on this page with {{ escrowPage.businessName }} & Castler, adhering to applicable laws.
+		div
+			button.btn.btn-primary(
+				style='border-radius:0px; height: 60px; width: 100%; position: absolute; bottom: 0px; left: 0px;',
+				(click)='nextView()'
+			) Next
+div(
+	*ngIf='innerWidth <= 600 && view === 2 && !isLoading',
+	style='min-height:100%; height:auto; background:#02042B; color:white;',
+	[style.max-width.px]='innerWidth'
+)
+	.container.p-0.m-0(style='height:auto; max-width:100%;')
+		.row.p-0.m-0
+			.col.p-0.m-0
+				img.float-left.logo(
+					src='https://myescrow.castler.com/assets/img/Castler_logo.png',
+					alt='Castler Logo',
+					height='40vh'
+				)
+			.col.p-0.m-0
+				span.mt-2.mr-2.float-right(style='color:white;') {{ escrowPage.businessName }}
+				img.mt-2.logo(src='/assets/img/person-icon-png-transparent.png' alt='Business Logo' height='38vh')
+		.col-sm.pt-2(
+			*ngIf='!paymentSuccessful && !paymentFailed && !paymentPending && !loading',
+			style='padding:10% 2%'
+		)
+			//- div(style='border-radius: 15px; background: #222346; color: white;')
+			div 
+				div(
+					style='display:inline-block; position:absolute; left: 25px; top: 23px'
+				)
+					a(type='text/html' target='_blank', (click)='prevView()')
+						fa-icon([icon]='["fas", "arrow-left"]')
+				div(style='display:inline-block;')
+					h3.pt-3(style='color:white; padding-left: 50px') PAYMENT DETAILS
+			form.pt-2.pl-4(
+				[formGroup]='paymentDetailsForm',
+				action='',
+				style='overflow:auto;'
+			) 
+				.row.mr-0
+					.form-group(style='width:97%')
+						label(for='account' style='font-size:14px;') Select Escrow
+						span.text-danger *
+						br
+						ng-select(
+							[items]='accounts',
+							bindLabel='name',
+							[(ngModel)]='selectedAccount',
+							[ngModelOptions]='{ standalone: true }',
+							loadingText='Loading...',
+							placeholder='Enter Escrow Name',
+							(change)='updateAccount()',
+							(search)='searchAccount($event.term)',
+							name='account'
+						)
+							ng-template(ng-label-tmp='' let-item='item')
+								span(*ngIf='selectedAccount') {{ item.itemName }}
+							ng-template(
+								ng-option-tmp='',
+								let-item='item',
+								let-search='searchTerm',
+								let-index='index'
+							)
+								span.sup-option {{ item.itemName }}
+				.row.mr-0
+					.form-group(style='width:97%')
+						label(for='amount') Amount
+						span.text-danger *
+						br
+						input#amount(
+							type='number',
+							[(ngModel)]='amount',
+							placeholder='Enter amount',
+							formControlName='amount',
+							autocomplete='off',
+							style='width:100%; border-radius:4px',
+							(change)='setButtonText()',
+							name='amount'
+						) 
+				.row.mr-0
+					.form-group(style='width:97%')
+						label(for='name') Name
+						span.text-danger *
+						br
+						input#name(
+							type='name',
+							placeholder='Enter name',
+							formControlName='name',
+							autocomplete='off',
+							style='width:100%'
+						)
+						span(*ngIf='nameError')
+							span.text-danger {{ nameError }}
+				.row.mr-0
+					.form-group(style='width:97%')
+						label(for='email') Email
+						span.text-danger *
+						br
+						input#email(
+							type='email',
+							placeholder='Email',
+							formControlName='email',
+							autocomplete='off',
+							style='width:100%',
+							(change)='validateEmail()'
+						)
+						span(*ngIf='emailError')
+							span.text-danger {{ emailError }}
+				.row.mr-0
+					.form-group(style='width:97%')
+						label(for='mobile') Mobile Number
+						span.text-danger *
+						br
+						input#mobile(
+							type='number',
+							placeholder='Mobile',
+							formControlName='mobile',
+							autocomplete='off',
+							style='width:100%',
+							(change)='validateMobile()'
+						) 
+						span(*ngIf='mobileError')
+							span.text-danger {{ mobileError }}
+				.row.mr-0(*ngFor='let field of customerFields.fields.slice(4)')
+					.form-group(style='width:97%')
+						label.label {{ field.label }}
+						span(*ngIf='field.required').text-danger *
+						br
+						input#mobile(
+							type='{{ field.type }}',
+							placeholder='{{ field.label }}',
+							autocomplete='off',
+							style='width:100%',
+							(change)='addValue($event)'
+						) 
+						span(*ngIf='field.type === "pan" && panError')
+							span.text-danger {{ panError }}
+						span(*ngIf='field.type === "aadhaar" && aadhaarError')
+							span.text-danger {{ aadhaarError }}
+		.row.m-0(
+			*ngIf='!paymentSuccessful && !paymentFailed && !paymentPending && !loading',
+			style='padding-top:20px; padding-bottom:20px;'
+		)
+			sbpro-app-button(
+				*ngIf='amount',
+				(click)='submit()',
+				loadingText='Loading...',
+				[disabled]='updating',
+				text='Pay ₹ {{amount}}',
+				[loading]='updating',
+				[btnClass]='{ "btn-block": false, "btn-primary": true, "btn-md": true }'
+			) Pay ₹ {{ amount }}
+			sbpro-app-button(
+				*ngIf='!amount',
+				(click)='submit()',
+				loadingText='Loading...',
+				[disabled]='updating',
+				text='Pay ₹ {{amount}}',
+				[loading]='updating',
+				[btnClass]='{ "btn-block": false, "btn-primary": true, "btn-md": true }'
+			) Pay ₹ 0.00
+		.col-sm.pt-2(
+			*ngIf='paymentSuccessful || paymentFailed || paymentPending',
+			style='padding:10% 5%'
+		)
+			//- .mt-5(
+			//-   style='border-radius: 15px; background: #222346; color: white; height: 100%; width: 100%'
+			//- )
+			div(style='padding:5%; text-align:center;')
+				div(
+					style='color:white; font-size:18px; font-weight:700px; margin-top:20%;'
+				)
+					img(
+						*ngIf='paymentSuccessful',
+						src='/assets/img/success.gif',
+						alt='success',
+						width='75',
+						height='75',
+						style='border-radius:50%; margin-bottom:5%'
+					)
+					img(
+						*ngIf='paymentFailed',
+						src='/assets/img/failed.gif',
+						alt='success',
+						width='75',
+						height='75',
+						style='border-radius:50%; margin-bottom:5%'
+					)
+					img(
+						*ngIf='!paymentSuccessful && !paymentFailed && paymentPending',
+						src='/assets/img/pending.gif',
+						alt='success',
+						width='75',
+						height='75',
+						style='border-radius:50%; margin-bottom:5%'
+					)
+					h1(*ngIf='paymentSuccessful || paymentFailed || !paymentPending' style='color:white; font-size:50px; font-weight:900px;') ₹ {{ amount }}
+					h1(
+						*ngIf='paymentSuccessful',
+						style='color:white; font-size:40px; font-weight:800px;'
+					) Payment Successful
+					h1(
+						*ngIf='paymentFailed',
+						style='color:white; font-size:40px; font-weight:800px;'
+					) Payment Failed
+					h1(
+						*ngIf='!paymentSuccessful && !paymentFailed && paymentPending',
+						style='color:white; font-size:40px; font-weight:800px;'
+					) Pending
+					br
+					p(*ngIf='paymentSuccessful') Your payment Id: {{ paymentId }}
+					p(*ngIf='paymentFailed') Your order Id: {{ orderId }}
+					p(*ngIf='!paymentSuccessful && !paymentFailed && paymentPending') Your order Id: {{ orderId }}
+					//- p A confirmation email has been sent to you.
+	.row.m-0(
+		*ngIf='paymentSuccessful || paymentFailed || paymentPending',
+		style='height:10%; max-width:100%; background:#02042B;'
+	)
+ngx-spinner
+	p(style='font-size: 20px; color: white') Processing...
+
+

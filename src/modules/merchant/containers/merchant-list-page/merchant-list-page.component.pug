@@ -1,0 +1,17 @@
+.flex-container
+  sbpro-dashboard-head(
+    icon='minimize-2',
+    title='Merchants',
+    description='Manage Merchants Here'
+  )
+  .container-fluid.mt-n10.flex-grow-1
+    sbpro-card-navigation(
+      sbproTocItem='Tabs',
+      [navNames]='["All Merchants", "IDFC Merchants"]',
+      [templates]='[all,idfc]',
+      [headerButtons]='[4]',
+    )
+      ng-template(#all)
+        sbpro-merchant-table([pageSize]='4',[idfc]='false')
+      ng-template(#idfc)
+        sbpro-merchant-table([pageSize]='4', [idfc]='true')

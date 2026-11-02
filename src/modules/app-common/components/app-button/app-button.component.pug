@@ -1,0 +1,12 @@
+button#input.btn(
+  [ngClass]='btnClass',
+  [disabled]='disabled || loading',
+  [ngStyle]='{ "background-color": buttonColor, border: "none", color : "white" }'
+)
+  span.spinner-border.spinner-border-sm(
+    role='status',
+    aria-hidden='true',
+    *ngIf='loading'
+  )
+  span(*ngIf='loading') &nbsp; {{ loadingText }}
+  span(*ngIf='!loading') {{ text }}

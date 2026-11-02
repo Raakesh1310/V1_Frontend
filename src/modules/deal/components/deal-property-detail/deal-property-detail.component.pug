@@ -1,0 +1,80 @@
+div([class.hide]='currentTab !== 2')
+  form([formGroup]='dealDataForm')
+    .form-group
+      label Property Type
+      span.text-danger(*ngIf='!viewMode') *
+      select#propertType.form-control(
+        formControlName='propertyType',
+        *ngIf='!viewMode'
+      )
+        option Residential
+        option Industrial
+        option Commercial
+      span.form-control(
+        *ngIf='viewMode',
+        [ngClass]='{ "no-border": viewMode, "pl-0": viewMode }'
+      )
+        b {{ dealData.propertyType }}
+
+    .form-group
+      label Property Address
+      span.text-danger(*ngIf='!viewMode') *
+      input.form-control(
+        type='text',
+        formControlName='propertyAddress',
+        *ngIf='!viewMode'
+      )
+      span.form-control(
+        *ngIf='viewMode',
+        [ngClass]='{ "no-border": viewMode, "pl-0": viewMode }'
+      )
+        b {{ dealData.propertyAddress }}
+      span(
+        *ngIf='propertyAddress.invalid && (propertyAddress.dirty || propertyAddress.touched)'
+      )
+        span.text-danger(*ngIf='propertyAddress.errors.required') Property Address is required.
+
+    .form-group
+      label State
+      span.text-danger(*ngIf='!viewMode') *
+      input.form-control(type='text', formControlName='state', *ngIf='!viewMode')
+      span.form-control(
+        *ngIf='viewMode',
+        [ngClass]='{ "no-border": viewMode, "pl-0": viewMode }'
+      )
+        b {{ dealData.state }}
+
+      span(*ngIf='state.invalid && (state.dirty || state.touched)')
+        span.text-danger(*ngIf='state.errors.required') State is required.
+
+    .form-group
+      label City
+      span.text-danger(*ngIf='!viewMode') *
+      input.form-control(type='text', formControlName='city', *ngIf='!viewMode')
+      span.form-control(
+        *ngIf='viewMode',
+        [ngClass]='{ "no-border": viewMode, "pl-0": viewMode }'
+      )
+        b {{ dealData.city }}
+
+      span(*ngIf='city.invalid && (city.dirty || city.touched)')
+        span.text-danger(*ngIf='city.errors.required') City is required.
+
+    .form-group
+      label Pincode
+      span.text-danger(*ngIf='!viewMode') *
+      input.form-control(type='number', formControlName='pinCode', *ngIf='!viewMode')
+      span.form-control(
+        *ngIf='viewMode',
+        [ngClass]='{ "no-border": viewMode, "pl-0": viewMode }'
+      )
+        b {{ dealData.pinCode }}
+
+      span(*ngIf='pinCode.invalid && (pinCode.dirty || pinCode.touched)')
+        span.text-danger(*ngIf='pinCode.errors.required') Pincode is required.
+        span.text-danger(*ngIf='pinCode.dirty') Pincode should have 6 digits
+
+    .form-group(*ngIf='viewMode') 
+      button.btn((click)='goBack()', class='castlerButtonColor') Back
+    .form-group(*ngIf='!viewMode')
+      button.btn((click)='submitPropertyDetail()', class='castlerButtonColor') {{ tabCount == 2 && !isEditDeal ? "Next" : "Update" }}

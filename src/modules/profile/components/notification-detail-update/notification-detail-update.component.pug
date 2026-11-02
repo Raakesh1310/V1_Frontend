@@ -1,0 +1,50 @@
+sbpro-card([headerActions]='true')
+  .card-header
+    | {{ header }}
+    button.btn.btn-icon.btn-link.btn-xl((click)='closer()', class='castlerButtonColor')
+      i-feather(name='x-circle')
+  .card-body
+    div(*ngIf='errors')
+      sbpro-alert(classes='alert-danger', [dismissable]='true')
+        | {{ errors[0] }}
+    div(*ngIf='!otpsent')
+      center
+        h5 Enter your new mobile number here
+        h6 You will have to verify this number with an OTP.
+
+      .form-group
+        label {{ message }}
+        input.form-control.form-control-sm(
+          [type]='type === "email" ? "email" : "number"',
+          [placeholder]='placeholder',
+          required,
+          #defInput,
+          [readonly]='otpsent'
+        ) 
+    div(*ngIf='otpsent')
+      center
+        h5 An SMS with 4-digit OTP has been sent on "{{ updatedMobile }}"
+      .form-group(*ngIf='otpsent')
+        label Enter OTP
+        input#otp.form-control.form-control-sm(
+          type='number',
+          placeholder='Enter OTP recieved',
+          required,
+          #otp
+        ) 
+      span(*ngIf='otpsent') Didn't receive an OTP? &nbsp;
+        span((click)='resendOTP()', [class.linker]='!timer') Resend
+        span(*ngIf='timer') ({{ counter }})
+  .card-footer
+    button.btn.btn-primary.float-right(
+      type='button',
+      *ngIf='!otpsent',
+      class='castlerButtonColor',
+      (click)='sendOTP()'
+    ) Update
+    button.btn.btn-primary.float-right(
+      type='button',
+      *ngIf='otpsent',
+      (click)='update()',
+      class='castlerButtonColor'
+    ) Confirm

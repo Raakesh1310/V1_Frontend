@@ -1,0 +1,16 @@
+{
+  "angularCompilerOptions": {
+    "enableIvy": true,
+    "fullTemplateTypeCheck": true,
+    "preserveWhitespaces": false,
+    "strictInjectionParameters": true
+  },
+  "compileOnSave": false,
+  "compilerOptions": {
+    "module": "commonjs",
+    "target": "es5",
+    "noImplicitAny": false,
+    "sourceMap": false,
+    "typeRoots": ["../node_modules"]
+  }
+}

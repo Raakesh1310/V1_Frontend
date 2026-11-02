@@ -1,0 +1,6 @@
+@import 'styles/variables.scss';
+@media print {
+  .noprint {
+    display: none;
+  }
+}

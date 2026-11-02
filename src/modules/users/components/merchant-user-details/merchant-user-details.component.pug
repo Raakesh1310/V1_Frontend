@@ -1,0 +1,131 @@
+div([headerActions]='true')
+	.row.align-items-stretch
+		div
+			form.pb-2
+				.d-flex.mb-2
+					//- input#search-box.mt-1.form-control.w-100.mr-2(
+					//- 	placement='top',
+					//- 	ngbPopover='Search by merchantUser Name, Email ID, Business Name, Mobile No.',
+					//- 	type='text',
+					//- 	name='s',
+					//- 	autocomplete='off',
+					//- 	placeholder='Search by merchantUser Name, Email ID, Business Name, Mobile No.',
+					//- 	[(ngModel)]='merchantUserService.searchTerm'
+					//- )
+
+					input#start-date.mt-1.form-control.w-25.mr-2(
+						type='text',
+						name='sd',
+						placeholder='Start Date',
+						autocomplete='off',
+						ngbDatepicker,
+						outsideDays='hidden',
+						#sd='ngbDatepicker',
+						(click)='sd.toggle()',
+						[(ngModel)]='merchantUserService.dateFrom',
+						[minDate]='merchantUserService.dateFromMin',
+						[maxDate]='merchantUserService.dateFromMax'
+					)
+					input#end-date.mt-1.form-control.w-25.mr-2(
+						type='text',
+						name='ed',
+						placeholder='End Date',
+						autocomplete='off',
+						ngbDatepicker,
+						outsideDays='hidden',
+						#ed='ngbDatepicker',
+						(click)='ed.toggle()',
+						[(ngModel)]='merchantUserService.dateTo',
+						[minDate]='merchantUserService.dateToMin',
+						[maxDate]='merchantUserService.dateToMax'
+					)
+					button.btn.mr-2.ws-wrap.mt-1.mb-1.castlerButtonColor(
+						type='submit',
+						(click)='submitSearchForm()'
+					)
+						fa-icon.d-flex.flex-row.align-items-center(
+							[icon]='["fas", "search"]'
+						)
+					button.btn.btn-link.mr-2.logoColor(type='button', (click)='clearForm()') Clear
+					.justify-content-end 
+						a.btn.btn-success.mt-1.mb-1.mr-2.ws-nowrap.btn-icon(
+							type='button',
+							target='_blank',
+							[href]='merchantUserService.reportDownloadLink$ | async'
+						)
+							fa-icon.d-flex.flex-row.align-items-center(
+								[icon]='["fas", "arrow-down"]'
+							)
+				.d-flex(*ngIf='(merchantUsers$ | async)?.length > 0') 
+					.flex-row
+						small.mb-2.mt-2 Showing {{ (merchantUserService.page - 1) * 10 + 1 }} to {{ (merchantUserService.page - 1) * 10 + (merchantUsers$ | async)?.length }} of {{ total$ | async }}
+		.table-responsive.pp-table-container.align-self-stretch.flex-grow-1.flex-stretch-1.table-striped(
+			*ngIf='(merchantUsers$ | async)?.length > 0 && !(loadingList$ | async)'
+		)
+			table.table
+				thead
+					tr
+						th.th-sticky-top(
+							scope='col',
+							sbSortable='event',
+							(sort)='onSort($event)'
+						)
+							span.ws-nowrap Merchant Id 
+						th.th-sticky-top(
+							scope='col',
+							sbSortable='event',
+							(sort)='onSort($event)'
+						)
+							span.ws-nowrap Merchant Name 
+						th.th-sticky-top(
+							scope='col',
+							sbSortable='event',
+							(sort)='onSort($event)'
+						)
+							span.ws-nowrap Roles 
+						th.th-sticky-top(
+							scope='col',
+							sbSortable='event',
+							(sort)='onSort($event)'
+						)
+							span.ws-nowrap Created At 
+				tbody
+					tr(*ngFor='let merchantUser of merchantUsers$ | async')
+						td
+							ngb-highlight(
+								[result]='merchantUser.merchantId',
+								[term]='merchantUserService.searchTerm'
+							)
+						td
+							ngb-highlight(
+								[result]='merchantUser?.merchant?.title',
+								[term]='merchantUserService.searchTerm'
+							)
+						td
+							ngb-highlight(
+								[result]='merchantUser?.rolesString',
+								[term]='merchantUserService.searchTerm'
+							)
+						td
+							ngb-highlight(
+								[result]='merchantUser.createdAtString',
+								[term]='merchantUserService.searchTerm'
+							)
+		.flex-container.flex-row(
+			*ngIf='(merchantUsers$ | async)?.length <= 0 && !(loadingList$ | async)'
+		)
+			.align-self-center No Data available
+		.flex-container.flex-row(*ngIf='loadingList$ | async')
+			.align-self-center Please wait...
+		.d-flex.justify-content-between.pt-2.align-self-end(
+			*ngIf='(merchantUsers$ | async)?.length > 0 && !(loadingList$ | async)'
+		)
+			ngb-pagination(
+				[collectionSize]='total$ | async',
+				[(page)]='merchantUserService.page',
+				[maxSize]='5',
+				[rotate]='true',
+				[ellipses]='false',
+				[boundaryLinks]='true'
+			)
+

@@ -1,0 +1,59 @@
+sbpro-card
+  .card-header(class='logoColor') Deposit Details
+
+  .flex-container.flex-row(*ngIf='!transaction && !(loadingData$ | async)')
+    .align-self-center No Data available
+  .flex-container.flex-row(*ngIf='!(loadingData$ | async)')
+    .align-self-center Please wait...
+
+  #print-section.card-body
+    form.details
+      .row
+        .col
+          .form-group
+            label Transaction ID
+            p {{ transaction?.transactionId || "--" }}
+          .form-group
+            label Escrow ID
+            p {{ transaction?.accountId || "--" }}
+          .form-group
+            label Escrow Name
+            p {{ transaction?.accountName || "--" }}
+          .form-group
+            label Amount
+            p ₹{{ transaction?.amount.toFixed(2) || "--" }}
+          .form-group
+            label Payment Mode
+            p {{ transaction?.paymentMode || "--" }}
+          .form-group
+            label UTR
+            p {{ transaction?.utr || "--" }}
+          .form-group
+            label Remarks
+            p {{ transaction?.remarks || "--" }}
+
+        .col
+          .form-group
+            label Remitter Name
+            p {{ transaction?.remitterName || "--" }}
+          .form-group
+            label Remitter Account Number
+            p {{ transaction?.remitterAccNumber || "--" }}
+          .form-group
+            label Remitter IFSC Code
+            p {{ transaction?.remitterIFSCCode || "--" }}
+          .form-group
+            label Date
+            p {{ getParsedDate(transaction?.updatedAt) || "--" }}
+          .form-group
+            label Bank Name 
+            p {{ transaction?.remitterBankName || "--" }}
+  .card-footer
+    button.btn((click)='goBack()', class='btn-light') Back
+    | &nbsp;&nbsp;&nbsp;&nbsp;
+    button.btn(
+      printSectionId='print-section',
+      ngxPrint,
+      class='castlerButtonColor',
+      [useExistingCss]='true'
+    ) Print

@@ -1,0 +1,112 @@
+.headingText {
+  font-family: Poppins, sans-serif;
+  font-style: normal;
+  font-weight: 600;
+  font-size: clamp(18px, 32px, 28px);
+  line-height: 1.2em;
+  letter-spacing: 0.02em;
+  color: #3E2808;
+}
+
+.background-color {
+  background-color: #FFFAF2;
+}
+
+.flex-display {
+  display: flex;
+  flex-direction: row;
+}
+
+#bottom {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+}
+
+.mobile-styling {
+  font-family: Poppins, sans-serif;
+  font-style: normal;
+  font-weight: 500;
+  font-size: clamp(1rem, -0.875vw + 8.333333vw, 1.1rem);
+  line-height: 25px;
+  letter-spacing: 0.02em;
+  color: rgba(62, 40, 8, 0.5);
+}
+
+.verificationTextStyling {
+  font-family: Poppins, sans-serif;
+  font-style: normal;
+  font-weight: 500;
+  font-size: 37.5582px;
+  line-height: 1.4em;
+  letter-spacing: 0.02em;
+  color: #3E2808;
+}
+
+.otpText {
+  font-family: Poppins, sans-serif;
+  font-style: normal;
+  font-weight: 500;
+  font-size: 12px;
+}
+
+.otpText2 {
+  font-family: Poppins, sans-serif;
+  font-style: normal;
+  font-weight: bold;
+  font-size: 16px;
+  letter-spacing: 0.02em;
+  color: #3E2808;
+}
+
+.emailStyle {
+  font-family: Poppins, sans-serif;
+  font-style: normal;
+  font-weight: 500;
+  font-size: 22px;
+  line-height: 37px;
+  letter-spacing: 0.02em;
+  color: #3E2808;
+}
+
+.myanchor {
+  text-decoration: none;
+}
+
+.continueBtn {
+  width: 120px;
+  height: 40px;
+  background: #F79A0E;
+  border-radius: 5.15696px;
+  color: white;
+  //border-color: #F79A0E;
+  box-shadow: 0px -1px 0px 2px rgba(239, 239, 239, 0.75);
+  -webkit-box-shadow: 0px -1px 0px 2px rgba(239, 239, 239, 0.75);
+  -moz-box-shadow: 0px -1px 0px 2px rgba(239, 239, 239, 0.75);
+}
+
+.createApplicationBtn {
+  max-width: 290px;
+  height: 40px;
+  background: #F79A0E;
+  color: white;
+  //border-color: #F79A0E;
+  border-radius: 117px;
+  box-shadow: 0px -1px 0px 2px rgba(239, 239, 239, 0.75);
+  -webkit-box-shadow: 0px -1px 0px 2px rgba(239, 239, 239, 0.75);
+  -moz-box-shadow: 0px -1px 0px 2px rgba(239, 239, 239, 0.75);
+}
+
+
+.arrowOrange {
+  fill: rgba(255, 92, 0, 0.6);
+}
+
+.arrowBlack {
+  fill: rgba(0, 0, 0, 0.28);
+}
+
+.vl {
+  border-left: 2px solid rgba(0, 0, 0, 0.25);
+  //height: 10px;
+}

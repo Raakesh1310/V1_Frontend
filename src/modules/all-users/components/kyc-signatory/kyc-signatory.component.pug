@@ -1,0 +1,102 @@
+form.details
+  .container-fluid
+    .row
+      .col-xl(*ngFor='let promoter of promoters; index as i')
+        .container.border.rounded.float-left.shadow-lg.p-3.mb-5.bg-white.rounded
+          .row.p-2
+            .col
+              label {{ businessType !== "Individual" ? i + 1 + "." : "" }} {{ promoter.name }}
+            //- .col(style='display: flex; justify-content: end')
+            //-   button.btn.btn-light.mr-3(type='button', *ngIf='promoter.edit',
+            //-     (click)='promoter.edit = false; checkForEdit()') Cancel
+            //-   button.btn((click)='promoter.edit = true; checkForEdit()', class='castlerButtonColor',
+            //-     *ngIf='!promoter.edit') Edit
+          hr
+          .row.p-2
+            .col.font-weight-bold Pan Number
+              div.input-group
+                input.non-editable.form-control(
+                  type='text',
+                  [(ngModel)]='promoter.pan',
+                  [readOnly]='!promoter.edit',
+                  [ngModelOptions]="{standalone: true}",
+                )
+                div.input-group-append.rounded-right(style='background: white;height: 42px')
+                  button.btn.castlerButtonColor(*ngIf='promoter.edit', (click)='verifyPan(promoter.pan,promoter)')
+                    | {{ promoter.panLoading ? "Verfying..." : "Verify" }}
+            .col.font-weight-bold(*ngIf='businessType != "Individual"')
+              div.d-flex
+                div(style='width: 100%') PAN
+                button.btn.btn-danger.btn-xs.mr-2(style='height: 20px', *ngIf='(promoter.edit && promoter.panFront)',
+                (click)='deleteKycDoc(promoter.panFront,"pan",promoter)') Delete
+                button.btn.castlerButtonColor.btn-xs(style='height: 20px', *ngIf='(promoter.edit && !promoter.panFront)',
+                  (click)='openPanSelectionBox(i)') Upload
+                //ng-container([ngTemplateOutlet] = 'alert', [ngTemplateOutletContext]="{promoter:promoter}")
+                input(
+                  #inputFilePan,
+                  type='file',
+                  [accept]='".png, .jpg, .pdf"',
+                  (click)="$event.target.value=null",
+                  (change)="helperCode($event,docType.pan,promoter)",
+                )
+              p
+                a(href="#", (click)='downloadFile($event, promoter.panFront, promoter.panImageName)', target='_blank', *ngIf='promoter.panFront') {{ promoter.panImageName }}
+          .row.p-2
+            .col.font-weight-bold Aadhaar Number
+              div.input-group
+                input.non-editable.form-control(
+                  [type]='promoter.edit ? "number" : "text"',
+                  [(ngModel)]='promoter.aadhar',
+                  [readOnly]='!promoter.edit',
+                  [ngModelOptions]="{standalone: true}",
+                )
+                div.input-group-append.rounded-right(style='background: white;height: 42px')
+                  button.btn.castlerButtonColor(*ngIf='promoter.edit', (click)='verifyAadhaar(promoter.aadhar, promoter)')
+                    | {{ promoter.aadhaarLoading ? "Verfying..." : "Verify" }}
+            .col.font-weight-bold(*ngIf='businessType != "Individual"')
+              div.d-flex
+                div(style='width: 100%') Aadhaar (front)
+                button.btn.btn-danger.btn-xs.mr-2(style='height: 20px', *ngIf='(promoter.edit && promoter.aadharFront)',
+                (click)='deleteKycDoc(promoter.aadharFront,"Ac_Front",promoter)') Delete
+                button.btn.castlerButtonColor.btn-xs(style='height: 20px', *ngIf='(promoter.edit && !promoter.aadharFront)',
+                (click)='openAadhaarFrontSelectionBox(i)') Upload
+                input(
+                  #inputFileAadhaarFront,
+                  type='file',
+                  [accept]='".png, .jpg, .pdf"',
+                  (click)="$event.target.value=null",
+                  (change)="helperCode($event,docType.aadharFront,promoter)",
+                )
+              p
+                a(href="#", (click)='downloadFile($event, promoter.aadharFront, promoter?.aadharFrontImageName)', target='_blank',
+                *ngIf='promoter.aadharFront') {{ promoter.aadharFrontImageName }}
+          .row.p-2(*ngIf='businessType != "Individual"')
+            .col
+            .col.font-weight-bold
+              div.d-flex
+                div(style='width: 100%') Aadhaar (back)
+                button.btn.btn-danger.btn-xs.mr-2(style='height: 20px', *ngIf='(promoter.edit && promoter.aadharBack)',
+                (click)='deleteKycDoc(promoter.aadharBack,"Ac_Back",promoter)',) Delete
+                button.btn.castlerButtonColor.btn-xs(style='height: 20px', *ngIf='(promoter.edit && !promoter.aadharBack)',
+                (click)='openAadhaarBackSelectionBox(i)') Upload
+                input(
+                  #inputFileAadhaarBack,
+                  type='file',
+                  [accept]='".png, .jpg, .pdf"',
+                  (click)="$event.target.value=null",
+                  (change)="helperCode($event,docType.aadharBack,promoter)",
+                )
+              p
+                a(href="#", (click)='downloadFile($event, promoter.aadharBack, promoter?.aadharBackImageName)', target='_blank',
+                *ngIf='promoter.aadharBack') {{ promoter.aadharBackImageName }}
+    div(style='display: flex; justify-content: start')
+      button.btn.castlerButtonColor((click)='patchKycData()', *ngIf='availableForEdit') Update
+
+//ng-template(#alert let-promoter='promoter')
+//    input(
+//        #inputFilePan,
+//        type='file',
+//        [accept]='".png, .jpg, .pdf"',
+//        (click)="$event.target.value=null",
+//        (change)="helperCode($event,docType.pan,promoter)",
+//    )

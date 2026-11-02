@@ -1,0 +1,25 @@
+@import 'styles/variables.scss';
+
+.light{
+    color: gray;
+}
+
+.setting{
+    cursor: pointer;
+    font-weight: 400;
+    font-size: medium;
+}
+
+.setting:hover{
+    color: rgb(11, 53, 194);
+    font-weight: 500;
+}
+
+.footer-title{
+    margin-left: 5%;
+    position: relative;
+}
+
+.sidenav-footer-content{
+    width: 100%;
+}

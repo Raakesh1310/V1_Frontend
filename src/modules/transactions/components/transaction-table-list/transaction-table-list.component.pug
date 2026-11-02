@@ -1,0 +1,177 @@
+sbpro-card(*ngIf='!showDetail', [headerActions]='true')
+  .card-header(class='logoColor')
+    span Deposit List
+
+  .card-body
+    form
+      .d-flex.mb-2
+        input#search-box.mt-1.form-control.mt-1.w-100.mr-2(
+          type='text',
+          name='s',
+          placement='top',
+          autocomplete='off',
+          ngbPopover='Search by Virtual ID, Transaction ID, Remitter name',
+          placeholder='Search by Virtual ID, Transaction ID, Remitter name',
+          [(ngModel)]='transactionService.searchTerm'
+        )
+
+        input#date-from.mt-1.form-control.w-25.mr-2(
+          type='text',
+          placeholder='Start Date',
+          name='dateFrom',
+          ngbDatepicker,
+          outsideDays='hidden',
+          autocomplete='off',
+          #dateFrom='ngbDatepicker',
+          (click)='dateFrom.toggle()',
+          [(ngModel)]='transactionService.dateFrom',
+          [minDate]='transactionService.dateFromMin',
+          [maxDate]='transactionService.dateFromMax'
+        )
+        input#date-to.mt-1.form-control.w-25.mr-2(
+          type='text',
+          placeholder='End Date',
+          name='dateTo',
+          ngbDatepicker,
+          outsideDays='hidden',
+          autocomplete='off',
+          #dateTo='ngbDatepicker',
+          (click)='dateTo.toggle()',
+          [(ngModel)]='transactionService.dateTo',
+          [minDate]='transactionService.dateToMin',
+          [maxDate]='transactionService.dateToMax'
+        )
+        button.btn.ml-2.ws-nowrap.mt-1.mb-1(
+          class='castlerButtonColor',
+          type='submit',
+          (click)='submitSearchForm()'
+        )
+          fa-icon.d-flex.flex-row.align-items-center([icon]='["fas", "search"]')
+        button.btn.btn-link.mt-1.mb-1.mr-2(
+          type='button',
+          (click)='clearSearchForm()',
+          class='logoColor'
+        )
+          | Clear
+        .justify-content-end 
+          a.btn.mt-1.mb-1.btn-success.ws-nowrap.btn-icon(
+            type='button',
+            target='_blank',
+            [href]='transactionService.reportDownloadLink$ | async'
+          )
+            fa-icon.d-flex.flex-row.align-items-center(
+              [icon]='["fas", "arrow-down"]'
+            )
+      .d-flex.mb-2(*ngIf='(transaction$ | async)?.length > 0')
+        .flex-row
+          small.mb-2.mt-2 Showing {{ (transactionService.page - 1) * 10 + 1 }} to {{ (transactionService.page - 1) * 10 + (transaction$ | async)?.length }} of {{ total$ | async }}
+
+    .table-responsive.pp-table-container
+      table.table
+        thead
+          tr
+            th(scope='col', sbSortable='date', (sort)='onSort($event)')
+              span Transaction Id
+              sb-sort-icon(
+                *ngIf='sortedColumn === "date"',
+                [direction]='sortedDirection'
+              )
+            th(scope='col', sbSortable='event', (sort)='onSort($event)')
+              span Escrow ID
+              sb-sort-icon(
+                *ngIf='sortedColumn === "event"',
+                [direction]='sortedDirection'
+              )
+            th(scope='col', sbSortable='time', (sort)='onSort($event)')
+              span Amount
+              sb-sort-icon(
+                *ngIf='sortedColumn === "time"',
+                [direction]='sortedDirection'
+              )
+            th(scope='col', sbSortable='time', (sort)='onSort($event)')
+              span.ws-nowrap Remitter Name
+              sb-sort-icon(
+                *ngIf='sortedColumn === "time"',
+                [direction]='sortedDirection'
+              )
+            th(scope='col', sbSortable='time', (sort)='onSort($event)')
+              span.ws-nowrap Remitter Account
+              sb-sort-icon(
+                *ngIf='sortedColumn === "time"',
+                [direction]='sortedDirection'
+              )
+            th(scope='col', sbSortable='time', (sort)='onSort($event)')
+              span.ws-nowrap Remitter IFSC
+              sb-sort-icon(
+                *ngIf='sortedColumn === "time"',
+                [direction]='sortedDirection'
+              )
+            th(scope='col', sbSortable='time', (sort)='onSort($event)')
+              span.ws-nowrap Deposit Date
+              sb-sort-icon(
+                *ngIf='sortedColumn === "time"',
+                [direction]='sortedDirection'
+              )
+        tbody(*ngIf='(transaction$ | async)?.length == 0')
+          tr
+            td(
+              *ngIf='!(transactionService.loading$ | async) && (transaction$ | async)?.length == 0'
+            ) No Entries Found
+            td.spinner(*ngIf='transactionService.loading$ | async')
+              .spinner-border.text-primary(role='status')
+                span.sr-only Loading...
+        tbody
+          tr(*ngFor='let trans of transaction$ | async')
+            td
+              ngb-highlight.myanchor(
+                [result]='trans.transactionId || "--"',
+                [term]='transactionService.searchTerm',
+                (click)='showDetails(trans.transactionId)',
+                class='tableClickEntryColor'
+              )
+            td
+              ngb-highlight(
+                [result]='trans.accountId + " " || "--"',
+                [term]='transactionService.searchTerm'
+              )
+            td
+              ngb-highlight(
+                [result]='toINR(trans.amount.toFixed(2)) || "--"',
+                [term]='transactionService.searchTerm'
+              )
+            td
+              ngb-highlight(
+                [result]='trans.remitterName || "--"',
+                [term]='transactionService.searchTerm'
+              )
+            td
+              ngb-highlight(
+                [result]='trans.remitterAccNumber || "--"',
+                [term]='transactionService.searchTerm'
+              )
+            td
+              ngb-highlight(
+                [result]='trans.remitterIFSCCode || "--"',
+                [term]='transactionService.searchTerm'
+              )
+            td
+              ngb-highlight.ws-nowrap(
+                [result]='trans.createdAt | date: "d MMM yyyy" || "--"',
+                [term]='transactionService.searchTerm'
+              )
+            //td
+            //    .d-inline-flex.align-items-center
+            //        p.mr-2([class]='trans.class')
+            //            ngb-highlight(
+            //                [result]='trans.status',
+            //                [term]='transactionService.searchTerm'
+            //            )
+    .d-flex.justify-content-between.p-2
+      ngb-pagination(
+        [collectionSize]='total$ | async',
+        [(page)]='transactionService.page',
+        [maxSize]='5',
+        [rotate]='true',
+        [ellipses]='false',
+        [boundaryLinks]='true'
+      )

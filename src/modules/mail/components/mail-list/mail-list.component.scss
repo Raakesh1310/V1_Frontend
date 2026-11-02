@@ -1,0 +1,12 @@
+@import 'styles/variables.scss';
+th,
+td,
+a {
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+table {
+  table-layout: fixed;
+}

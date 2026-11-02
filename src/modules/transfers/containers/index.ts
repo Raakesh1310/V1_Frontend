@@ -1,0 +1,31 @@
+import { AllFundTransfersComponent } from './all-fund-transfers/all-fund-transfers.component';
+import { ScheduledTransferComponent } from './scheduled-transfer/scheduled-transfer.component';
+import { TransferAuthorizationPageComponent } from './transfer-authorization-page/transfer-authorization-page.component';
+import { TransferOverviewComponent } from './transfer-overview/transfer-overview.component';
+import { TransferComponent } from './transfer/transfer.component';
+import { BulkTransferOverviewComponent } from './bulk-transfer-overview/bulk-transfer-overview.component';
+import { ScheduledTransferDetailsComponent } from './scheduled-transfer-details/scheduled-transfer-details.component';
+import { ScheduledTransferSaOverviewComponent } from './scheduled-transfer-sa-overview/scheduled-transfer-sa-overview.component';
+import { ScheduledTransferSaDetailsComponent } from './scheduled-transfer-sa-details/scheduled-transfer-sa-details.component';
+import { UpiTransferOverviewComponent } from './upi-transfer-overview/upi-transfer-overview.component';
+import { BankAccountTransferComponent } from './bank-account-transfer/bank-account-transfer.component';
+import { TransferBankAccountOverviewComponent } from './transfer-bank-account-overview/transfer-bank-account-overview.component';
+import { BulkTransferBankAccountOverviewComponent } from './bulk-transfer-bank-account-overview/bulk-transfer-bank-account-overview.component';
+import { UpiBankAccountTransferOverviewComponent } from './upi-bank-account-transfer-overview/upi-bank-account-transfer-overview.component';
+
+export const containers = [TransferComponent, TransferOverviewComponent, AllFundTransfersComponent, ScheduledTransferComponent, TransferAuthorizationPageComponent, BulkTransferOverviewComponent, ScheduledTransferDetailsComponent, ScheduledTransferSaOverviewComponent, ScheduledTransferSaDetailsComponent, UpiTransferOverviewComponent, BankAccountTransferComponent, TransferBankAccountOverviewComponent, BulkTransferBankAccountOverviewComponent, UpiBankAccountTransferOverviewComponent];
+
+export * from './scheduled-transfer/scheduled-transfer.component';
+export * from './transfer/transfer.component';
+export * from './transfer-overview/transfer-overview.component';
+export * from './all-fund-transfers/all-fund-transfers.component';
+export * from './transfer-authorization-page/transfer-authorization-page.component';
+export * from './bulk-transfer-overview/bulk-transfer-overview.component';
+export * from './scheduled-transfer-details/scheduled-transfer-details.component';
+export * from './scheduled-transfer-sa-overview/scheduled-transfer-sa-overview.component';
+export * from './scheduled-transfer-sa-details/scheduled-transfer-sa-details.component';
+export * from './upi-transfer-overview/upi-transfer-overview.component';
+export * from './bank-account-transfer/bank-account-transfer.component';
+export * from './transfer-bank-account-overview/transfer-bank-account-overview.component';
+export * from './bulk-transfer-bank-account-overview/bulk-transfer-bank-account-overview.component';
+export * from './upi-bank-account-transfer-overview/upi-bank-account-transfer-overview.component';

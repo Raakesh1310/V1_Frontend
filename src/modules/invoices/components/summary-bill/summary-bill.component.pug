@@ -1,0 +1,68 @@
+sbpro-card 
+  .card-header(class='logoColor')
+    span Summary Bill
+
+  .card-body
+    center(*ngIf='billing.length === 0')
+      b Loading invoice...
+    #printsection(*ngIf='billing.length > 0')
+      span(*ngIf='viewMode')
+        img(
+          height='100px',
+          width='220px',
+          src='assets/img/Castler_logo.png'
+        )
+        br
+        br
+        center
+          h1 
+            b {{ months[month] }}'{{ year }} Bill
+        br
+        br
+      span(*ngIf='merchantProfile')
+        h1 {{ merchantProfile.businessName }}
+        span.address 
+          h5 {{ merchantProfile.addressLine }}
+          h5 {{ merchantProfile.city }}
+          h5 {{ merchantProfile.state }} - {{ merchantProfile.pinCode }}
+          h5 India
+          h5 GSTIN {{ merchantProfile.businessGst }}
+
+      br
+      br
+      table.table 
+        thead 
+          tr
+            th(*ngIf='!viewMode') S.No
+            th Fee Type
+            th Qty
+            th Amount ( in Rs )
+
+        tbody
+          tr(*ngFor='let item of groupedBill | keyvalue; let i = index') 
+            td(*ngIf='!viewMode') {{ i + 1 }}
+            td {{ feeTypes[item.key] }}
+            td {{ item.value.length }}
+            td {{ getSum(item.value) }}
+          tr 
+            th Total
+            td(*ngIf='!viewMode')
+            td 
+            td 
+              b {{ total }}
+
+    span(*ngIf='!viewMode') 
+      button.btn.btn-light((click)='goBack()') Back
+      span &nbsp;&nbsp;
+      button.btn((click)='detailed()', class='castlerButtonColor') Detailed Bill
+
+  .card-footer(*ngIf='viewMode')
+    button.btn.btn-light((click)='closeModal()') Back to list
+    span &nbsp;&nbsp;
+    button.btn(
+      class='castlerButtonColor',
+      *ngIf='billing.length > 0',
+      printSectionId='printsection',
+      ngxPrint,
+      [useExistingCss]='true'
+    ) Print

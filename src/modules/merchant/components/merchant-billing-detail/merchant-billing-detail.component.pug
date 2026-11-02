@@ -1,0 +1,204 @@
+div
+  div
+    div
+      form.pb-2
+        div
+          .d-flex.mb-2
+            ng-multiselect-dropdown.w-50.mr-2.mt-custom(
+              name='title',
+              [placeholder]='"Select Merchant"',
+              [settings]='dropdownSettings',
+              [data]='merchants',
+              [(ngModel)]='selectedItems',
+              [disabled]='disabled'
+            )
+            select#statusList.mt-1.form-control.w-25.mr-2(
+              name='feeType',
+              [(ngModel)]='billingService.feeType'
+            )
+              option(value='') Fee Type
+              option(*ngFor='let type of feeType', [ngValue]='type') {{ type }}
+            input#start-date.mt-1.form-control.w-25.mr-2(
+              type='text',
+              name='sd',
+              placeholder='Start Date',
+              autocomplete='off',
+              ngbDatepicker,
+              outsideDays='hidden',
+              #sd='ngbDatepicker',
+              (click)='sd.toggle()',
+              [(ngModel)]='billingService.dateFrom',
+              [minDate]='billingService.dateFromMin',
+              [maxDate]='billingService.dateFromMax'
+            )
+            input#end-date.mt-1.form-control.w-25.mr-2(
+              type='text',
+              name='ed',
+              placeholder='End Date',
+              autocomplete='off',
+              ngbDatepicker,
+              outsideDays='hidden',
+              #ed='ngbDatepicker',
+              (click)='ed.toggle()',
+              [(ngModel)]='billingService.dateTo',
+              [minDate]='billingService.dateToMin',
+              [maxDate]='billingService.dateToMax'
+            )
+
+            button.btn.mb-1.mt-1.mr-2.ws-nowrap.castlerButtonColor(
+              type='submit',
+              (click)='submitSearchForm()'
+            )
+              fa-icon.d-flex.flex-row.align-items-center.mr-2(
+                [icon]='["fas", "search"]'
+              )
+              | Search
+            button.btn.btn-link.mb-1.mt-1.mr-2.logoColor(
+              type='button',
+              (click)='clearForm()'
+            ) Clear
+            .justify-content-end
+              a.btn.btn-success.mb-1.mt-1.mr-2.ws-nowrap.btn-icon(
+                type='button',
+                target='_blank',
+                [href]='billingService.reportDownloadLink$ | async'
+              )
+                fa-icon.d-flex.flex-row.align-items-center(
+                  [icon]='["fas", "arrow-down"]'
+                )
+    .table-responsive.pp-table-container.align-self-stretch.flex-grow-1.flex-stretch-1.table-striped
+      table.table
+        thead
+          tr
+            th.th-sticky-top(
+              *ngIf='!merchantId',
+              scope='col',
+              sbSortable='event',
+              (sort)='onSort($event)'
+            )
+              span.ws-nowrap Merchant Name
+            th.th-sticky-top(
+              scope='col',
+              sbSortable='event',
+              (sort)='onSort($event)'
+            )
+              span.ws-nowrap Date
+            th.th-sticky-top(
+              scope='col',
+              sbSortable='event',
+              (sort)='onSort($event)'
+            )
+              span.ws-nowrap Fee Type
+            th.th-sticky-top(scope='col', sbSortable='time', (sort)='onSort($event)')
+              span.ws-nowrap Fee Type Description
+            th.th-sticky-top(scope='col', sbSortable='time', (sort)='onSort($event)')
+              span.ws-nowrap Unit Cost
+            th.th-sticky-top(scope='col', sbSortable='time', (sort)='onSort($event)')
+              span.ws-nowrap Net Fee Amount
+        tbody(*ngIf='(billing$ | async)?.length > 0 && !(loadingList$ | async)')
+          tr(*ngFor='let bill of billing$ | async; index as i')
+            td(*ngIf='!merchantId')
+              ngb-highlight.ws-nowrap(
+                [result]='bill.merchantName',
+                [term]='billingService.searchTerm'
+              )
+            td
+              ngb-highlight.ws-nowrap(
+                [result]='bill.createdAt | date: "d MMM yyyy" || "--"',
+                [term]='billingService.searchTerm'
+              )
+            td
+              ngb-highlight(
+                [result]='bill.billingType.toUpperCase()',
+                [term]='billingService.searchTerm',
+                *ngIf='bill.billingType !== "miscellanousBillings"'
+              )
+              span(*ngIf='bill.billingType === "miscellanousBillings"') {{ bill.miscellanousFeeType }}
+
+            td
+              a.nav-link.p-0(
+                style='color: #417505;font-weight: bold',
+                *ngIf='bill.accountId',
+                href='javascript:void(0);',
+                (click)='openAccountDetail(bill.accountId)'
+              )
+                ngb-highlight(
+                  [result]='bill.accountId',
+                  [term]='billingService.searchTerm'
+                )
+              a.nav-link.p-0(
+                style='color: #417505;font-weight: bold',
+                *ngIf='bill.transferId',
+                href='javascript:void(0);',
+                (click)='openTransferDetails(bill.transferId)'
+              )
+                ngb-highlight(
+                  [result]='bill.transferId',
+                  [term]='billingService.searchTerm'
+                )
+              a.nav-link.p-0(
+                style='color: #417505;font-weight: bold',
+                *ngIf='bill.crnId',
+                href='javascript:void(0);',
+                (click)='openKYCDetails(bill.crnId)'
+              )
+                ngb-highlight(
+                  [result]='bill.crnId',
+                  [term]='billingService.searchTerm'
+                )
+              span(*ngIf='bill.bankAccount') {{ bill.bankAccount.toUpperCase() }}
+              span(
+                *ngIf='!bill.transferId && !bill.accountId && !bill.crnId && !bill.bankAccount && !bill.miscellanousFeeType && bill.billingType !== "deposit"'
+              ) --
+              span(*ngIf='bill.billingType === "miscellanousBillings"') {{ bill.feeSetting.toUpperCase() }}
+              span(*ngIf='bill.billingType === "deposit"') {{ bill.feeSetting.toUpperCase() }}
+
+            td
+              span(*ngIf='bill.billingType === "virtualAccount"') 
+                span(*ngIf='bill.feeSetting !== "one-time"') {{ bill.feeAmount }} per VA
+                span(*ngIf='bill.feeSetting === "one-time"') one-time
+              span(*ngIf='bill.billingType === "transaction"') {{ bill.feeAmount }}{{ bill.feeSetting === "percentage" ? "% of transaction" : " per Transaction" }}
+              span(*ngIf='bill.kycType') {{ bill.billingAmount }} per {{ bill.kycType }}
+              span(*ngIf='bill.imps') {{ bill.billingAmount }} per IMPS
+              span(*ngIf='bill.billingType === "pennyTest"') {{ bill.feeAmount }} per Payee
+              span(*ngIf='bill.billingType === "deposit"') {{ bill.feeAmount }}%
+            td
+              ngb-highlight(
+                [result]='bill.billingAmount',
+                [term]='billingService.searchTerm'
+              )
+    .flex-container.flex-row(
+      *ngIf='(billing$ | async)?.length <= 0 && !(loadingList$ | async)'
+    )
+      .align-self-center No Data available
+    .flex-container.flex-row(*ngIf='loadingList$ | async')
+      .align-self-center Please wait...
+    .d-flex.justify-content-between.pt-2.align-self-end(
+      *ngIf='(billing$ | async)?.length > 0 && !(loadingList$ | async)'
+    )
+      ngb-pagination(
+        [collectionSize]='total$ | async',
+        [(page)]='billingService.page',
+        [maxSize]='5',
+        [rotate]='true',
+        [ellipses]='false',
+        [boundaryLinks]='true'
+      )
+
+ng-template(#monthlyModalTemplate)
+  .card-body 
+    h2 Download monthly Invoice
+    br
+    .form-group 
+      label Choose Month
+      select#monthList.mt-1.form-control.form-control-sm.w-100(
+        name='month',
+        [(ngModel)]='selectedMonth'
+      )
+        option(value='') Select Month
+        option(*ngFor='let month of months', [ngValue]='month') {{ month }}
+
+  .card-footer
+    button.float-right.btn.btn-primary((click)='close(); generateInvoice()') Download
+    span.float-right &nbsp;&nbsp;
+    button.float-right.btn.btn-link((click)='close()') Close

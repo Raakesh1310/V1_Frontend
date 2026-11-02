@@ -1,0 +1,181 @@
+form
+  .d-flex.mb-2
+    input#search-box.mt-1.form-control.w-50.mr-2(
+      type='text',
+      name='s',
+      placement='top',
+      ngbPopover='Search by Payee Name',
+      autocomplete='off',
+      placeholder='Search by Payee Name',
+      [(ngModel)]='payeeService.searchTerm'
+    )
+
+    button.btn.ml-3.ws-nowrap.mt-1.mb-2.castlerButtonColor(
+      type='submit',
+      (click)='submitSearchForm()'
+    )
+      fa-icon.d-flex.flex-row.align-items-center([icon]='["fas", "search"]')
+
+    button.btn.btn-link.mt-1.mt-1.mr-2.logoColor(
+      type='button',
+      (click)='clearSearchForm()'
+    ) Clear
+    a.btn.mt-1.mb-1.btn-success.ws-nowrap.btn-icon(
+      style='color: white',
+      type='button',
+      target='_blank',
+      [href]='payeeService.reportDownloadLink$ | async'
+    )
+      fa-icon.d-flex.flex-row.align-items-center([icon]='["fas", "arrow-down"]')
+
+    button.ml-auto.btn.mb-1.mt-1.castlerButtonColor(
+      *ngIf='isAdmin && !readOnly',
+      type='button',
+      (click)='addPayee()'
+    ) + Add new Payee
+
+  .d-flex.mb-2(*ngIf='(payees$ | async)?.length > 0')
+    .flex-row
+      small.mb-2.mt-2 Showing {{ (payeeService.page - 1) * 10 + 1 }} to {{ (payeeService.page - 1) * 10 + (payees$ | async)?.length }} of {{ total$ | async }}
+
+  .table-responsive.pp-table-container.table-responsive-sm
+    table.table
+      thead
+        tr
+          th(scope='col' sbSortable='date', (sort)='onSort($event)')
+            span.ws-nowrap Payee Id
+            sb-sort-icon(
+              *ngIf='sortedColumn === "date"',
+              [direction]='sortedDirection'
+            )
+          th(scope='col' sbSortable='date', (sort)='onSort($event)')
+            span.ws-nowrap Account Holder
+            sb-sort-icon(
+              *ngIf='sortedColumn === "date"',
+              [direction]='sortedDirection'
+            )
+          th(scope='col' sbSortable='event', (sort)='onSort($event)')
+            span IFSC
+            sb-sort-icon(
+              *ngIf='sortedColumn === "date"',
+              [direction]='sortedDirection'
+            )
+          th(scope='col' sbSortable='event', (sort)='onSort($event)')
+            span.ws-nowrap Account Number
+            sb-sort-icon(
+              *ngIf='sortedColumn === "event"',
+              [direction]='sortedDirection'
+            )
+          th(scope='col' sbSortable='time', (sort)='onSort($event)')
+            span Bank
+            sb-sort-icon(
+              *ngIf='sortedColumn === "time"',
+              [direction]='sortedDirection'
+            )
+          th(scope='col' sbSortable='time', (sort)='onSort($event)', *ngIf='upiPayoutEnabled')
+            span VPA
+            sb-sort-icon(
+              *ngIf='sortedColumn === "time"',
+              [direction]='sortedDirection'
+            )
+          th(scope='col' sbSortable='time', (sort)='onSort($event)')
+            span.ws-nowrap Addition Date
+            sb-sort-icon(
+              *ngIf='sortedColumn === "time"',
+              [direction]='sortedDirection'
+            )
+          th(scope='col' sbSortable='time', (sort)='onSort($event)')
+            span.ws-nowrap Status
+            sb-sort-icon(
+              *ngIf='sortedColumn === "time"',
+              [direction]='sortedDirection'
+            )
+
+          th(scope='col' sbSortable='time', (sort)='onSort($event)')
+            span.ws-nowrap Edit
+            sb-sort-icon(
+              *ngIf='sortedColumn === "time"',
+              [direction]='sortedDirection'
+            )
+
+      tbody(*ngIf='(payees$ | async)?.length == 0')
+        tr
+          td(
+            *ngIf='!(payeeService.loading$ | async) && (payees$ | async)?.length == 0'
+          ) No Entries Found
+          td.spinner(*ngIf='payeeService.loading$ | async')
+            .spinner-border.text-primary(role='status')
+              span.sr-only Loading...
+
+      tbody(*ngIf='(payees$ | async)?.length > 0')
+        tr(*ngFor='let payee of payees$ | async')
+          td
+            ngb-highlight(
+              [result]='payee.payeeId',
+              [term]='payeeService.searchTerm'
+            )
+          td
+            a.nav-link.p-0.tableClickEntryColor(
+              href='javascript:void(0);',
+              (click)='showDetails(payee.payeeId)'
+            )
+              ngb-highlight(
+                [result]='payee.accountHolder',
+                [term]='payeeService.searchTerm'
+              )
+          td
+            ngb-highlight(
+              [result]='payee.ifsc || "--"',
+              [term]='payeeService.searchTerm'
+            )
+          td
+            ngb-highlight(
+              [result]='payee.accountNumber || "--"',
+              [term]='payeeService.searchTerm'
+            )
+          td
+            ngb-highlight(
+              [result]='payee.bankName || "--"',
+              [term]='payeeService.searchTerm'
+            )
+          td(*ngIf='upiPayoutEnabled')
+            ngb-highlight(
+              [result]='payee.vpa || "--"',
+              [term]='payeeService.searchTerm'
+            )
+          td
+            ngb-highlight(
+              [result]='payee.createdAt | date: "d MMM yyyy" || "--"',
+              [term]='payeeService.searchTerm'
+            )
+          td
+            ngb-highlight(
+              [result]='payee.status || "--"',
+              [term]='payeeService.searchTerm'
+            )
+          td
+            i-feather(name="edit",href='javascript:void(0);',
+              (click)='showDetails(payee.payeeId)')
+  .d-flex.justify-content-between.p-2
+    ngb-pagination(
+      [collectionSize]='total$ | async',
+      [(page)]='payeeService.page',
+      [maxSize]='5',
+      [rotate]='true',
+      [ellipses]='false',
+      [boundaryLinks]='true'
+    )
+
+ng-template(#infoMessage)
+  sbpro-add-payee-container(
+    [showLeftAndTopNav]='false',
+    [modal]='modalRef',
+    [merchantId]='merchantId',
+    (emitCntrCloseModal)='setModalClose($event)'
+  )
+  //sbpro-add-payee(
+  //  [merchantId]='merchantId',
+  //  (emitCloseModal)='setModalClose($event)'
+  //)
+  .card-footer
+    button.btn.float-right.castlerButtonColor((click)='closeModal()') close

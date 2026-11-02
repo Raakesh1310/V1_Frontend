@@ -1,0 +1,16 @@
+@import 'styles/variables.scss';
+
+sbpro-alert {
+  p {
+    margin-bottom: 0rem;
+  }
+}
+
+.captchaCredit {
+  font-size: x-small;
+}
+
+input[type=email]:focus {
+  outline:none;
+  border-image-source: linear-gradient( #e4b657, #a2751a);
+}

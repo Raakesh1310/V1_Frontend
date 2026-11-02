@@ -1,0 +1,220 @@
+div
+  form.pb-2(*ngIf='filtersVisible')
+    .d-flex.mb-2
+      input#search-box.mt-1.form-control.w-100.mr-2(
+        placement='top',
+        ngbPopover='Search by Business Name, Escrow name, Escrow ID',
+        type='text',
+        name='s',
+        autocomplete='off',
+        placeholder='Search by Business Name, Escrow name, Escrow ID',
+        [(ngModel)]='accountsService.searchTerm'
+      )
+      input#start-date.mt-1.form-control.w-25.mr-2(
+        type='text',
+        name='sd',
+        placeholder='Start Date',
+        autocomplete='off',
+        ngbDatepicker,
+        outsideDays='hidden',
+        autoClose='outside',
+        #sd='ngbDatepicker',
+        (click)='sd.toggle()',
+        [(ngModel)]='accountsService.dateFrom',
+        [minDate]='accountsService.dateFromMin',
+        [maxDate]='accountsService.dateFromMax'
+      )
+      input#end-date.mt-1.form-control.w-25.mr-2(
+        type='text',
+        name='ed',
+        placeholder='End Date',
+        autocomplete='off',
+        ngbDatepicker,
+        outsideDays='hidden',
+        #ed='ngbDatepicker',
+        (click)='ed.toggle()',
+        [(ngModel)]='accountsService.dateTo',
+        [minDate]='accountsService.dateToMin',
+        [maxDate]='accountsService.dateToMax'
+      )
+      select.mt-1.form-control.w-25.mr-2(
+        name='bank',
+        *ngIf='!isTrustee',
+        [(ngModel)]='accountsService.bank'
+      )
+        option(value='') Select Bank
+        option(value='icici') ICICI
+        option(value='rbl') RBL
+        option(value='idfc') IDFC
+        option(value='yes_bank') YES BANK
+        option(value='ibl') IndusInd
+        option(value='hdfc') HDFC
+        option(value='axis') Axis
+        option(value='dbs') DBS
+      select#statusList.mt-1.form-control.w-25.mr-2(
+        name='status',
+        [(ngModel)]='accountsService.status'
+      )
+        option(value='') Select Status
+        option(*ngFor='let st of statusList', [ngValue]='st') {{ st }}
+      button.btn.mr-2.ws-wrap.mt-1.castlerButtonColor(
+        type='submit',
+        (click)='loadData()'
+      )
+        fa-icon.d-flex.flex-row.align-items-center([icon]='["fas", "search"]')
+      button.btn.btn-link.mr-2.logoColor(
+        type='button',
+        (click)='clearSearchForm()'
+      ) Clear
+      .justify-content-end 
+        a.btn.btn-success.ws-wrap.float-right.mt-1.mb-1.btn-icon(
+          type='button',
+          target='_blank',
+          [href]='accountsService.reportDownloadLink$ | async'
+        )
+          fa-icon.d-flex.flex-row.align-items-center(
+            [icon]='["fas", "arrow-down"]'
+          )
+    .form-group
+      label Auto Transfer Escrows &nbsp;
+      label.switch
+        input(
+          type='checkbox',
+          #checkbox,
+          [checked]='accountsService.isAuto',
+          [(ngModel)]='accountsService.isAuto',
+          (change)='updateIsAutoCheckBoxVal($event)'
+        )
+        span.slider.round
+
+    .d-flex(*ngIf='(account$ | async)?.length > 0') 
+      .flex-row
+        small.mb-2.mt-2 Showing {{ (accountsService.page - 1) * 10 + 1 }} to {{ (accountsService.page - 1) * 10 + (account$ | async)?.length }} of {{ total$ | async }}
+.table-responsive.pp-table-container.align-self-stretch.flex-grow-1.flex-stretch-1.table-striped(
+  *ngIf='!(loadingList$ | async)'
+)
+  table.table
+    thead
+      tr
+        th.th-sticky-top(
+          scope='col',
+          sbSortable='date',
+          (sort)='onSort($event)',
+          *ngIf='!merchantId'
+        )
+          span.ws-nowrap Business Name
+          sb-sort-icon(
+            *ngIf='sortedColumn === "date"',
+            [direction]='sortedDirection'
+          )
+        th.th-sticky-top(scope='col', sbSortable='date', (sort)='onSort($event)')
+          span.ws-nowrap Escrow ID
+          sb-sort-icon(
+            *ngIf='sortedColumn === "date"',
+            [direction]='sortedDirection'
+          )
+        th.th-sticky-top(scope='col', sbSortable='event', (sort)='onSort($event)')
+          span.ws-nowrap Creation Date
+          sb-sort-icon(
+            *ngIf='sortedColumn === "date"',
+            [direction]='sortedDirection'
+          )
+        th.th-sticky-top(scope='col', sbSortable='event', (sort)='onSort($event)')
+          span.ws-nowrap Escrow Name
+          sb-sort-icon(
+            *ngIf='sortedColumn === "event"',
+            [direction]='sortedDirection'
+          )
+        // Removed Email from this table.
+        //- th.th-sticky-top(scope='col', sbSortable='time', (sort)='onSort($event)')
+        //-   span.ws-nowrap Email Id
+        //-   sb-sort-icon(
+        //-     *ngIf='sortedColumn === "time"',
+        //-     [direction]='sortedDirection'
+        //-   )
+        th.th-sticky-top(scope='col', sbSortable='time', (sort)='onSort($event)')
+          span.ws-nowrap Available Balance
+          sb-sort-icon(
+            *ngIf='sortedColumn === "time"',
+            [direction]='sortedDirection'
+          )
+        th.th-sticky-top(scope='col', sbSortable='time', (sort)='onSort($event)')
+          span.ws-nowrap Escrow Status
+          sb-sort-icon(
+            *ngIf='sortedColumn === "time"',
+            [direction]='sortedDirection'
+          )
+        th.th-sticky-top(
+          *ngIf='!readOnly',
+          scope='col',
+          sbSortable='time',
+          (sort)='onSort($event)'
+        )
+          span.ws-nowrap Action
+          sb-sort-icon(
+            *ngIf='sortedColumn === "time"',
+            [direction]='sortedDirection'
+          )
+
+    tbody
+      tr(*ngFor='let account of account$ | async')
+        td(*ngIf='!merchantId')
+          ngb-highlight(
+            *ngIf='account?.merchantTitle',
+            [result]='account?.merchantTitle'
+          )
+        td
+          a.nav-link.p-0.tableClickEntryColor(
+            href='javascript:void(0);',
+            (click)='viewDetails(account.accountId, account.merchantId)'
+          )
+            ngb-highlight([result]='account.accountId || "--"')
+        td
+          ngb-highlight(
+            [result]='account.createdAt | date: "d MMM yyyy" || "--"'
+          )
+        td
+          ngb-highlight([result]='account.name || "--"')
+        // Removed Email from this table.
+        //- td
+        //-   ngb-highlight([result]='account.email || "--"')
+        td
+          ngb-highlight([result]='toINR(account.balance.toFixed(2))')
+        td
+          ngb-highlight([result]='account.status', [term]='account$.status')
+        td(*ngIf='account.status !== "Closed" && !readOnly')
+          span.btn.btn-sm(
+            (click)='openWarningModal(account.accountId)',
+            style='background: #417505; color: white'
+          ) {{ "Close" }}
+        td(*ngIf='account.status === "Closed" && !readOnly')
+          ngb-highlight([result]='"--"')
+.flex-container.flex-row(
+  *ngIf='(account$ | async)?.length <= 0 && !(loadingList$ | async)'
+)
+  .align-self-center No Data available
+.flex-container.flex-row(*ngIf='loadingList$ | async')
+  .align-self-center Please wait...
+.d-flex.justify-content-between.pt-2.align-self-end(
+  [class.full-width]='merchantId',
+  *ngIf='(account$ | async)?.length > 0 && !(loadingList$ | async)'
+)
+  button.btn.btn-light.align-self-start(*ngIf='merchantId', (click)='goBack()') Back
+
+  ngb-pagination.align-self-end(
+    [collectionSize]='total$ | async',
+    [(page)]='accountsService.page',
+    [maxSize]='5',
+    [rotate]='true',
+    [ellipses]='false',
+    [boundaryLinks]='true'
+  )
+
+ng-template(#warningMessage)
+  .card-header.modal-header.logoColor Warning Message
+  .card-body
+    p Are you sure you want to close the account
+  .card-footer
+    button.btn.btn-sm.float-right.castlerButtonColor((click)='closeModal(true)') Yes
+    span.float-right &nbsp;&nbsp;&nbsp;
+    button.btn.btn-link.btn-sm.float-right.logoColor((click)='closeModal(false)') No

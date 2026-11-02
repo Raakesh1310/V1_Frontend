@@ -1,0 +1,19 @@
+
+.form-group
+  label(for='pan') PAN
+  span.linker.float-right(*ngIf='removable && !livePage')
+    i-feather(name='trash-2', (click)='rmField()')
+  span.text-danger(*ngIf='required') *
+  span.ml-1(*ngIf='panVerified')
+    i-feather.text-success(name='check-circle')
+  input.form-control.form-control-sm(
+    [id]='pan',
+    type='text',
+    placeholder='PAN',
+    (change)='onChange()',
+    #defInput,
+    autocomplete='off',
+    [value]='value',
+    [class.disabled]='!livePage'
+  )
+  span.text-danger(*ngIf='errors.length > 0') {{ errors[0] }}

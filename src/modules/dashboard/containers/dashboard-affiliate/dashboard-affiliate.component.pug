@@ -1,0 +1,158 @@
+.container-fluid.mt-5
+  .d-flex.justify-content-between.align-items-sm-center.flex-column.flex-sm-row.mb-4
+    .mr-4.mb-3.mb-sm-0
+      h1.mb-0 Dashboard
+      .small
+        span.font-weight-500.text-primary Friday
+        |
+        | &middot; September 20, 2020 &middot; 12:16 PM
+
+    sbpro-dropdown(
+      [classes]='["btn-sm", "font-weight-500", "line-height-normal", "p-3"]',
+      dropdownStyle='text',
+      background='btn-white',
+      animation='animated--fade-in'
+    )
+      .dropdown-trigger
+        i-feather.text-primary.mr-2(name='calendar')
+        | Jan - Feb 2020
+      .dropdown-items
+        a.dropdown-item([routerLink]='') Last 30 days
+        a.dropdown-item([routerLink]='') Last week
+        a.dropdown-item([routerLink]='') This year
+        a.dropdown-item([routerLink]='') Yesterday
+        .dropdown-divider
+        a.dropdown-item([routerLink]='') Custom
+
+  .alert.alert-primary.border-0.mb-4.mt-5.px-md-5
+    .position-relative
+      .row.align-items-center.justify-content-between
+        .col.position-relative
+          h2.text-primary Welcome back, your dashboard is ready!
+          p.text-gray-700 Great job, your affiliate dashboard is ready to go! You can view sales, generate links, prepare coupons, and download affiliate reports using this dashboard.
+          a.btn.btn-teal([routerLink]='')
+            | Get started
+            i-feather(name='arrow-right')
+        .col.d-none.d-md-block.text-right.pt-3
+          img.img-fluid.mt-n5(
+            src='assets/img/drawkit/color/drawkit-content-man-alt.svg',
+            style='max-width: 25rem;'
+          )
+
+  .row
+    .col-xl-3.col-md-6.mb-4
+      .card.border-top-0.border-bottom-0.border-right-0.border-left-lg.border-blue.h-100
+        .card-body
+          .d-flex.align-items-center
+            .flex-grow-1
+              .small.font-weight-bold.text-blue.mb-1 Earnings (monthly)
+              .h5 $4,390
+              .text-xs.font-weight-bold.text-success.d-inline-flex.align-items-center
+                i-feather(name='trending-up')
+                | 12%
+            .ml-2
+              fa-icon.fa-2x.text-gray-200([icon]='["fas", "dollar-sign"]')
+
+    .col-xl-3.col-md-6.mb-4
+      .card.border-top-0.border-bottom-0.border-right-0.border-left-lg.border-purple.h-100
+        .card-body
+          .d-flex.align-items-center
+            .flex-grow-1
+              .small.font-weight-bold.text-purple.mb-1 Average sale price
+              .h5 $27.00
+              .text-xs.font-weight-bold.text-danger.d-inline-flex.align-items-center
+                i-feather(name='trending-down')
+                | 3%
+            .ml-2
+              fa-icon.fa-2x.text-gray-200([icon]='["fas", "tag"]')
+
+    .col-xl-3.col-md-6.mb-4
+      .card.border-top-0.border-bottom-0.border-right-0.border-left-lg.border-green.h-100
+        .card-body
+          .d-flex.align-items-center
+            .flex-grow-1
+              .small.font-weight-bold.text-green.mb-1 Clicks
+              .h5 11,291
+              .text-xs.font-weight-bold.text-success.d-inline-flex.align-items-center
+                i-feather(name='trending-up')
+                | 12%
+            .ml-2
+              fa-icon.fa-2x.text-gray-200([icon]='["fas", "mouse-pointer"]')
+
+    .col-xl-3.col-md-6.mb-4
+      .card.border-top-0.border-bottom-0.border-right-0.border-left-lg.border-yellow.h-100
+        .card-body
+          .d-flex.align-items-center
+            .flex-grow-1
+              .small.font-weight-bold.text-yellow.mb-1 Conversion rate
+              .h5 1.23%
+              .text-xs.font-weight-bold.text-danger.d-inline-flex.align-items-center
+                i-feather(name='trending-down')
+                | 1%
+            .ml-2
+              fa-icon.fa-2x.text-gray-200([icon]='["fas", "percentage"]')
+
+  .row
+    .col-lg-4.col-xl-3.mb-4
+      .card.bg-secondary.o-visible.mb-4
+        .card-body
+          h4.text-white Report generation
+          p.text-white-50
+            | Ready to get started? Let us know now! It's time to start building that dashboard you've been waiting to create!
+          img.float-left(
+            src='assets/img/drawkit/color/drawkit-developer-woman-flush.svg',
+            style='width: 8rem; margin-left: -2.5rem; margin-bottom: -5.5rem;'
+          )
+        .card-footer.bg-transparent.pt-0.border-0.text-right
+          a.btn.btn-primary([routerLink]='') Continue
+
+      .card.mb-4
+        .card-header
+          | Affiliate Reports
+        .list-group.list-group-flush.small
+          a.list-group-item.list-group-item-action.border-top([routerLink]='')
+            fa-icon.fa-fw.text-blue.mr-2([icon]='["fas", "dollar-sign"]')
+            | Earnings Reports
+          a.list-group-item.list-group-item-action([routerLink]='')
+            fa-icon.fa-fw.text-purple.mr-2([icon]='["fas", "tag"]')
+            | Average Sale Price
+          a.list-group-item.list-group-item-action([routerLink]='')
+            fa-icon.fa-fw.text-green.mr-2([icon]='["fas", "mouse-pointer"]')
+            | Engagement (Clicks &amp; Impressions)
+          a.list-group-item.list-group-item-action([routerLink]='')
+            fa-icon.fa-fw.text-yellow.mr-2([icon]='["fas", "percentage"]')
+            | Conversion Rate
+          a.list-group-item.list-group-item-action([routerLink]='')
+            fa-icon.fa-fw.text-pink.mr-2([icon]='["fas", "chart-pie"]')
+            | Segments
+        .card-footer
+          a.text-xs.d-flex.align-items-center.justify-content-between([routerLink]='')
+            | View More Reports
+            fa-icon([icon]='["fas", "long-arrow-alt-right"]')
+
+      .card.bg-secondary.border-0
+        .card-body
+          h5.text-white-50 Budget reporting
+          .mb-4
+            span.display-4.text-white $48k
+            span.text-white-50 per year
+          .progress.bg-white-25.rounded-pill(style='height: 0.5rem;')
+            .progress-bar.bg-white.w-75.rounded-pill(
+              role='progressbar',
+              aria-valuenow='75',
+              aria-valuemin='0',
+              aria-valuemax='100'
+            )
+
+    .col-lg-8.col-xl-9.mb-4
+      .card.mb-4
+        .card-header 
+          | Sales reporting
+        .card-body
+          sb-charts-area
+
+      .card
+        .card-header 
+          | Sales reporting
+        .card-body
+          sb-charts-bar

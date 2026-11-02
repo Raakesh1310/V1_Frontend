@@ -1,0 +1,60 @@
+div(*ngIf='errors.length > 0')
+  sbpro-alert(classes='alert-danger', [dismissable]='true')
+    | {{ errors[0] }}
+form(autocomplete='off', [formGroup]='settingsForm')
+  .form-group(*ngIf='showAccountStatus')
+    .col-sm-12.col-md-3.col-lg-3
+      label.font-weight-bold.text-black
+        | Escrow Status
+      .row
+        .col-sm-12.col-md-3.col-lg-3.pl-5
+          input#active(
+            type='radio',
+            #active,
+            value='Active',
+            name='accountStatus',
+            [checked]='accountStatus === "Active"',
+            (change)='accountStatus = $event.target.value'
+          )
+        .col-sm-12.col-md-3.col-lg-3.pl-0
+          label(for='active') 
+            | Active
+      .row
+        .col-sm-12.col-md-3.col-lg-3.pl-5
+          input#inactive(
+            type='radio',
+            #inactive,
+            value='Inactive',
+            name='accountStatus',
+            [checked]='accountStatus === "Inactive"',
+            (change)='accountStatus = $event.target.value'
+          )
+        .col-sm-12.col-md-3.col-lg-3.pl-0
+          label(for='inactive') 
+            | Inactive
+      .row
+        .col-sm-12.col-md-3.col-lg-3.pl-5
+          input#closed(
+            type='radio',
+            #closed,
+            value='Closed',
+            name='accountStatus',
+            [checked]='accountStatus === "Closed"',
+            (change)='accountStatus = $event.target.value'
+          )
+        .col-sm-12.col-md-3.col-lg-3.pl-0
+          label(for='closed') 
+            | Closed
+  .form-group(
+    *ngIf='bank === "rbl" && upiEnabled && !vpa && accountStatus === "Active"'
+  )
+    .col-sm-12.col-md-3.col-lg-3
+      label.font-weight-bold.text-black
+        | UPI
+      .row 
+        .col
+          button.btn.btn-primary((click)='linkVPA()') Link VPA
+
+  br
+  .form-group
+    button.btn.castlerButtonColor((click)='onSubmit()') Update

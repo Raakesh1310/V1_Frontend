@@ -1,0 +1,81 @@
+sbpro-card([headerActions]='true', *ngIf='productForm')
+  .card-header
+    | Add Field
+    button.btn.btn-icon.btn-link.btn-xl((click)='closer()')
+      i-feather(name='x-circle')
+  .card-body
+    div(*ngIf='errors.length > 0')
+      sbpro-alert(classes='alert-danger', [dismissable]='true')
+        | {{ errors[0] }}
+    form([formGroup]='productFieldForm')
+      .row
+        .col-sm-12
+          .form-group
+            label(for='label') Label
+            span.text-danger *
+            input#frm-cntrl-amount.form-control(
+              type='text',
+              placeholder='Field label',
+              formControlName='label'
+            )
+        //- .col-sm-12.col-md-12.col-lg-3
+        //-   .form-group
+        //-     label(for='type') Type
+        //-     select#type.form-control(formControlName='type')
+        //-       option text
+        //-       option number
+        //- .col-sm-12.col-md-12.col-lg-3
+        //-   .form-group
+        //-     label(for='required') Mandatory
+        //-     select#required.form-control(formControlName='required')
+        //-       option No
+        //-       option Yes
+  .card-footer
+    button.btn.btn-primary.float-right((click)='addProductField()') Add
+
+sbpro-card([headerActions]='true', *ngIf='customerForm')
+  .card-header
+    | Add Field
+    button.btn.btn-icon.btn-link.btn-xl((click)='closer()')
+      i-feather(name='x-circle')
+  .card-body
+    div(*ngIf='errors.length > 0')
+      sbpro-alert(classes='alert-danger', [dismissable]='true')
+        | {{ errors[0] }}
+    form([formGroup]='customerFieldForm')
+      .row
+        .col-sm-12
+          .form-group
+            label(for='label') Field
+            span.text-danger *
+            select#required.form-control(formControlName='label')
+              option(*ngFor='let field of predefinedField') {{ field }}
+              option Custom Field
+      .row(*ngIf='customField')
+        .col-sm-12.col-md-12.col-lg-6
+          .form-group
+            label(for='label') Label
+            span.text-danger *
+            input#frm-cntrl-amount.form-control(
+              type='text',
+              formControlName='label'
+            )
+      .row(*ngIf='!customField')
+        .col-sm-12.col-md-12.col-lg-12
+          .custom-control.custom-checkbox
+            input#verification.custom-control-input(
+              type='checkbox',
+              formControlName='verification'
+            )
+            label.custom-control-label(for='verification') Verification Required
+      .row(*ngIf='customField')
+        .col-sm-12.col-md-12.col-lg-6
+          .custom-control.custom-checkbox
+            input#verification.custom-control-input(
+              type='checkbox',
+              formControlName='required'
+            )
+            label.custom-control-label(for='required') Required Field
+
+  .card-footer
+    button.btn.btn-primary.float-right((click)='addCustomerField()') Add

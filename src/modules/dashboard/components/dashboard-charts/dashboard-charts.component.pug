@@ -1,0 +1,60 @@
+.d-flex.flex-row
+    sbpro-inward-outward-chart.col-xl-6.col-md-6(
+        [startDate]='startDate',
+        [endDate]='endDate',
+        [bankNames]='bankNames',
+        [cb] = 'cb'
+    )
+
+    sb-charts-pie#changeGridToColumn.col-xl-6.col-md-6(
+        [startDate]='startDate',
+        [endDate]='endDate',
+        [bankNames]='bankNames',
+        [cb] = 'cb'
+    )
+
+sbpro-total-active-account.mb-5.d-block(
+    *ngIf='isAdmin',
+    [startDate]='startDate',
+    [endDate]='endDate',
+    [bankNames]='bankNames'
+)
+
+sbpro-card.mb-4.d-block([headerActions]='true', *ngIf="isAdmin")
+  .card-header(
+    style='display: flex;justify-content: flex-start;background-color: white; color: #417505'
+  )
+    | Select Dates -
+    input(
+      style='border-width:0px;border:none;outline:0;width: 300px; color: #6BC127',
+      type='text',
+      readonly,
+      ngxDaterangepickerMd,
+      [locale]='{ format: "DD/MM/YYYY" }',
+      [(ngModel)]='selected',
+      [showCustomRangeLabel]='true',
+      [alwaysShowCalendars]='true',
+      [ranges]='ranges',
+      [maxDate]='today',
+      (datesUpdated)='datesUpdated($event)',
+      [linkedCalendars]='true',
+      [showClearButton]='true',
+      placeholder='Select please...'
+    )
+
+sbpro-dashboard-bar-chart(
+    #barCharts,
+    [startDate]='startDate',
+    [endDate]='endDate',
+    [bankNames]='bankNames',
+    [cb] = 'cb'
+)
+
+//- sbpro-dashboard-cards(
+//-     *ngIf="isAdmin",
+//-     #dashboardCards,
+//-     [startDate]='startDate',
+//-     [endDate]='endDate',
+//-     [bankNames]='bankNames',
+//-     [cb]='cb'
+//- )

@@ -1,0 +1,109 @@
+div
+  div
+    form.pb-2(*ngIf ='filtersVisible')
+      .d-flex.mb-2
+        input#start-date.mt-1.form-control.sm.w-25.mr-2(
+          type='text',
+          name='sd',
+          placeholder='Start Date',
+          autocomplete='off',
+          ngbDatepicker,
+          outsideDays = 'hidden',
+          #sd = 'ngbDatepicker',
+          (click) = 'sd.toggle()',
+          [(ngModel)] = 'bankStatementService.dateFrom',
+          [minDate] = 'bankStatementService.dateFromMin',
+          [maxDate] = 'bankStatementService.dateFromMax',
+        )
+        input#end-date.mt-1.form-control.w-25.mr-2(
+          type='text',
+          name='ed',
+          placeholder='End Date',
+          autocomplete='off',
+          ngbDatepicker,
+          outsideDays = 'hidden',
+          #ed = 'ngbDatepicker',
+          (click) = 'ed.toggle()',
+          [(ngModel)] = 'bankStatementService.dateTo',
+          [minDate] = 'bankStatementService.dateToMin',
+          [maxDate] = 'bankStatementService.dateToMax',
+        )
+
+        button.btn.mr-2.ws-nowrap.mt-1.mb-1.castlerButtonColor(
+          type='submit',
+          (click) = 'submitSearch()'
+        )
+          fa-icon.d-flex.flex-row.align-items-center([icon]='["fas", "search"]')
+        button.btn.btn-link.mr-2.logoColor(type='button',(click)='clearForm()') Clear
+        .justify-content-end 
+          a.btn.btn-success.mb-1.mt-1.mr-2.ws-nowrap.btn-icon(
+            style = 'color: white',
+            type='button',
+            target='_blank',
+            [href]='bankStatementService.reportDownloadLink$ | async'
+          )
+            fa-icon.d-flex.flex-row.align-items-center(
+              [icon]='["fas", "arrow-down"]'
+            )
+
+      .d-flex(*ngIf='(bankStatements$ | async)?.length > 0') 
+        .flex-row
+          small.mb-2.mt-2 Showing {{ (bankStatementService.page - 1) * 10 + 1 }} to {{ (bankStatementService.page - 1) * 10 + (bankStatements$ | async)?.length }} of {{ total$ | async }}
+
+  .table-responsive.pp-table-container.align-self-stretch.flex-grow-1.flex-stretch-1.table-striped
+    table.table
+      thead 
+        tr
+          th.th-sticky-top(
+            scope='col',
+            sbSortable='event',
+            (sort)='onSort($event)',
+          )
+            span.ws-nowrap Date 
+          th.th-sticky-top(
+            scope='col',
+            sbSortable='time',
+            (sort)='onSort($event)',
+          )
+            span.ws-nowrap Description
+          th.th-sticky-top(scope='col' sbSortable='time', (sort)='onSort($event)')
+            span.ws-nowrap Withdraw (Dr)
+          th.th-sticky-top(scope='col' sbSortable='time', (sort)='onSort($event)')
+            span.ws-nowrap Credit (Cr)
+          th.th-sticky-top(scope='col' sbSortable='time', (sort)='onSort($event)')
+            span.ws-nowrap Balance
+
+      tbody(*ngIf='(bankStatements$ | async)?.length > 0 && !(loadingList$ | async)') 
+        tr(*ngFor = 'let bankStatement of bankStatements$ | async; index as i')
+          td
+            span {{bankStatement.transactionTime? toUTC(bankStatement.transactionTime):"--"}}
+          td
+            span {{bankStatement?.narration ? bankStatement.narration : "--" }}
+          td
+            span {{bankStatement.transactionType === "debit"? toINR(bankStatement.amount) : "--"}}
+          td
+            span {{bankStatement.transactionType === "credit"? toINR(bankStatement.amount) : "--"}} 
+          td
+            span {{bankStatement.accountBalance ? toINR(bankStatement.accountBalance) : "--"}} 
+
+        
+        
+        
+  .flex-container.flex-row(
+    *ngIf='(bankStatements$ | async)?.length <= 0 && !(loadingList$ | async)'
+  )
+    .align-self-center No Data available
+  .flex-container.flex-row(*ngIf='loadingList$ | async')
+    .align-self-center Please wait...
+  .d-flex.justify-content-between.pt-2.align-self-end(
+    *ngIf='(bankStatements$ | async)?.length > 0 && !(loadingList$ | async)'
+  )
+    ngb-pagination(
+      [collectionSize]='total$ | async',
+      [(page)]='bankStatementService.page',
+      [maxSize]='5',
+      [rotate]='true',
+      [ellipses]='false',
+      [boundaryLinks]='true'
+    )
+  button.btn.castlerButtonColor.float-left((click)='goBack()') Back

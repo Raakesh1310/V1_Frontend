@@ -1,0 +1,79 @@
+.active {
+  cursor: pointer;
+  color: black;
+  font-weight: bold;
+}
+.myBtn {
+  padding: 1% 5%;
+  border: none;
+  border-radius: 2px;
+  font-weight: bold;
+}
+.header-btn {
+  padding: 1% 5%;
+  border: none;
+  border-radius: 2px;
+  color: black;
+  font-weight: bold;
+}
+.row {
+  width: 100%;
+}
+.container-list {
+  button {
+    margin: 0% 0%;
+    border: 0.2pt solid rgb(228, 227, 227);
+  }
+}
+.alert {
+  ul {
+    list-style: none;
+  }
+}
+
+.linker {
+  float: right;
+  cursor: pointer;
+}
+
+#dummy {
+  padding: 0.25rem 0.5rem;
+  p {
+    background-color: whitesmoke;
+    width: auto;
+    padding: 0.2rem 0.5rem;
+  }
+}
+
+.docUp {
+  cursor: pointer;
+  text-decoration: underline;
+  text-decoration-color: cornflowerblue;
+  span {
+    height: 20px;
+    font-weight: bold;
+    font-size: large;
+    color: cornflowerblue;
+    padding-left: 5px;
+  }
+}
+
+.fordummy {
+  opacity: 0.4;
+  margin-top: 1px;
+  margin-bottom: 1px;
+}
+
+#ndocs {
+  display: none;
+}
+
+.hidden {
+  visibility: hidden;
+}
+
+.modal-btn {
+  float: right;
+  margin: 2%;
+  margin-top: 0%;
+}

@@ -1,0 +1,340 @@
+sbpro-card
+    .card-header
+        .row
+            .container-list.col-sm-12
+                center
+                    button(
+                        [ngClass]='descValid === "1" ? "header-btn" : "myBtn"',
+                        [class.active]='currentTab === "1"',
+                        (click)='toggle("1")'
+                    )
+                        img(
+                            *ngIf='descValid === "0"',
+                            src='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAACOUlEQVQ4T2NkoAA0rFMWYyRXf/1aFRlmJqbjZBnQsFZNiYmJ4cTfv/+5STagZp2qJhsj46G/f/+L/PvzL5IkA5rWqBgysDDuYWf9y/f1K/PmprDbQUQbULtKxZKZmWGbqMgfgZcvWV7+ZPin3hl27yPYgJYlRhb/GBmOswh9sqryvHMcPWDrVis5MzIyrJWV+cv/+CHTp18///u1xz04CFLHCNMcFxzNsGL3vG9/WX77VXve2gszpGG1ks+fv/+WKCv/53/9kvHr+w+Mc9tj7ufD5Bmblhr91zP9w/D122cGQ6VohpV7Vnxk/PvfqyH07rHa1coR//78nWlqzMf38tWn/3dvM9zj4ubWagi7+gtuQNZUUR4OVq4bhqbMQsxMfzlFBZQZDhy9/4GdmWPdjz/fQ8xM+fi+fP3CcPnc309/fv+37M14dA3Zi+AwKOhXEGDm+XfJwIRNnJn5DxsXBx/D5Qu/GXQNWBm+//jMcPP6vy+fPjI09qU97EEPH3gsFM+UEmFgZL1kaMYuysT0iyVS9z7D8ksKDG/fsP59eP/3mZ7kh5YMjAz/cRoAkiidqiDxj/X/RW1DThEO9h9M//5xMFw49f3D379/dfoznzzFluwx0kHRVGVZRrY/53UNeYVu3/j89du3/8n9aY9W4coz2BKSpIEjr5ljuNDSp3d+VK3qeQlKF/8YGBh+MjAwfGNgYPjOwMDwHB4LWEyWZmBgYNe24uZj/Mf488qJL28ZGBhA0fYBmysAxlTdl2ZXgBgAAAAASUVORK5CYII='
+                        )
+                        | &nbsp; Description
+                    button(
+                        [ngClass]='payeeValid === "1" ? "header-btn" : "myBtn"',
+                        [class.active]='currentTab === "2"',
+                        (click)='toggle("2")',
+                        [disabled]='payeeEnabled'
+                    )
+                        img(
+                            *ngIf='payeeValid === "0"',
+                            src='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAACOUlEQVQ4T2NkoAA0rFMWYyRXf/1aFRlmJqbjZBnQsFZNiYmJ4cTfv/+5STagZp2qJhsj46G/f/+L/PvzL5IkA5rWqBgysDDuYWf9y/f1K/PmprDbQUQbULtKxZKZmWGbqMgfgZcvWV7+ZPin3hl27yPYgJYlRhb/GBmOswh9sqryvHMcPWDrVis5MzIyrJWV+cv/+CHTp18///u1xz04CFLHCNMcFxzNsGL3vG9/WX77VXve2gszpGG1ks+fv/+WKCv/53/9kvHr+w+Mc9tj7ufD5Bmblhr91zP9w/D122cGQ6VohpV7Vnxk/PvfqyH07rHa1coR//78nWlqzMf38tWn/3dvM9zj4ubWagi7+gtuQNZUUR4OVq4bhqbMQsxMfzlFBZQZDhy9/4GdmWPdjz/fQ8xM+fi+fP3CcPnc309/fv+37M14dA3Zi+AwKOhXEGDm+XfJwIRNnJn5DxsXBx/D5Qu/GXQNWBm+//jMcPP6vy+fPjI09qU97EEPH3gsFM+UEmFgZL1kaMYuysT0iyVS9z7D8ksKDG/fsP59eP/3mZ7kh5YMjAz/cRoAkiidqiDxj/X/RW1DThEO9h9M//5xMFw49f3D379/dfoznzzFluwx0kHRVGVZRrY/53UNeYVu3/j89du3/8n9aY9W4coz2BKSpIEjr5ljuNDSp3d+VK3qeQlKF/8YGBh+MjAwfGNgYPjOwMDwHB4LWEyWZmBgYNe24uZj/Mf488qJL28ZGBhA0fYBmysAxlTdl2ZXgBgAAAAASUVORK5CYII='
+                        )
+                        | &nbsp; Link Payee
+                    button(
+                        [ngClass]='(docsArray && docsArray.length > 0 && !isDetailPage) ? "myBtn" : "header-btn"',
+                        [class.active]='currentTab === "3"',
+                        [disabled]='docsEnabled',
+                        (click)='toggle("3")'
+                    )
+                        img(
+                            *ngIf='docsArray && docsArray.length > 0 && !isDetailPage',
+                            src='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAACOUlEQVQ4T2NkoAA0rFMWYyRXf/1aFRlmJqbjZBnQsFZNiYmJ4cTfv/+5STagZp2qJhsj46G/f/+L/PvzL5IkA5rWqBgysDDuYWf9y/f1K/PmprDbQUQbULtKxZKZmWGbqMgfgZcvWV7+ZPin3hl27yPYgJYlRhb/GBmOswh9sqryvHMcPWDrVis5MzIyrJWV+cv/+CHTp18///u1xz04CFLHCNMcFxzNsGL3vG9/WX77VXve2gszpGG1ks+fv/+WKCv/53/9kvHr+w+Mc9tj7ufD5Bmblhr91zP9w/D122cGQ6VohpV7Vnxk/PvfqyH07rHa1coR//78nWlqzMf38tWn/3dvM9zj4ubWagi7+gtuQNZUUR4OVq4bhqbMQsxMfzlFBZQZDhy9/4GdmWPdjz/fQ8xM+fi+fP3CcPnc309/fv+37M14dA3Zi+AwKOhXEGDm+XfJwIRNnJn5DxsXBx/D5Qu/GXQNWBm+//jMcPP6vy+fPjI09qU97EEPH3gsFM+UEmFgZL1kaMYuysT0iyVS9z7D8ksKDG/fsP59eP/3mZ7kh5YMjAz/cRoAkiidqiDxj/X/RW1DThEO9h9M//5xMFw49f3D379/dfoznzzFluwx0kHRVGVZRrY/53UNeYVu3/j89du3/8n9aY9W4coz2BKSpIEjr5ljuNDSp3d+VK3qeQlKF/8YGBh+MjAwfGNgYPjOwMDwHB4LWEyWZmBgYNe24uZj/Mf488qJL28ZGBhA0fYBmysAxlTdl2ZXgBgAAAAASUVORK5CYII='
+                        )
+                        | &nbsp; Documents
+    .card-body
+        .row
+            .container-form.col-sm-12
+                div(*ngIf='errors && errors.length > 0')
+                    sbpro-alert(classes='alert-danger', [dismissable]='true')
+                        | {{ errors[0] }}
+                div([ngSwitch]='currentTab')
+                    span(*ngSwitchCase='1')
+                        form.details(*ngIf='isDetailPage')
+                            .row
+                                .col
+                                    .form-group
+                                        label(for='frm-cntrl-name') Escrow Name
+                                        p {{ account.name }}
+                                    .form-group
+                                        label(for='frm-cntrl-name') Email
+                                        p {{ account.email }}
+                                    .form-group
+                                        label(for='frm-cntrl-name') IFSC
+                                        p {{ account.ifsc }}
+                                    .form-group
+                                        label(for='frm-cntrl-name') Balance
+                                        p {{ account.balance }}
+                                    .form-group
+                                        label(for='frm-cntrl-name') Expected Volume
+                                        p(*ngIf='account.expectedVolume') {{ account.expectedVolume }}
+                                        p(*ngIf='!account.expectedVolume') --
+
+                                .col
+                                    .form-group
+                                        label(for='frm-cntrl-name') Escrow ID
+                                        p {{ account.accountId }}
+                                    .form-group
+                                        label(for='frm-cntrl-name') Purpose
+                                        p {{ account.purpose }}
+                                    .form-group
+                                        label(for='frm-cntrl-name') Start Date
+                                        p {{ account.startDate | date:"dd MMM yyyy" }}
+                                    .form-group
+                                        label(for='frm-cntrl-name') Validity
+                                        p {{ account.validity }}
+
+                        form([formGroup]='descForm', autocomplete="off", *ngIf='!isDetailPage')
+                            .form-group
+                                label(for='frm-cntrl-name') Escrow Name
+                                span.text-danger *
+                                input#frm-cntrl-name.form-control.form-control-sm(
+                                    type='text',
+                                    placeholder='Enter the name of escrow',
+                                    formControlName='name',
+                                    name='name',
+                                    autocomplete='new-account-name',
+                                    (keydown)='utilityService.onlyAlphaNumeric($event)' 
+                                )
+
+                            .form-group
+                                label(for='frm-cntrl-purpose') Purpose
+                                span.text-danger *
+                                input#frm-cntrl-purpose.form-control.form-control-sm(
+                                    type='text',
+                                    placeholder='Enter the purpose of escrow',
+                                    formControlName='purpose',
+                                    name='purpose',
+                                    autocomplete="new-purpose"
+                                )
+
+                            .form-group
+                                label(for='frm-cntrl-email') Email
+                                span.text-danger *
+                                input#frm-cntrl-email.form-control.form-control-sm(
+                                    type='email',
+                                    placeholder='your-email@email.com',
+                                    formControlName='email'
+                                )
+
+                            .form-group
+                                label(for='frm-cntrl-validity') Validity
+                                span.text-danger *
+                                input#frm-cntrl-validity.form-control.form-control-sm(
+                                    type='number',
+                                    placeholder='Enter Validity of escrow (in days)',
+                                    formControlName='validity',
+                                    min='1'
+                                )
+
+                            .form-group
+                                label(for='frm-cntrl-start-date') Start Date
+                                input#frm-cntrl-start-date.aria-readonly.form-control.form-control-sm(
+                                    type='text',
+                                    placeholder='DD MMM YYYY',
+                                    autocomplete='off',
+                                    formControlName='start_date',
+                                    ngbDatepicker,
+                                    outsideDays='hidden',
+                                    #d='ngbDatepicker',
+                                    (click)='d.toggle()',
+                                    [minDate]="minDate1"
+                                )
+
+                            .form-group
+                                label(for='frm-cntrl-end-date') Expected Volume
+                                input#frm-cntrl-end-date.form-control.form-control-sm(
+                                    type='number',
+                                    placeholder='Enter the amount in INR',
+                                    formControlName='expectedVolume',
+                                    min='1'
+                                )
+
+                            button.btn.btn-primary(
+                                (click)='descValidate()',
+                                *ngIf='!isDetailPage'
+                            ) Next
+
+                    span(*ngSwitchCase='2')
+                        form([formGroup]='linkPayeeForm', autocomplete="off" ,*ngIf = '!hiddenOnAuto')
+                            .row
+                                .col-sm-4
+                                    .form-group
+                                        label(for='payee') Payee
+                                        br
+                                        ng-select(
+                                            [items]='payee',
+                                            bindLabel='accountHolder',
+                                            [(ngModel)]='selectedPayee',
+                                            [ngModelOptions]='{ standalone: true }',
+                                            loadingText='Loading...',
+                                            placeholder='Enter Payee Name',
+                                            (change)='updatePayee()',
+                                            [disabled]='submitted',
+                                            (search)='fetchPayee($event.term)',
+                                            name='payee'
+                                        )
+                                            ng-template(ng-label-tmp='', let-item='item')
+                                                span(*ngIf='selectedPayee') {{ item.accountHolder }} | {{ item.email }}
+                                            ng-template(
+                                                ng-option-tmp='',
+                                                let-item='item',
+                                                let-search='searchTerm',
+                                                let-index='index'
+                                            )
+                                                span.sup-option {{ item.accountHolder }}
+                                                br
+                                                span.sub-option {{ item.email }} | {{ item.mobile }}
+
+                                .col-sm-3
+                                    .form-group
+                                        label(for='frm-cntrl-email') Payout share
+                                        span.text-danger *
+                                        br
+                                        input#frm-cntrl-email.form-control.form-control-sm(
+                                            type='number',
+                                            placeholder='Enter payout share',
+                                            formControlName='share',
+                                            required
+
+                                        )
+
+                                .col-sm-2
+                                    .form-group
+                                        label Unit
+                                        span.text-danger *
+                                        br
+                                        select#frm-cntrl-unit.form-control.form-control-sm(
+                                            name='share',
+                                            [(ngModel)]='selectedValue',
+                                            [ngModelOptions]='{ standalone: true }',
+                                            [disabled]='linkedPayeeArray && linkedPayeeArray.length > 0 ? true : false'
+                                        )
+                                            option(value='%') %
+                                            option(value='INR') INR
+
+                                .col-sm-1
+                                    .form-group
+                                        label.hidden button
+                                        br
+                                        button#addbtn.btn.btn-secondary.btn-sm(
+                                            (click)='payeeValidate()',
+                                            [disabled]='submitted'
+
+                                        ) ADD
+
+                        .row
+                            .col-sm-6
+                                .form-group
+                                    label Schedule Auto Transfer
+                                    br
+                                    label.switch
+                                        input(type='checkbox', #checkbox, [disabled]='isDetailPage', [checked]='isAuto' ,(click)='checkboxAction(checkbox)')
+                                        span.slider.round
+                        br
+                        .table-responsive.pp-table-container
+                            table.table
+                                thead
+                                    tr
+                                        th(scope='col')
+                                            span S.No.
+                                        th(scope='col')
+                                            span Payee Name
+                                        th(scope='col')
+                                            span Payee Email
+                                        th(scope='col')
+                                            span Share
+                                            span(*ngIf='selectedValue === "%"') ({{ shareSum }}%)
+                                        th(scope='col')
+                                            span
+
+                                tbody(*ngIf='linkedPayeeArray && linkedPayeeArray?.length == 0')
+                                    tr
+                                        td No payee linked
+                                tbody(*ngIf='linkedPayeeArray && linkedPayeeArray?.length > 0')
+                                    tr(*ngFor='let p of linkedPayeeArray; let i = index')
+                                        td
+                                            | {{ i + 1 }}
+                                        td
+                                            span(*ngIf='p.name') {{ p.name }}
+                                            span(*ngIf='!p.name') {{ p.accountHolder }}
+                                        td
+                                            | {{ p.email }}
+                                        td
+                                            | {{ p.share }} {{ selectedValue }}
+                                        td
+                                            span.linker((click)='removePayee(i)', *ngIf='!p._id') &nbsp;&nbsp;&nbsp;&nbsp;
+                                                img(
+                                                    src='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAChUlEQVRIS9WVT2jUQBTG35uktaJSdyfgnx48iYIHe9GLItVNIoqg4sGKIm2yXRARRERoL/YgCkJV0EOhTcSKUEFBBG3ZbKR4EOypgicFEaGINklLRalrZ57siiC1O20OBZ3b8OZ9v/nevJlBWOKBS6wP/wbAsDsOEMm7ALC66ljKhIAdT0JveKEKLMpB1nSfIwOPlZc9rAiSPnNMErQmoZ9LDTDMfIsAcU1KXK4x+PpLgDYIidHvuZCwQgfkxOhDNQpyJZP4DZl2Lir1j/wJ/csB33OyCbT6Q0DyJmlaKxBJ5S4RGUo5CIBnQJQfxc8GxpWASjBjFhoZiqmy/GF8CQdiFWBVS8GorxMTpM80JkP3pueurXUGyK32Mkp9SxT2vTFst1WTNCo11lQRYEKOC4bbo6I3yO3CZhDiVRx6DdVqzRk1Dzljux8R2JGk2Pcim3PHUINuIGip5iOMkIDuJPSaM6azExDvTwZeFb5oALfaXyNgVxT4j1UAbjmHEaE7KvpbUwLyI4Q0kBQ9XwUwTKdD1bI1S8Rt9wEQjMaBd1XpwHY7kbA5CvqPpnKQtdp7gbTppNR/QenAcnuIoCEueadTAbjtXgKi9XHgO2oH+TtI9D4KvIupAFnTOUuIuycD76AKkLXcJ0gwFJe8W6kA3MqfAJCn4sDfoe6itpeI2vXKnUgFyNjOPiK4MRX4m7jtdmpIT2eJbayI6CjfCsL9cdG7YuTa3hGyQlzyS6kAPNexDWB2OA5vc9VTkTHdaR3ZromgbywVwNhbWEdSjAOiKYE+z5fMJK0FxEDHujWfir3zrlH+B9xyuoDgvCSsnxcA8jsw7IkD/3Itl4v6cJTP9QLB/x/wE1zHRCjF83WXAAAAAElFTkSuQmCC'
+                                                )
+
+                        button.btn.btn-primary((click)='payeeNext()', *ngIf='!isDetailPage') Next
+
+                    span(*ngSwitchCase='3')
+                        form([formGroup]='docsForm',*ngIf = '!hiddenOnAuto')
+                            .row
+                                .col-sm-4
+                                    .form-group
+                                        select#frm-cntrl-email.form-control.form-control-sm(
+                                            name='docType',
+                                            [(ngModel)]='selectedDoc',
+                                            [ngModelOptions]='{ standalone: true }',
+                                            [disabled]='submitted'
+                                        )
+                                            option(value='') Select a type of document
+                                            option(value='Request letter for account opening') Request letter for account opening
+                                            option(value='Escrow agreement') Escrow agreement
+                                            option(value='Transaction parties agreement') Transaction parties agreement
+                                            option(value='Indemnity undertaking') Indemnity undertaking
+
+                                .col
+                                    .form-group
+                                        input#ndocs(
+                                            #myInput,
+                                            type='file',
+                                            enctype='multipart/form-data',
+                                            (change)='onfileChange($event)',
+                                            multiple
+                                            [disabled]='submitted'
+                                        )
+                                        button.btn.btn-secondary.btn-sm((click)='docUp()') + Upload Files
+                            br
+                        .row
+                            .table-responsive.pp-table-container
+                                table.table
+                                    thead
+                                        tr
+                                            th(scope='col')
+                                                span S.No.
+                                            th(scope='col')
+                                                span Document Type
+                                            th(scope='col')
+                                                span Document Uploaded
+                                            th(scope='col')
+                                                span
+
+                                    tbody(*ngIf='docsArray && docsArray?.length == 0')
+                                        tr
+                                            td No Files Uploaded
+                                    tbody(*ngIf='docsArray && docsArray?.length > 0')
+                                        tr(*ngFor='let doc of docsArray; let i = index')
+                                            td
+                                                | {{ i + 1 }}
+                                            td
+                                                span {{ doc.docType }}
+                                            td
+                                                a(
+                                                    href='{{ docUrlPrefix+doc.hash }}',
+                                                    target='_blank',
+                                                    *ngIf='doc.hash'
+                                                ) {{ doc.name }}
+                                                span(*ngIf='!doc.hash') {{ doc.name }}
+                                            td
+                                                span.linker((click)='removeDoc(i)', *ngIf='!doc.hash') &nbsp;&nbsp;&nbsp;&nbsp;
+                                                    img(
+                                                        src='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAChUlEQVRIS9WVT2jUQBTG35uktaJSdyfgnx48iYIHe9GLItVNIoqg4sGKIm2yXRARRERoL/YgCkJV0EOhTcSKUEFBBG3ZbKR4EOypgicFEaGINklLRalrZ57siiC1O20OBZ3b8OZ9v/nevJlBWOKBS6wP/wbAsDsOEMm7ALC66ljKhIAdT0JveKEKLMpB1nSfIwOPlZc9rAiSPnNMErQmoZ9LDTDMfIsAcU1KXK4x+PpLgDYIidHvuZCwQgfkxOhDNQpyJZP4DZl2Lir1j/wJ/csB33OyCbT6Q0DyJmlaKxBJ5S4RGUo5CIBnQJQfxc8GxpWASjBjFhoZiqmy/GF8CQdiFWBVS8GorxMTpM80JkP3pueurXUGyK32Mkp9SxT2vTFst1WTNCo11lQRYEKOC4bbo6I3yO3CZhDiVRx6DdVqzRk1Dzljux8R2JGk2Pcim3PHUINuIGip5iOMkIDuJPSaM6azExDvTwZeFb5oALfaXyNgVxT4j1UAbjmHEaE7KvpbUwLyI4Q0kBQ9XwUwTKdD1bI1S8Rt9wEQjMaBd1XpwHY7kbA5CvqPpnKQtdp7gbTppNR/QenAcnuIoCEueadTAbjtXgKi9XHgO2oH+TtI9D4KvIupAFnTOUuIuycD76AKkLXcJ0gwFJe8W6kA3MqfAJCn4sDfoe6itpeI2vXKnUgFyNjOPiK4MRX4m7jtdmpIT2eJbayI6CjfCsL9cdG7YuTa3hGyQlzyS6kAPNexDWB2OA5vc9VTkTHdaR3ZromgbywVwNhbWEdSjAOiKYE+z5fMJK0FxEDHujWfir3zrlH+B9xyuoDgvCSsnxcA8jsw7IkD/3Itl4v6cJTP9QLB/x/wE1zHRCjF83WXAAAAAElFTkSuQmCC'
+                                                    )
+
+                        button.btn.btn-primary((click)='onSubmit()', *ngIf='!isDetailPage && !submitted') Submit
+                        button.btn.btn-primary(*ngIf='submitted', [disabled]='submitted')
+                            span.spinner-border.spinner-border-sm(role='status', aria-hidden='true')
+                            | &nbsp; Submitting...
+button.modal-btn.btn.btn-primary(
+    (click)='onSubmit()',
+    *ngIf='isDetailPage && (currentTab === "2" || currentTab == "3")',
+    [disabled] = 'hiddenOnAuto'
+) Update
+button.modal-btn.btn.btn-link((click)='closeModal()', *ngIf='isDetailPage') close

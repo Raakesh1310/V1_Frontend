@@ -1,0 +1,23 @@
+.flex-container
+  sbpro-dashboard-head(
+    icon='book',
+    title='Bank Account Details'
+  )
+  .container-fluid.mt-n10.responsiveForm.flex-grow-1(*ngIf = '!loading')
+    sbpro-card-navigation(
+      sbproTocItem='Tabs',
+      [navNames]='navNames',
+      [templates]='templates'
+    )
+      ng-template(#basic)
+        sbpro-bank-account-basic-details()
+      ng-template(#escrowparties)
+        sbpro-bank-account-escrow-parties
+      ng-template(#statements)
+        sbpro-bank-account-statement
+      ng-template(#agreement)
+        sbpro-connected-banking-agreement
+      ng-template(#digitalEscrowList)
+        sbpro-digital-escrow-list([merchantId]='merchantId',)
+ngx-spinner
+  p(style='font-size: 20px; color: white') Processing. Please wait...

@@ -1,0 +1,10 @@
+sbpro-layout-dashboard([light]='true')
+  router-outlet
+    sbpro-dashboard-head(icon='book', title='All VPAs')
+    .container-fluid.mt-n10
+      .row
+        .col-lg-12
+          sbpro-card
+            .card-header(class='logoColor') VPA List
+            .card-body
+              sbpro-vpa-list()

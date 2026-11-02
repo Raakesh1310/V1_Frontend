@@ -1,0 +1,47 @@
+@import 'styles/variables.scss';
+
+.link {
+  cursor: pointer;
+  padding: 2% 8%;
+  border-radius: 25px;
+  color: black;
+  text-decoration: underline;
+}
+
+.red {
+  text-decoration: underline;
+}
+.red:hover {
+  background-color: rgb(238, 164, 164);
+}
+
+.green-color-box {
+  background-color: lightgreen;
+}
+
+.link:hover {
+  text-decoration: underline;
+}
+
+.detailsText {
+  font-size: 16px;
+  font-weight: 500;
+  color: black;
+}
+
+.flex-display-column {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.flex-display {
+  display: flex;
+  //justify-content: center;
+  //align-items: center;
+}
+
+.leftAlign {
+  text-align: left;
+}

@@ -1,0 +1,58 @@
+sbpro-card([headerActions]='true')
+  .card-header(class='logoColor')
+    | Email
+    button.btn.btn-icon.btn-link.btn-sm((click)='close()', class='castlerButtonColor1')
+      i-feather(name='x-circle')
+  .card-body 
+    form
+      .form-group 
+        label(for='recipients')
+          b Recipients&nbsp;
+          span ({{ mail.recipients.length }})
+
+      .input-group.input-group-joined.mb-4
+        .input-group-prepend((click)='toggleSearch()')
+          span.input-group-text
+            i-feather(name='search')
+        input.form-control.width-30(
+          *ngIf='showSearch',
+          type='text',
+          placeholder='Search Email...',
+          aria-label='Search',
+          (keyup)='filterEmail($event)'
+        )
+
+        span.form-control.custom.custom-control(*ngIf='!showSearch')
+          span.badge.badge-light.mr-2.p-2(*ngFor='let recipient of recipients') {{ recipient.email }}
+      span.form-control.custom.custom-control(*ngIf='showSearch')
+        span.badge.badge-light.mr-2.p-2(*ngFor='let recipient of recipients') {{ recipient.email }}
+
+      .form-group 
+        label(for='subject') 
+          b Subject
+
+        textarea#subject.form-control.ws-wrap(
+          rows='1',
+          [readonly]='true',
+          [value]='mail.subject'
+        ) 
+
+      .form-group
+        label(for='body') 
+          b Body
+        textarea#body.form-control(rows='6', [readonly]='true', [value]='mail.body')
+
+      .row 
+        .col-sm-12.col-md-6
+          .form-group
+            label(for='senttOn') 
+              b Sent On: &nbsp; &nbsp;
+            span#sentOn {{ mail.createdAt | date: "d MMM yyyy" }}
+
+        .col-sm-12.col-md-6
+          .form-group
+            label(for='sentby') 
+              b Sent By: &nbsp; &nbsp;
+            span#sentBy 
+              span(*ngIf='mail.createdByEmail') {{ mail.createdByEmail }}
+              span(*ngIf='!mail.createdByEmail') --

@@ -1,0 +1,31 @@
+sbpro-card([headerActions]='true')
+  .card-header(class='logoColor')
+    span(*ngIf='header') {{header}}
+    span(*ngIf='!header') OTP
+    button.btn.btn-icon.btn-link.s((click)='closer()', class='castlerButtonColor1',)
+      i-feather(name='x-circle')
+  .card-body
+    div(*ngIf='error')
+      sbpro-alert(classes='alert-danger', [dismissable]='true')
+        | {{ error }}
+    center
+      h5 {{ message }}
+
+    .form-group
+      input.form-control.form-control-sm(
+        type='number',
+        placeholder='Enter the OTP recieved',
+        name='otp',
+        required,
+        autocomplete='off',
+        #otp
+      )
+    span Didn't receive an OTP? &nbsp;
+      span((click)='resendOTP()', [class.linker]='!timer', style='color: #417505; font-weight:bold') Resend
+      span(*ngIf='timer') ({{ counter }})
+  .card-footer
+    button.btn.float-right(
+      type='button',
+      (click)='verifyOTP(otp.value)',
+      class='castlerButtonColor'
+    ) Verify

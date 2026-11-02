@@ -1,0 +1,12 @@
+**
+**/**
+!.gitignore
+!environment.ts.example
+#!environment.sandbox.ts
+#!environment.prod.ts
+#*
+#*/
+#!.gitignore
+#
+#!src/environments/example.environment.ts
+#!src/environments/environment.local.ts

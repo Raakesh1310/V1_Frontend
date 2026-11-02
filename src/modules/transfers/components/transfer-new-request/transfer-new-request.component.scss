@@ -1,0 +1,59 @@
+@import 'styles/variables.scss';
+
+td {
+  width: 50%;
+  border-top: none;
+}
+
+td:nth-child(1) {
+  font-weight: bold;
+  width: 15%;
+}
+
+p {
+  margin-bottom: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.customCheckBoxWidth {
+  width: 20px;
+  flex: 0;
+}
+
+.subTextAmount {
+  p {
+    font-size: small;
+  }
+}
+
+.fader {
+  color: rgb(156, 156, 156);
+}
+
+.selecter {
+  margin-top: 8px;
+}
+
+.freq {
+  position: relative;
+  top: 45%;
+  left: 0px;
+}
+
+.selected-list .c-list .c-token {
+    background: #0abc11 !important;
+}
+
+.pure-checkbox input[type="checkbox"]:checked + label:before {
+    background: #0abc11 !important;
+    border-color: #0abc11 !important;
+}
+
+.pure-checkbox input[type="checkbox"] + label:before {
+    color: #0abc11 !important;
+    border: 1px solid #0abc11 !important;
+}
+
+#uploadDocs {
+  display: none;
+}

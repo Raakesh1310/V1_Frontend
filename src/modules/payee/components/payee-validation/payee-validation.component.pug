@@ -1,0 +1,137 @@
+div
+	.mb-4.mt-4.ml-1.flex-display(*ngIf='!isAdmin')
+		p#introWidth Enter the required details in the template and upload (.xls, .xlsx, .csv)
+		.mt-2.myanchor(
+			style='width:190px;padding:0;margin-right:2%;text-align:center;'
+		)
+			a(
+				href='{{ sampleFileUrl }}',
+				target='_self',
+				download='Bulk_payee_sample.xlsx',
+				style='color: #687281'
+			)
+				.float-left
+					| Download Template
+				.float-right
+					img.ml-1(src='/assets/img/excel.png' width='25' height='25')
+	div(*ngIf='errors.length > 0')
+		sbpro-alert(classes='alert-danger', [dismissable]='true')
+			| {{ errors[0] }}
+	input(
+		type='file',
+		*ngIf='!isAdmin',
+		#inputFile,
+		accept='.xlsx, .xls, .csv',
+		(change)='uploadExcel($event)',
+		(click)='$event.target.value = null'
+	)
+	sbpro-card.mt-5.myanchor((click)='openUpload()', *ngIf='!isAdmin')
+		.card-body.flex-display.justify-content-center(
+			*ngIf='payeeStatus === states.upload'
+		)
+			p(style='font-size: 18px') Upload File
+			svg.bi.bi-file-earmark-arrow-up-fill.ml-3.marginTop(
+				xmlns='http://www.w3.org/2000/svg',
+				width='24',
+				height='24',
+				fill='currentColor',
+				viewbox='0 0 16 16'
+			)
+				path(
+					d='M9.293 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V4.707A1 1 0 0 0 13.707 4L10 .293A1 1 0 0 0 9.293 0zM9.5 3.5v-2l3 3h-2a1 1 0 0 1-1-1zM6.354 9.854a.5.5 0 0 1-.708-.708l2-2a.5.5 0 0 1 .708 0l2 2a.5.5 0 0 1-.708.708L8.5 8.707V12.5a.5.5 0 0 1-1 0V8.707L6.354 9.854z'
+				)
+		.card-body.flex-display.justify-content-around.align-center(
+			*ngIf='payeeStatus === states.submit'
+		)
+			.flex-display
+				p.logoColor.mr-3.pt-2.textSize {{ uploadedFileName }}
+				button.btn.castlerButtonColor3((click)='sendDataToApi()') Validate Payees
+		.card-body.flex-display.justify-content-around.align-center(
+			*ngIf='payeeStatus === states.error'
+		)
+			p.pt-2(style='color: red') {{ checkForValidHeaders ? "Error in File Headers, Upload Valid File" : "No payees added. Error in the fle. Upload again" }}
+			p.pt-2(style='color: red') {{ errors }}
+			p(style='font-size: 18px') Upload File Again
+			svg.bi.bi-file-earmark-arrow-up-fill.marginTop(
+				xmlns='http://www.w3.org/2000/svg',
+				width='24',
+				height='24',
+				fill='currentColor',
+				viewbox='0 0 16 16'
+			)
+				path(
+					d='M9.293 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V4.707A1 1 0 0 0 13.707 4L10 .293A1 1 0 0 0 9.293 0zM9.5 3.5v-2l3 3h-2a1 1 0 0 1-1-1zM6.354 9.854a.5.5 0 0 1-.708-.708l2-2a.5.5 0 0 1 .708 0l2 2a.5.5 0 0 1-.708.708L8.5 8.707V12.5a.5.5 0 0 1-1 0V8.707L6.354 9.854z'
+				)
+
+	p.mt-2.mb-4(*ngIf='!isAdmin') Previously Uploaded files will be shown here:-
+	.table-responsive.pp-table-container.table-responsive-sm
+		table.table
+			thead
+				tr
+					th(scope='col' sbSortable='event', *ngIf='isAdmin')
+						span.ws-nowrap Merchant Title
+					th(scope='col' sbSortable='event')
+						span.ws-nowrap Penny Drop ID
+					th(scope='col' sbSortable='time')
+						span.ws-nowrap Request Date
+					th(scope='col' sbSortable='time')
+						span.ws-nowrap Total Verifications
+					th(scope='col' sbSortable='time')
+						span.ws-nowrap Successful Verifications
+					th(scope='col' sbSortable='time')
+						span.ws-nowrap Failed Verifications
+					th(scope='col' sbSortable='time')
+						span.ws-nowrap Action
+			tbody(*ngIf='(payeesValidations$ | async)?.length == 0')
+				tr
+					td(
+						*ngIf='!(payeesValidations$.loading$ | async) && (payeesValidations$ | async)?.length == 0'
+					) No Entries Found
+					td.spinner(*ngIf='payeesValidations$.loading$ | async')
+						.spinner-border.text-primary(role='status')
+							span.sr-only Loading...
+			tbody
+				tr(*ngFor='let data of payeesValidations$ | async')
+					td(*ngIf='isAdmin')
+						a.nav-link.p-0(
+							href='javascript:void(0);',
+							(click)='openDetails(data?.merchantId)',
+							style='color: #417505;font-weight: bold'
+						)
+							span {{ data?.merchantTitle }}
+					td
+						ngb-highlight([result]='data.batchId')
+					td
+						ngb-highlight([result]='data.createdAt')
+					td
+						ngb-highlight([result]='data.totalValidations')
+					td
+						ngb-highlight([result]='data.successfulValidations')
+					td
+						ngb-highlight([result]='totalFailedValidations(data.failedValidations,data.processingErrorValidations)')
+					td
+						a.btn.btn-success.mt-1.mb-1.mr-2.ws-nowrap(
+							*ngIf='["completed", "failed", "processing_error"].includes(data.status) && data.payeeAdditionCompleted',
+							type='button',
+							target='_blank',
+							[href]='payeeValidationService.validationReportURL(data.batchId)'
+						) Download
+						span.verifyButton(*ngIf='data.status === "processing"') Verifying...
+						span.verifyButton(
+							*ngIf='data.status !== "processing" && !data.payeeAdditionCompleted && data.status !== "processing_error"'
+						) Adding Payees...
+						span.text-danger(*ngIf='data.status === "failed" || data.status === "processing_error"') Failed
+	.d-flex.justify-content-between.p-2
+		ngb-pagination(
+			[collectionSize]='payeeValidationService.total$ | async',
+			[maxSize]='10',
+			[(page)]='payeeValidationService.page',
+			[pageSize]='payeeValidationService.pageSize',
+			[rotate]='true',
+			[ellipses]='false',
+			[boundaryLinks]='true'
+		)
+			//- (pageChange)='loadPage($event)',
+
+ngx-spinner
+	p(style='font-size: 20px; color: white') Adding Payees...

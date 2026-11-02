@@ -1,0 +1,17 @@
+sbpro-dashboard-head(
+  icon='activity',
+  title='Transfer List',
+  description='Transfer Details'
+)
+.container-fluid.mt-n10
+  sbpro-card-navigation(
+    sbproTocItem='Tabs',
+    [navNames]='onlySingleTransfer ?["Single Transfer"] : ["Single Transfer","Bulk Transfer"]',
+    [templates]='onlySingleTransfer ?[singleTransfer] : [singleTransfer,bulkTransfer]',
+    [selectedIndexForFade] = 'selectedIndexForFade',
+    [selectedIndex] = 'selectedIndexForFade',
+  )
+    ng-template(#singleTransfer)
+      sbpro-passbook-table-list([pageSize]='10', [connectedBanking]='true',)
+    ng-template(#bulkTransfer)
+      sbpro-bulk-table-list([connectedBanking]='true')

@@ -1,0 +1,53 @@
+sbpro-card.d-block(
+    [headerActions]='true',
+    style='height: 100%',
+    *ngIf='!loadingData'
+)
+    .card-header.text-white(
+        style='background: linear-gradient(261.06deg, #6BD394 8%, #41AC9A 100%)',
+        *ngIf = '!connectedBanking'
+    ) Digital Escrow Balance
+
+    .card-header.text-white(
+        style='background: linear-gradient(261.06deg, #6BD394 8%, #41AC9A 100%)',
+        *ngIf = 'connectedBanking'
+    ) Bank Accounts
+
+    .card-body(style='background: #FFFBF4;')
+        .chart-pie.h-100(style='position: relative;')
+            .h-100(*ngIf='banks === "All Banks"')
+                sbpro-accounts-table()
+
+            .h-100.d-flex.flex-column.align-center(*ngIf='!connectedBanking || banks != "All Banks"')
+                div(style='height: 300px')
+                    canvas.vertical-center(#pieChartRef)
+
+.dashboard-card(*ngIf='loadingData')
+    ngx-skeleton-loader(count='1', [theme]='{ height: "20px", width: "180px" }')
+    ngx-skeleton-loader(count='1', [theme]='{ height: "20px" }')
+    div(
+        style='display : flex; align-items: center; justify-content: space-between; margin-top: 25px'
+    )
+        div(style='display : flex; flex-direction: column')
+            ngx-skeleton-loader(count='2', [theme]='{ height: "14px", width: "120px" }')
+            ngx-skeleton-loader(count='2', [theme]='{ height: "14px", width: "120px" }')
+        ngx-skeleton-loader(
+            count='1',
+            appearance='circle',
+            [theme]='{ height: "220px", width: "220px" }'
+        )
+//.dashboard-card(*ngIf='loadingData && connectedBanking  && !isAdmin && banks !== "All Banks"')
+//  //- ngx-skeleton-loader(count='1', [theme]='{ height: "20px", width: "180px" }')
+//  //- ngx-skeleton-loader(count='1', [theme]='{ height: "20px" }')
+//  div(*ngFor = 'let item of  [1,2,3,4,5]', style ='margin-top: 15px')
+//    ngx-skeleton-loader(count='1', [theme]='{ height: "30px" }', [appearance]='line')
+//
+//.dashboard-card.table-accounts(*ngIf='loadingData && connectedBanking  && !isAdmin && banks === "All Banks"')
+//  div(*ngFor = 'let item of [1,2,3,4,5]')
+//    .row
+//      .col.table-accounts
+//        ngx-skeleton-loader(count='2', [theme]='{ height: "20px", width: "100px"}')
+//        ngx-skeleton-loader(count='2', [theme]='{ height: "20px", width: "50px"}')
+//      .col.table-accounts
+//        ngx-skeleton-loader(count='2', [theme]='{ height: "20px", width: "100px"}')
+//        ngx-skeleton-loader(count='2', [theme]='{ height: "20px", width: "50px"}')

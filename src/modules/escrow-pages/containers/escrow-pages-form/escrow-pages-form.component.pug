@@ -1,0 +1,17 @@
+sbpro-dashboard-head(
+  icon='layout',
+  title='Create Page',
+  description='Build your escrow landing page here.'
+)
+.container-fluid.mt-n10.responsiveForm
+  sbpro-create-form([escrowPagePG]='escrowPagePG', [pgSettlementAccount]='pgSettlementAccount')
+
+ng-template(#infoMessage)
+  .card-header.modal-header.logoColor Information Message
+  .card-body
+    | Please contact info@castler.com to enable payments via escrow pages.
+  .card-footer
+    button.btn.float-right(
+      (click)='closeModal()',
+      style='border-color: #bc8e32;color: #417505; border-width: 2px'
+    ) Exit

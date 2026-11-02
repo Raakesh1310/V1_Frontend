@@ -1,0 +1,102 @@
+// This file can be replaced during build by using the `fileReplacements` array.
+// `ng build --prod` replaces `environment.ts` with `environment.prod.ts`.
+// The list of file replacements can be found in `angular.json`.
+
+export const environment = {
+    production: false,
+    enableLogs: false,
+    disableSite: false,
+
+    /**
+     * Feature: Authentication
+     *
+     * Defines Environments related
+     * to Authentication module
+     */
+    defaultUrl: 'auth/login',
+    enableRegistration: false,
+
+    /**
+     * Static Resources
+     */
+    logo: '/assets/img/strata-logo.png',
+    name: 'Real Estate Investment Platform',
+    email: 'admin@yourcompany.com',
+
+    /**
+     * Prefixes
+     */
+    host: 'http://localhost:4200',
+    apiHost: 'http://localhost:3000',
+    apiPrefix: 'http://localhost:3000/api/v1',
+    urlPortalPrefix: 'portal',
+    urlAdminPrefix: 'super-admin',
+
+    /**
+     * Misc Settings
+     */
+    captchaDisable: true,
+    secretKey: 'secret_key',
+    defaultItemsPerPage: 10,
+    decryptKey: false,
+    canAdminViewUserOptions: false,
+
+    /**
+     * Feature: Challan/I-Sure
+     */
+    challanPayTo: 'NCOME TECH SOLUTIONS PVT LTD',
+
+    /**
+     * Feature: Notification
+     */
+    enableWHATSAPP: false,
+
+    /**
+     * Feature: Escrow Pages
+     */
+    escrowPagesVerificationFields: [],
+    escrowPagesRequiredFields: ['pan', 'bank', 'aadhaar', 'custom'],
+    /**
+     * Feature: Razorpay
+     */
+    razorpayKey: 'rzp_test_yTQNCr2QW7Y9m8',
+    razorpayLogo: '/assets/img/Castler_logo.png',
+
+    dateDifferentialInMonth: 1,
+    dateDifferentialInWeek: 1,
+    maxNumberOfNotes: 5,
+
+    /**
+     * FOr Merchant activate/deactivate OTP verification
+     */
+    superAdminMobile: 8895106117,
+    maxApprovals: 200,
+    maxTransfersinBulk: 5000
+    
+    /**
+     * For X API Generation
+     */
+    enableXAPIKey: '',
+    /**
+     * Dashboard
+     */
+    noOfDaysSwitch: 28
+    maxSize: 10 * 1024 * 1024,
+
+    /**
+     * Effective Balance Delay
+     */
+    effectiveBalanceDelay: 400,
+    depositMaxAmount: 1000000,
+    adminEmail:"",
+    ReportServiceHost=https://report-qa.ncome.in/report
+};
+
+/*
+ * For easier debugging in development mode, you can import the following file
+ * to ignore zone related error stack frames such as `zone.run`, `zoneDelegate.invokeTask`.
+ *
+ * This import should be commented out in production mode because it will have a negative impact
+ * on performance if an error is thrown.
+ */
+// import 'zone.js/dist/zone-error';  // Included with Angular CLI.

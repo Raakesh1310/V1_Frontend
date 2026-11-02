@@ -1,0 +1,19 @@
+sbpro-dashboard-head(
+  icon='activity',
+  title='Approvals Report',
+  description='Pending Approvals'
+)
+.container-fluid.mt-n10
+  sbpro-card-navigation(
+    sbproTocItem='Tabs',
+    [navNames]='NavName',
+    [templates]='Template',
+  )
+    ng-template(#singleTransfer)
+      sbpro-single-transfer-approval
+    ng-template(#bulkTransfer)
+      sbpro-bulk-transfer-approval
+    ng-template(#merchant)
+      sbpro-merchant-approval
+    ng-template(#payees)
+      sbpro-payee-approval

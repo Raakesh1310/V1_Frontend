@@ -1,0 +1,282 @@
+div(hidden)
+  form#printsection(*ngIf='challan')
+    .row.printForm
+      .col-5
+        .row.customerCopy
+          .col
+            img(
+              height='75px',
+              width='150px',
+              src='assets/img/Castler_logo.png'
+            )
+          .col
+            span.headerText Pay Slip
+          .col
+            img(
+              height='75px',
+              width='150px',
+              src='assets/img/Castler_logo.png'
+            )
+
+        br
+        br
+        .row
+          .col-8
+            .form-group
+              label(for='exampleSolidFormControlTextarea1') Deposited in branch:
+          .col-4
+            .form-group
+              label(for='exampleSolidFormControlTextarea1') Date:
+
+        .form-group
+          label(for='exampleSolidFormControlTextarea1') Pay to: {{ challan.payTo }}
+
+        .form-group
+          label(for='exampleSolidFormControlTextarea1') Unique Reference Number: {{ challan.challanId }}
+
+          .form-group
+          label(for='exampleSolidFormControlTextarea1') Payer Name: {{ challan.payerName }}
+
+          .form-group
+          label(for='exampleSolidFormControlTextarea1') Payer Details: {{ challan.payerDetail }}
+
+        .row
+          .col
+            .form-group
+              label(for='exampleSolidFormControlTextarea1') Contact 1: {{ challan.contact1 }}
+          .col
+            .form-group
+              label Contact 2: {{ challan.contact2 }}
+
+        .form-group
+          label(for='exampleSolidFormControlTextarea1') Amount: {{ challan.amount }}
+
+        .form-group
+          label(for='exampleSolidFormControlTextarea1') Amount in words: {{ challan.amountWords }}
+
+        .row
+          .col
+            .form-group
+              label(for='exampleSolidFormControlTextarea1') Bank Name:
+          .col
+            .form-group
+              label(for='exampleSolidFormControlTextarea1') Cheque number:
+
+        .row
+          .col
+            h4 For office use only
+            hr
+        .row
+          .col
+            .form-group
+              label Sign of officer:
+            .form-group
+              label Cheque is subjected to realisation:
+
+          .col
+            br
+            br
+            br
+            .form-group
+              label(for='exampleFormControlTextarea1') Depositors Signature:
+
+      .col-7
+        .row.bankCopy
+          .col
+            img(
+              height='50px',
+              width='100px',
+              src='assets/img/Castler_logo.png'
+            )
+          .col
+            span.headerText Pay Slip
+          .col
+            img(
+              height='50px',
+              width='100px',
+              src='assets/img/Castler_logo.png'
+            )
+
+        br
+        br
+
+        .row
+          .col-8
+            .form-group
+              label(for='exampleSolidFormControlTextarea1') Deposited in branch:
+          .col-4
+            .form-group
+              label(for='exampleSolidFormControlTextarea1') Date:
+
+        .form-group
+          label(for='exampleSolidFormControlTextarea1') Pay to: {{ challan.payTo }}
+        .form-group
+          label(for='exampleSolidFormControlTextarea1') Unique Reference Number: {{ challan.challanId }}
+
+          .form-group
+          label(for='exampleSolidFormControlTextarea1') Payer Name: {{ challan.payerName }}
+
+          .form-group
+          label(for='exampleSolidFormControlTextarea1') Payer Details: {{ challan.payerDetail }}
+
+        .row
+          .col
+            .form-group
+              label(for='exampleSolidFormControlTextarea1') Contact 1: {{ challan.contact1 }}
+          .col
+            .form-group
+              label Contact 2: {{ challan.contact2 }}
+        .form-group
+          label(for='exampleSolidFormControlTextarea1') Amount: {{ challan.amount }}
+
+        .form-group
+          label(for='exampleSolidFormControlTextarea1') Amount in words: {{ challan.amountWords }}
+
+        .row
+          .col
+            .form-group
+              label(for='exampleSolidFormControlTextarea1') Bank Name:
+          .col
+            .form-group
+              label(for='exampleSolidFormControlTextarea1') Cheque number:
+
+        .row
+          .col
+            h4 For office use only
+            hr
+        .row
+          .col
+            .form-group
+              label Tran ID:
+            .row
+              .col
+                br
+                .form-group
+                  label Sign of officer:
+              .col
+                .form-group
+                  label Sign of verifying officer:
+
+          .col
+            br
+            br
+            br
+            .form-group
+              label(for='exampleFormControlTextarea1') Depositors Signature:
+
+sbpro-card(*ngIf='!isPrintable')
+  .card-header(class='logoColor') Challan Form
+  .card-body
+    div(*ngIf='errors.length > 0')
+      sbpro-alert(classes='alert-danger', [dismissable]='true')
+        | {{ errors[0] }}
+    form([formGroup]='challanForm', autocomplete='off')
+      .form-group(*ngIf='isAdmin')
+        label(for='payee') Merchant
+        span.text-danger *
+        br
+        ng-select(
+          [items]='merchants',
+          bindLabel='title',
+          [(ngModel)]='selectedMerchant',
+          (change)='updateMerchant()',
+          [ngModelOptions]='{ standalone: true }',
+          loadingText='Loading...',
+          placeholder='Select Merchant',
+          (search)='getMerchants($event.term)',
+          name='merchant'
+        )
+          ng-template(ng-label-tmp='', let-item='item')
+            span(*ngIf='selectedMerchant') {{ item.title }}
+          ng-template(
+            ng-option-tmp='',
+            let-item='item',
+            let-search='searchTerm',
+            let-index='index'
+          )
+            span.sup-option {{ item.title }}
+            br
+            span.sub-option {{ item.merchantId }} | {{ item.email }}
+      .form-group
+        label(for='frm-cntrl-amount') Escrow
+        span.text-danger *
+        ng-select(
+          [items]='accounts',
+          bindLabel='name',
+          [(ngModel)]='selectedAccount',
+          loadingText='Loading...',
+          placeholder='Enter Escrow Name',
+          (change)='updateAccount()',
+          [disabled]='submitted',
+          name='account',
+          [ngModelOptions]='{ standalone: true }',
+          (search)='fetchAccount($event)'
+        )
+          ng-template(ng-label-tmp='', let-item='item')
+            span(*ngIf='selectedAccount') {{ utilService.firstCapitalize(item.name) }} &nbsp;
+              span.fader - {{ item.accountId }}
+          ng-template(
+            ng-option-tmp='',
+            let-item='item',
+            let-search='searchTerm',
+            let-index='index'
+          )
+            span.sup-option {{ utilService.firstCapitalize(item.name) }}
+            br
+            span.sub-option {{ item.accountId }}
+
+      .form-group
+        label(for='payerdetail') Payer Name
+        span.text-danger *
+        input#payerdetail.form-control.form-control-sm(
+          type='text',
+          formControlName='payerName'
+        )
+
+      .form-group
+        label(for='exampleSolidFormControlSelect2') Payer Details 1
+        span.text-danger *
+        input#exampleSolidFormControlSelect2.form-control.form-control-sm(
+          formControlName='payerDetail1',
+          type='text'
+        )
+      .form-group
+        label(for='exampleSolidFormControlSelect2') Payer Details 2
+        span.text-danger *
+        input#exampleSolidFormControlSelect2.form-control.form-control-sm(
+          formControlName='payerDetail2',
+          type='text'
+        )
+      .row
+        .col
+          .form-group
+            label(for='exampleSolidFormControlSelect3') Contact 1
+            span.text-danger *
+            input#exampleSolidFormControlSelect3.form-control.form-control-sm(
+              formControlName='contact1',
+              type='tel'
+            )
+        .col
+          .form-group
+            label(for='exampleSolidFormControlSelect4') Contact 2
+            input#exampleSolidFormControlSelect4.form-control.form-control-sm(
+              formControlName='contact2',
+              type='tel'
+            )
+      .form-group
+        label(for='exampleSolidFormControlSelect5') Amount (in fig)
+        span.text-danger *
+        input#exampleSolidFormControlSelect5.form-control.form-control-sm(
+          formControlName='amount',
+          type='text'
+        )
+      .form-group
+        label(for='exampleSolidFormControlTextarea6') Amount (in words)
+        span.text-danger *
+        input#exampleSolidFormControlTextarea6.form-control.form-control-sm(
+          formControlName='amountWords',
+          type='text'
+        )
+
+      .form-group
+        button.btn((click)='onSubmit()', class='castlerButtonColor') Submit

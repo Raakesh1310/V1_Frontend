@@ -1,0 +1,28 @@
+sbpro-card
+  .card
+  .card-header Mobile Number Update
+  .card-body
+    .sb-preview
+      .sbp-preview-content
+        form
+          .form-group
+            label(for='exampleFormControlInput1') Current Mobile Number
+            input#exampleFormControlInput1.form-control(
+              type='text',
+              placeholder='9898980808'
+            )
+          .form-group
+            label(for='exampleFormControlInput2') New Mobile Number
+              span.text-danger *
+            input#exampleFormControlInput2.form-control(
+              type='text',
+              placeholder='9898984523'
+            )
+          .form-group
+            label(for='exampleFormControlInput2') Verify OTP
+              span.text-danger *
+            input#exampleFormControlInput2.form-control(
+              type='number',
+              placeholder='02345'
+            )
+          button.btn.btn-primary(type='button') Update

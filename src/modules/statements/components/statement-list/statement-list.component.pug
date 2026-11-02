@@ -1,0 +1,199 @@
+div
+  div
+    form.pb-2(*ngIf='filtersVisible')
+      .d-flex.mb-2
+        input#wildSearch.mt-1.form-control.w-100.mr-2(
+          *ngIf='!accountId',
+          type='text',
+          name='s',
+          placeholder='Search by Business name, From Virtual A/C, Reference ID',
+          placement='top',
+          autocomplete='off',
+          ngbPopover='Search by Business name, From Virtual A/C, Reference ID',
+          [(ngModel)]='statementService.s'
+        )
+        input#start-date.mt-1.form-control.sm.w-25.mr-2(
+          type='text',
+          name='sd',
+          placeholder='Start Date',
+          autocomplete='off',
+          ngbDatepicker,
+          outsideDays='hidden',
+          #sd='ngbDatepicker',
+          (click)='sd.toggle()',
+          [(ngModel)]='statementService.dateFrom',
+          [minDate]='statementService.dateFromMin',
+          [maxDate]='statementService.dateFromMax'
+        )
+        input#end-date.mt-1.form-control.w-25.mr-2(
+          type='text',
+          name='ed',
+          placeholder='End Date',
+          autocomplete='off',
+          ngbDatepicker,
+          outsideDays='hidden',
+          #ed='ngbDatepicker',
+          (click)='ed.toggle()',
+          [(ngModel)]='statementService.dateTo',
+          [minDate]='statementService.dateToMin',
+          [maxDate]='statementService.dateToMax'
+        )
+
+        //- select.mt-1.form-control.w-25.mr-2(
+        //-   name='bank',
+        //-   [(ngModel)]='statementService.bank'
+        //- )
+        //-   option(value='') Select Bank
+        //-   option(value='icici') ICICI
+        //-   option(value='rbl') RBL
+        //-   option(value='idfc') IDFC
+        //-   option(value='yes_bank') YES BANK
+
+        .btn.mr-2.ws-nowrap.mt-1.mb-1.castlerButtonColor(
+          type='submit',
+          (click)='submitSearchForm()'
+        )
+          fa-icon.d-flex.flex-row.align-items-center([icon]='["fas", "search"]')
+        button.btn.btn-link.mr-2.logoColor(type='button', (click)='clearForm()') Clear
+        .justify-content-end 
+        div.dropdown.mt-1(style="position: relative; display: inline-block;")
+          button.dropbtn(style="background-color: #417505; color: white; padding: 5px 10px; font-size: 14px;  min-width: 120px;border: none; cursor: pointer;",(click)="toggleDropdown()")
+            | Download 
+            fa-icon.flex-row.align-items-right(
+              [icon]='["fas", "arrow-down"]'
+            )
+          div.dropdown-content(style="position: absolute; background-color: #f9f9f9; min-width: 120px; box-shadow: 0px 4px 8px 0px rgba(0,0,0,0.2); z-index: 10000",[style.display]="dropdownOpen ? 'block' : 'none'")
+            a([href]='statementService.reportDownloadLink$ | async',style="color: black; padding: 8px 12px; text-decoration: none; display: inline-block; cursor: pointer; border-right: 1px solid #ccc;",(mouseenter)="highlight($event)", (mouseleave)="unhighlight($event)",(click)="statementService.fileType = 'csv'") CSV
+            a([href]='statementService.reportDownloadLink$ | async',style="color: black; padding: 8px 12px; text-decoration: none; display: inline-block;",(mouseenter)="highlight($event)", (mouseleave)="unhighlight($event)",(click)="statementService.fileType ='pdf'") PDF
+
+      .d-flex(*ngIf='(statements$ | async)?.length > 0') 
+        .flex-row
+          small.mb-2.mt-2 Showing {{ (statementService.page - 1) * 10 + 1 }} to {{ (statementService.page - 1) * 10 + (statements$ | async)?.length }} of {{ total$ | async }}
+
+  .table-responsive.pp-table-container.align-self-stretch.flex-grow-1.flex-stretch-1.table-striped
+    table.table
+      thead
+        tr
+          th.th-sticky-top(
+            scope='col',
+            sbSortable='event',
+            (sort)='onSort($event)',
+            *ngIf='!accountId'
+          )
+            span.ws-nowrap Business name
+          th.th-sticky-top(scope='col' sbSortable='event', (sort)='onSort($event)')
+            span.ws-nowrap Date
+          th.th-sticky-top(
+            scope='col',
+            sbSortable='time',
+            (sort)='onSort($event)',
+            *ngIf='!accountId'
+          )
+            span.ws-nowrap From Escrow ID
+          th.th-sticky-top(scope='col' sbSortable='time', (sort)='onSort($event)')
+            span.ws-nowrap {{ accountId ? "Transaction ID / Payment ID" : "Reference ID" }}
+          th.th-sticky-top(scope='col' sbSortable='time', (sort)='onSort($event)')
+            span.ws-nowrap Description
+          th.th-sticky-top(scope='col' sbSortable='time', (sort)='onSort($event)')
+            span.ws-nowrap UTR 
+          th.th-sticky-top(scope='col' sbSortable='time', (sort)='onSort($event)')
+            span.ws-nowrap Withdraw (Dr)
+          th.th-sticky-top(scope='col' sbSortable='time', (sort)='onSort($event)')
+            span.ws-nowrap Deposit (Cr)
+          th.th-sticky-top(
+            scope='col',
+            sbSortable='time',
+            (sort)='onSort($event)',
+            *ngIf='!accountId'
+          )
+            span Status
+          th.th-sticky-top(
+            scope='col',
+            sbSortable='time',
+            (sort)='onSort($event)',
+            *ngIf='accountId'
+          )
+            span Balance
+
+      tbody(*ngIf='(statements$ | async)?.length > 0 && !(loadingList$ | async)')
+        tr(*ngFor='let statement of statements$ | async; index as i')
+          td(*ngIf='!accountId')
+            a.nav-link.p-0.tableClickEntryColor(
+              href='javascript:void(0);',
+              (click)='openMerchant(statement.merchantId)'
+            )
+              ngb-highlight(
+                [result]='statement.merchantTitle',
+                [term]='statementService.searchTerm'
+              )
+          td
+            ngb-highlight.ws-nowrap(
+              [result]='statement.createdAt | date: "d MMM yyyy" || "--"',
+              [term]='statementService.searchTerm'
+            )
+          td(*ngIf='!accountId')
+            a.nav-link.p-0.tableClickEntryColor(
+              href='javascript:void(0);',
+              (click)='openAccount(statement.accountId)'
+            )
+              ngb-highlight(
+                [result]='statement.accountId',
+                [term]='statementService.searchTerm'
+              )
+          td
+            a.nav-link.p-0.tableClickEntryColor(
+              href='javascript:void(0);',
+              (click)='statement.transferId ? openTransfer(statement.transferId) : openTransaction(statement.transactionId)' 
+            )
+              ngb-highlight(
+                [result]='statement.transferId || statement.transactionId || "--"',
+                [term]='statementService.searchTerm'
+              )
+          td
+            span(*ngIf='statement.transferId') {{ statement.transferId.startsWith("TFFD") ? "Funds Blocked" : "Transfer to " + statement.beneficiaryName }}
+            span(*ngIf='statement.transactionId && statement.remarks') {{ statement.remarks.startsWith("Reversal of") ? statement.remarks : "Transfer from " + statement.remitterName }}
+            span(*ngIf='statement.transactionId && !statement.remarks') {{ "Transfer from " + statement.remitterName }}
+          td
+            ngb-highlight(
+              *ngIf='statement.utr',
+              [result]='statement.utr'
+            )
+          td
+            ngb-highlight(
+              *ngIf='statement.transferId',
+              [result]='statement.amount',
+              [term]='statementService.searchTerm'
+            )
+          td
+            ngb-highlight(
+              *ngIf='statement.transactionId',
+              [result]='statement.amount',
+              [term]='statementService.searchTerm'
+            )
+          td(*ngIf='!accountId')
+            ngb-highlight(
+              [result]='statement.status || "--"',
+              [term]='statementService.searchTerm'
+            )
+          td(*ngIf='accountId')
+            ngb-highlight(
+              [result]='statement.accountBalance || "--"',
+              [term]='statementService.searchTerm'
+            )
+  .flex-container.flex-row(
+    *ngIf='(statements$ | async)?.length <= 0 && !(loadingList$ | async)'
+  )
+    .align-self-center No Data available
+  .flex-container.flex-row(*ngIf='loadingList$ | async')
+    .align-self-center Please wait...
+  .d-flex.justify-content-between.pt-2.align-self-end(
+    *ngIf='(statements$ | async)?.length > 0 && !(loadingList$ | async)'
+  )
+    ngb-pagination(
+      [collectionSize]='total$ | async',
+      [(page)]='statementService.page',
+      [maxSize]='5',
+      [rotate]='true',
+      [ellipses]='false',
+      [boundaryLinks]='true'
+    )

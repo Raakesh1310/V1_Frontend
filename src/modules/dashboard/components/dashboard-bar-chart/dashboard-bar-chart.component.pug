@@ -1,0 +1,43 @@
+sbpro-card.mb-5.mt-4.d-block(
+  [headerActions]='true',
+  style='height: 400px',
+  *ngIf='!loadingData'
+)
+  .card-header(style='color: #417505;background-color: white')
+    p {{ dropDownVal }}
+    select(
+      style='width: 250px;border:none;outline:0;height:30px;color: #6BC127',
+      (change)='onChange($event)'
+    )
+      option(*ngFor='let val of inwardOutwardDropdown')
+        p {{ val }}
+
+  // Body for Total Outward Fund Transfer
+  .card-body(
+    [hidden]='dropDownVal === "Total Inward Fund Deposit" || dropDownVal === "Total Billing" || dropDownVal === "Total Deposits"'
+  )
+    sb-charts-bar(label='Transfer Amount', [reportData]='outwardTransferReport')
+
+  // Body for Total Inward Fund deposit 
+  .card-body(
+    [hidden]='dropDownVal === "Total Outward Fund Transfer" || dropDownVal === "Total Billing" || dropDownVal === "Total Transfers"'
+  )
+    sb-charts-area(
+      label='Transaction Amount',
+      [reportData]='inwardTransactionReport'
+    )
+
+  // Body for Total Billing Amount
+  .card-body(
+    [hidden]='dropDownVal === "Total Outward Fund Transfer" || dropDownVal === "Total Inward Fund Deposit" || dropDownVal === "Total Deposits"|| dropDownVal === "Total Transfers"'
+  )
+    sbpro-billings-charts(label='Total Bills', [reportData]='billingReport')
+
+// Skeleton loader for whole widget
+.dashboard-card(style='display: flex; flex-direction: column', *ngIf='loadingData',[bankNames]='bankNames')
+  ngx-skeleton-loader(count='1', [theme]='{ height: "20px", width: "220px" }')
+  ngx-skeleton-loader(count='1', [theme]='{ height: "20px", width: "280px" }')
+  ngx-skeleton-loader(count='1', [theme]='{ height: "20px" }')
+  ngx-skeleton-loader(count='1', [theme]='{ height: "20px" }')
+  ngx-skeleton-loader(count='1', [theme]='{ height: "20px" }')
+  ngx-skeleton-loader(count='1', [theme]='{ height: "20px" }')

@@ -1,0 +1,103 @@
+sb-layout-auth
+  .container
+    .row.justify-content-center
+      .col-xl-5.col-lg-6.col-md-8.col-sm-11
+        .card.border-0.shadow-lg.mt-5
+          .card-body.p-5.text-center
+            .icons-org-join
+              i-feather.icon-user(name='user')
+              fa-icon.icon-arrow([icon]='["fas", "long-arrow-alt-right"]')
+              i-feather.icon-users(name='users')
+            .h3.text-secondary.font-weight-300.mb-0 Join an Organization
+          hr.m-0
+          .card-body.p-5
+            form(
+              [formGroup]='organizationJoinFormCode',
+              (ngSubmit)='onSubmitCode()'
+            )
+              h5.font-weight-500.mb-3 Have an access code?
+              .form-group
+                input#codeInput.form-control.form-control-solid.py-4(
+                  data-cy='codeInput',
+                  type='text',
+                  placeholder='Enter access code',
+                  aria-label='Access Code',
+                  formControlName='code',
+                  [class.is-valid]='codeControlValid',
+                  [class.is-invalid]='codeControlInvalid'
+                )
+                .invalid-feedback(*ngIf='codeControl.hasError("required")')
+                  | Code required
+                .invalid-feedback(*ngIf='codeControl.hasError("code")')
+                  | Code not recognized
+
+              .form-group
+                button.btn.btn-block.btn-secondary(
+                  data-cy='accessCodeButton',
+                  type='submit',
+                  [disabled]='organizationJoinFormCode.invalid'
+                ) Request
+
+          .org-or-divider
+            .org-or or
+          .card-body.p-5
+            form(
+              [formGroup]='organizationJoinFormRequest',
+              (ngSubmit)='onSubmitRequest()'
+            )
+              h5.font-weight-500.mb-3 Request access
+              .form-group
+                input#joinNameInput.form-control.form-control-solid.py-4(
+                  data-cy='joinNameInput',
+                  type='text',
+                  placeholder='Existing organization name',
+                  aria-label='Organization Name',
+                  formControlName='name',
+                  [class.is-valid]='nameControlValid',
+                  [class.is-invalid]='nameControlInvalid'
+                )
+                .invalid-feedback(*ngIf='nameControl.hasError("required")')
+                  | Name required
+                .invalid-feedback(*ngIf='nameControl.hasError("name")')
+                  | Organization not recognized
+
+              .form-group
+                button.btn.btn-block.btn-secondary(
+                  data-cy='joinOrgNamedButton',
+                  type='submit',
+                  [disabled]='organizationJoinFormRequest.invalid'
+                ) Join
+
+ng-template(#confirmationModalAccessCode, let-modal)
+  .modal-header
+    h5.modal-title Access Code
+    button.close(
+      type='button',
+      aria-label='Close',
+      (click)='modal.dismiss("Cross click")'
+    )
+      span(aria-hidden='true') ×
+  .modal-body.
+    Wired up and ready to go. Just add a backend.
+    <br><br>
+    code: <code>{{organizationJoinFormCode.value.code}}</code>
+  .modal-footer
+    button.btn.btn-secondary(type='button', (click)='modal.close()') Close
+    button.btn.btn-primary(type='button', (click)='modal.close("DASHBOARD")') Proceed back to Dashboard
+
+ng-template(#confirmationModalRequest, let-modal)
+  .modal-header
+    h5.modal-title Request Access
+    button.close(
+      type='button',
+      aria-label='Close',
+      (click)='modal.dismiss("Cross click")'
+    )
+      span(aria-hidden='true') ×
+  .modal-body.
+    Wired up and ready to go. Just add a backend.
+    <br><br>
+    name: <code>{{organizationJoinFormRequest.value.name}}</code>
+  .modal-footer
+    button.btn.btn-secondary(type='button', (click)='modal.close()') Close
+    button.btn.btn-primary(type='button', (click)='modal.close("DASHBOARD")') Proceed back to Dashboard

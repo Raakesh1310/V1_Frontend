@@ -1,0 +1,154 @@
+.rightSideWidthHeight {
+  max-width: 450px;
+  width: 100%;
+  height: 550px;
+}
+
+.flex-display {
+  display: flex;
+  flex-direction: row;
+}
+
+.select-options{
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); 
+  grid-gap: 8px;
+}
+
+@media screen and (max-width: 685px) {
+  .flex-display {
+    display: flex;
+    flex-direction: column;
+    align-content: space-around;
+    //justify-content: space-evenly;
+    //flex-wrap: wrap;
+  }
+
+  .select-options{
+  display: grid;
+  grid-template-columns: repeat(2, 1fr); 
+  grid-gap: 8px;
+}
+
+  .rightSideWidthHeight {
+    max-width: 350px;
+    width: 100%;
+    height: 650px;
+  }
+
+}
+
+@media screen and (max-width: 555px) {
+
+  .rightSideWidthHeight {
+    max-width: 250px;
+    width: 100%;
+    height: 790px;
+  }
+
+  .select-options{
+  display: grid;
+  grid-template-columns: repeat(1, 1fr); 
+  grid-gap: 8px;
+}
+}
+
+
+.kycText {
+  font-family: Poppins, sans-serif;
+  font-style: normal;
+  font-weight: 500;
+  font-size: 35px;
+  line-height: 65px;
+  letter-spacing: 0.02em;
+  color: #3E2808;
+}
+
+.myanchor {
+  text-decoration: none;
+}
+
+.forText {
+  font-family: Poppins, sans-serif;
+  font-style: normal;
+  font-weight: 500;
+  font-size: 25px;
+  line-height: 65px;
+  letter-spacing: 0.02em;
+  color: #3E2808;
+}
+
+.kycOptionsText {
+  font-family: Poppins, sans-serif;
+  font-style: normal;
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 20px;
+  letter-spacing: 0.02em;
+}
+
+.kycOptions1 {
+  width: auto;
+  height: 50px;
+  align-items: center;
+  background: rgba(0, 0, 0, 0.04);
+  color: #3E2808;
+}
+
+.kycOptions2 {
+  width: auto;
+  height: 50px;
+  align-items: center;
+  background: #F69A0E;
+  color: white;
+}
+
+.orangeBackground {
+  fill: #FFB931;
+}
+
+.whiteBackground {
+  fill: white;
+}
+
+.labelText {
+  font-family: Poppins, sans-serif;
+  font-style: normal;
+  font-weight: 300;
+  font-size: 14px;
+  //line-height: 28px;
+  letter-spacing: 0.02em;
+  color: #3E2808;
+}
+
+#bottom {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+}
+
+.custom-switch .custom-control-input:checked ~ .custom-control-label::before {
+  background-color: #FF9B04 !important;
+  border: none;
+}
+
+.custom-switch .custom-control-input:checked:focus ~ .custom-control-label::before {
+  box-shadow: 0 0 0 0 #fff, 0 0 0 0.1rem #FF9B04
+}
+
+.custom-switch .custom-control-input:focus ~ .custom-control-label::before {
+  box-shadow: 0 0 0 0 #fff, 0 0 0 0.1rem #FF9B04
+}
+
+.custom-switch .custom-control-input:active ~ .custom-control-label::before {
+  background-color: #FF9B04 !important;
+  border: none;
+}
+
+.arrowOrange {
+  fill: rgba(255, 92, 0, 0.6);
+}
+
+.arrowBlack {
+  fill: rgba(0, 0, 0, 0.28);
+}

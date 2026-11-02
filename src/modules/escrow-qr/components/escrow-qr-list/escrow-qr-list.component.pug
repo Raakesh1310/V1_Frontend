@@ -1,0 +1,336 @@
+sbpro-layout-dashboard([light]='true')
+  router-outlet
+    sbpro-dashboard-head(icon='book', title='Escrow QR')
+    .container-fluid.mt-n10.responsiveForm.flex-grow-1
+      .row.h-100
+        .col-lg-12.h-100
+          sbpro-card([headerActions]='true')
+            .card-header.logoColor Escrow QR List
+              div 
+                span.mr-2
+                button.btn.btn-sm.mt-1.mb-1.mr-2.castlerButtonColor(
+                  type='button',
+                  (click)='showForm()'
+                ) Create Escrow QR
+            .card-body
+              form
+                .d-flex.mb-2
+                  input#search-box.mt-1.form-control.w-50.mr-2(
+                    style='max-width:100%',
+                    type='text',
+                    name='s',
+                    placement='top',
+                    ngbPopover='Search',
+                    autocomplete='off',
+                    placeholder='UPI Id, QR Id, Escrow ID, Escrow Name',
+                    [(ngModel)]='searchTerm',
+                    (change)='updateDownloadLink()'
+                  )
+                  input#start-date.mt-1.form-control.w-25.mr-2(
+                    type='text',
+                    name='sd',
+                    placeholder='Start Date',
+                    autocomplete='off',
+                    ngbDatepicker,
+                    outsideDays='hidden',
+                    autoClose='outside',
+                    #sd='ngbDatepicker',
+                    (click)='sd.toggle()',
+                    [(ngModel)]='startDate',
+                    (ngModelChange)='startDateChange()',
+                    [maxDate]='maxDate'
+                  )
+                  input#end-date.mt-1.form-control.w-25.mr-2(
+                    type='text',
+                    name='ed',
+                    placeholder='End Date',
+                    autocomplete='off',
+                    ngbDatepicker,
+                    outsideDays='hidden',
+                    #ed='ngbDatepicker',
+                    (click)='ed.toggle()',
+                    [(ngModel)]='endDate',
+                    (ngModelChange)='endDateChange()',
+                    [maxDate]='maxDate'
+                  )
+
+                  button.btn.ml-3.ws-nowrap.mt-1.mb-2.castlerButtonColor(
+                    type='submit',
+                    (click)='filterData()'
+                  )
+                    fa-icon.d-flex.flex-row.align-items-center(
+                      [icon]='["fas", "search"]'
+                    )
+                  button.btn.btn-link.mt-1.mb-1.mr-2.logoColor(
+                    type='button',
+                    (click)='ngOnInit()'
+                  )
+                    | Clear
+                  //- button.btn.mt-1.mb-1.mr-2.castlerButtonColor(
+                  //-   type='button',
+                  //-   (click)='showForm()'
+                  //- ) Create Escrow QR
+                .d-flex.mb-2(*ngIf='escrowQRList.length > 0')
+                  .flex-row
+                    small.mb-2.mt-2 Showing {{ (page - 1) * 10 + 1 }} to {{ (page - 1) * 10 + escrowQRList.length }} of {{ total }}
+              .table-responsive.pp-table-container.table-responsive-sm
+                table.table
+                  thead
+                    tr
+                      th(
+                        scope='col',
+                        sbSortable='date',
+                        (sort)='onSort($event)',
+                        *ngIf='isAdmin'
+                      )
+                        span.ws-nowrap Merchant Name
+                        sb-sort-icon(
+                          *ngIf='sortedColumn === "date"',
+                          [direction]='sortedDirection'
+                        )
+                      th(scope='col', sbSortable='date', (sort)='onSort($event)')
+                        span.ws-nowrap Date
+                        sb-sort-icon(
+                          *ngIf='sortedColumn === "date"',
+                          [direction]='sortedDirection'
+                        )
+                      th(scope='col', sbSortable='event', (sort)='onSort($event)')
+                        span Escrow QR Id
+                        sb-sort-icon(
+                          *ngIf='sortedColumn === "date"',
+                          [direction]='sortedDirection'
+                        )
+                      th(scope='col', sbSortable='event', (sort)='onSort($event)')
+                        span Purpose
+                        sb-sort-icon(
+                          *ngIf='sortedColumn === "date"',
+                          [direction]='sortedDirection'
+                        )
+                      th(scope='col', sbSortable='event', (sort)='onSort($event)')
+                        span UPI Id
+                        sb-sort-icon(
+                          *ngIf='sortedColumn === "date"',
+                          [direction]='sortedDirection'
+                        )
+                      th(scope='col', sbSortable='event', (sort)='onSort($event)')
+                        span.ws-nowrap Escrow ID
+                        sb-sort-icon(
+                          *ngIf='sortedColumn === "event"',
+                          [direction]='sortedDirection'
+                        )
+                      th(scope='col', sbSortable='time', (sort)='onSort($event)')
+                        span Amount
+                        sb-sort-icon(
+                          *ngIf='sortedColumn === "time"',
+                          [direction]='sortedDirection'
+                        )
+                      th(scope='col', sbSortable='event', (sort)='onSort($event)')
+                        span QR
+                        sb-sort-icon(
+                          *ngIf='sortedColumn === "date"',
+                          [direction]='sortedDirection'
+                        )
+                  tbody(*ngIf='escrowQRList.length == 0')
+                    tr
+                      td No Entries Found
+
+                  tbody(*ngIf='escrowQRList.length > 0')
+                    tr(*ngFor='let escrowQR of escrowQRList')
+                      td(*ngIf='isAdmin') 
+                        | {{ escrowQR.merchantName }}
+                      td
+                        ngb-highlight(
+                          [result]='escrowQR.createdAt | date: "d MMM yyyy" || "--"'
+                        )
+                      td 
+                        a.nav-link.p-0.tableClickEntryColor(
+                          href='javascript:void(0);',
+                          (click)='showDetails(escrowQR.qrId)'
+                        )
+                          | {{ escrowQR.qrId }}
+                      td {{ escrowQR.purpose }}
+                      td {{ escrowQR.vpa }}
+                      td {{ escrowQR.accountId }}
+                      td {{ escrowQR.amount }}
+                      td
+                        button.btn.btn-sm.btn-success.ml-0(
+                          (click)='showQRCode(escrowQR)'
+                        ) View QR
+
+                .d-flex.justify-content-between.p-2
+                  ngb-pagination(
+                    [collectionSize]='total',
+                    [maxSize]='5',
+                    [(page)]='page',
+                    [pageSize]='pageSize',
+                    [rotate]='true',
+                    [ellipses]='false',
+                    (pageChange)='pageChange($event)',
+                    [boundaryLinks]='true'
+                  )
+
+ng-template(#detailsTemplate)
+  sbpro-card([headerActions]='true')
+  #screen.div(style='background-color: white') 
+    .card-header.logoColor
+      | QR Code
+      img([src]="'/assets/img/Bhim-Upi-Logo.png'",alt='bhim-upi-logo',style="float: right; width: 150px; height: auto; margin-left: 10px;")
+    #screen.card-body.text-center.bg-white
+      small
+        small Powered By
+      p
+        img([src]='rbl', alt='RBL', height='50')
+      br
+      div(*ngIf='qrAmount') 
+        strong ₹{{ qrAmount }}
+      img#qrcode.svgIcon([src]='qrCode')
+      br
+      .bold
+        img([src]="'/assets/img/fast-forward-logo.png'",alt='fast-forward-logo',style="width: 25px; height: auto; margin-right: 10px;")
+        | Scan and Pay using any UPI App
+        .d-flex.justify-content-around.align-items-center(style='height: 70px;')
+          img.p-1.m-0([src]='paytm', alt='Paytm', width='100px')
+          img.p-1.m-0([src]='phonepe', alt='PhonePe', width='150px')
+          img.p-1.m-0([src]='gpay', alt='GPay', width='95px')
+      br
+      strong {{ merchantName }}
+      br
+  .card-footer
+    span
+      button.btn.btn-sm.btn-success.float-right((click)='downloadQR(vpa)') Download QR
+      span.float-right &nbsp;&nbsp;
+      button.btn.btn-sm.btn-danger.float-right.ml-0((click)='onCancel()') Close
+  span.float-right &nbsp;&nbsp;
+
+ng-template(#formTemplate)
+  sbpro-card([headerActions]='true', ngNativeValidate)
+    .card-header.logoColor
+      | Create Escrow QR
+    .card-body.text-left
+      div(*ngIf='errors.length > 0')
+      .alert.alert-danger.alert-dismissible.fade.show(
+        role='alert',
+        *ngIf='errors.length > 0'
+      )
+        | {{ errors[0] }}
+        button.close(
+          type='button',
+          (click)='errors = []',
+          data-dismiss='alert',
+          aria-label='Close'
+        )
+          span(aria-hidden='true') ×
+      form(autocomplete='off', [formGroup]='escrowQRForm')
+        .col
+          .form-group(*ngIf='isAdmin')
+            label(for='payee') Merchant
+            span.text-danger *
+            br
+            ng-select(
+              [items]='merchants',
+              bindLabel='title',
+              [(ngModel)]='selectedMerchant',
+              (change)='updateMerchant()',
+              [ngModelOptions]='{ standalone: true }',
+              loadingText='Loading...',
+              placeholder='Select Merchant',
+              (search)='getMerchants($event.term)',
+              name='merchant'
+            )
+              ng-template(ng-label-tmp='', let-item='item')
+                span(*ngIf='selectedMerchant') {{ item.title }}
+              ng-template(
+                ng-option-tmp='',
+                let-item='item',
+                let-search='searchTerm',
+                let-index='index'
+              )
+                span.sup-option {{ item.title }}
+                br
+                span.sub-option {{ item.merchantId }} | {{ item.email }}
+          .form-group
+            label(for='account') Escrow
+            span.text-danger *
+            ng-select(
+              [items]='accounts',
+              bindLabel='name',
+              [(ngModel)]='selectedAccount',
+              formControlName='accountId',
+              loadingText='Loading...',
+              placeholder='Enter Escrow Name',
+              (change)='updateAccount($event)',
+              name='account',
+              (search)='fetchAccount($event)'
+            )
+              ng-template(ng-label-tmp='', let-item='item')
+                span(*ngIf='selectedAccount') {{ utilService.firstCapitalize(item.name) }} &nbsp;
+                span.fader - {{ item.accountId }}
+              ng-template(
+                ng-option-tmp='',
+                let-item='item',
+                let-search='searchTerm',
+                let-index='index'
+              )
+                span.sup-option {{ utilService.firstCapitalize(item.name) }}
+                br
+                span.sub-option {{ item.accountId }}
+          .form-group
+            label(for='type') Fixed Amount
+            .row
+              .col-sm-12.col-md-3.col-lg-3.pl-5.pr-0
+                input#active(
+                  type='radio',
+                  #active,
+                  value='yes',
+                  name='fixedAmount',
+                  [checked]='fixedAmount === "yes"',
+                  (change)='fixedAmount = $event.target.value'
+                )
+              .col-sm-12.col-md-3.col-lg-3.pl-0
+                label(for='yes') 
+                  | Yes
+              .col-sm-12.col-md-3.col-lg-3.pl-5
+                input#inactive(
+                  type='radio',
+                  #inactive,
+                  value='no',
+                  name='fixedAmount',
+                  [checked]='fixedAmount === "no"',
+                  (change)='fixedAmount = $event.target.value'
+                )
+              .col-sm-12.col-md-3.col-lg-3.pl-0
+                label(for='no') 
+                  | No
+          .form-group(*ngIf='fixedAmount === "yes"')
+            label(for='amountcontrol') Amount
+            span.text-danger *
+            input#amountcontrol.form-control.form-control-sm(
+              type='text',
+              placeholder='Enter Amount',
+              formControlName='amount',
+              appTwoDigitDecimalNumber,
+              name='amount',
+              (change)='amountChanged($event)'
+            )
+          .form-group
+            label(for='purpose') Purpose (optional)
+            input#purpose.form-control.form-control-sm(
+              type='text',
+              placeholder='Purpose of the transfer',
+              formControlName='purpose',
+              name='purpose',
+              maxlength='30'
+            )
+    .card-footer
+      span
+        button.btn.btn-sm.btn-success.float-right((click)='createEscrowQR()') Create QR Code
+        span.float-right &nbsp;&nbsp;
+        button.btn.btn-sm.btn-danger.float-right.ml-0((click)='onCancel()') Close
+    span.float-right &nbsp;&nbsp;
+
+ngx-spinner
+  p(style='font-size: 20px; color: white') Please wait...
+
+#download
+  img#canvas
+  a#downloadLink

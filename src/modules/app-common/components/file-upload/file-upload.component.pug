@@ -1,0 +1,43 @@
+input#ndocs(
+  #myInput,
+  type='file',
+  enctype='multipart/form-data',
+  (change)='onfileChange($event)'
+)
+button.btn.btn-success.btn-sm((click)='docUp()', *ngIf='!hideButton') + Upload Files
+
+div(*ngIf='!multi')
+  p(*ngIf='files?.length > 0') {{ files[0].name }} &nbsp;&nbsp;
+    button.my-1.mr-2.btn.btn-transparent-dark.btn-icon.btn-sm(
+      type='button',
+      (click)='removeFile(i)'
+    )
+      i-feather(name='trash-2')
+
+div(*ngIf='multi')
+  .row(*ngIf='files?.length > 0')
+    .table-responsive.pp-table-container
+      br
+      br
+      table.table
+        thead
+          tr
+            th(scope='col')
+              span S.No.
+            th(scope='col')
+              span Document Uploaded
+            th(scope='col')
+              span 
+
+        tbody
+          tr(*ngFor='let doc of files; let i = index')
+            td
+              | {{ i + 1 }}
+            td
+              span {{ doc.name }}
+            td
+              button.my-1.mr-2.btn.btn-transparent-dark.btn-icon.btn-sm(
+                type='button',
+                (click)='removeFile(i)'
+              )
+                i-feather(name='trash-2')

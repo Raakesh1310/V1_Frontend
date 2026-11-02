@@ -1,0 +1,173 @@
+div(*ngIf='errors !== null && errors.length > 0')
+    .alert.alert-danger.alert-dismissible.fade.show(role='alert', *ngIf='errors.length > 0')
+        | {{ errors[0] }}
+    //-     button.close(
+    //-         type='button',
+    //-         (click)='errors = []',
+    //-         data-dismiss='alert',
+    //-         aria-label='Close'
+    //-     )
+    //-         span(aria-hidden='true') ×
+form
+    .d-flex.mb-2
+        input#search-box.mt-1.form-control.w-100.mr-2(
+            type='text',
+            name='s',
+            placement='top',
+            autocomplete='off',
+            (input) = 'Search($event)',
+            [(ngModel)] = 'searchTerm',
+            ngbPopover='Search by Business ID, Payment ID, Beneficiary Name',
+            placeholder='Search by Business ID, Payment ID, Beneficiary Name',
+        )
+        input#date-from.mt-1.form-control.w-25.mr-2(
+            type='text',
+            placeholder='Start Date',
+            name='dateFrom',
+            ngbDatepicker,
+            outsideDays='hidden',
+            autocomplete='off',
+            #dateFrom='ngbDatepicker',
+            (click)='dateFrom.toggle()',
+            [(ngModel)] = 'startDate',
+            (ngModelChange)="startDateChange()",
+            [maxDate]="maxDate"
+        )
+        input#date-to.mt-1.form-control.w-25.mr-2(
+            type='text',
+            placeholder='End Date',
+            name='dateTo',
+            ngbDatepicker,
+            outsideDays='hidden',
+            autocomplete='off',
+            #dateTo='ngbDatepicker',
+            (click)='dateTo.toggle()',
+            [(ngModel)] = 'endDate',
+            (ngModelChange)="endDateChange()",
+            [maxDate]='maxDate',
+        )
+        button.btn.ws-nowrap.mt-1.mb-1(
+            class='castlerButtonColor',
+            type='submit',
+            (click)='filterData()'
+        )
+            fa-icon.d-flex.flex-row.align-items-center([icon]='["fas", "search"]')
+        button.btn.btn-link.mt-1.mb-1.mr-5(
+            type='button',
+            class='logoColor',
+            (click)='clearButtonClick()'
+        )
+            | Clear
+
+        select#statusList.mt-1.form-control.w-25.ml-2(
+            name='status',
+            (click)='setDataLocally()',
+            (change)= 'openModal(alert,$event)' 
+        )
+            option(value='') Take Action
+            option(*ngFor='let st of approvalList', [ngValue]='st') {{ st }}
+        //button.btn.btn-link.mt-1.mb-1.mr-2(
+        //    type='button',
+        //    class='logoColor',
+        //    (click)='ngOnInit()'
+        //)
+        //    | Clear
+
+.table-responsive.pp-table-container.table-responsive-sm
+    table.table
+        thead
+            tr
+                th(scope='col' sbSortable='event', *ngIf='isAdmin')
+                    span.ws-nowrap Merchant Name
+                th(scope='col' sbSortable='event')
+                    span.ws-nowrap Escrow/Bank Account Name
+                th(scope='col' sbSortable='time')
+                    span.ws-nowrap From Escrow ID/Bank Account
+                th(scope='col' sbSortable='event')
+                    span.ws-nowrap Payment ID
+                th(scope='col' sbSortable='event')
+                    span.ws-nowrap Request Date
+                th(scope='col' sbSortable='time')
+                    span.ws-nowrap Beneficiary Name
+                th(scope='col' sbSortable='time')
+                    span.ws-nowrap Amount
+                th(scope='col' sbSortable='time')
+                    span.ws-nowrap Purpose
+                th(scope='col' sbSortable='time' style='text-align : center')
+                    input(type='checkbox', [(ngModel)]="isChecked", (change)="selectAll($event)")
+                    //form
+                    //    .checkboxes
+                    //        label
+                    //            span.mr-2 Select All
+                    //            input(type='checkbox', [(ngModel)]="isChecked", (change)="checkValue($event)", [ngModelOptions]="{standalone: true}")
+
+                    //div.d-flex.justify-content-center
+                    //    span.ws-nowrap Select All
+                    //    input.ml-2(type='checkbox', [(ngModel)]="isChecked", (change)="checkValue($event)")
+        tbody
+            tr(*ngIf='isLoading')
+                .spinner-border.text-primary(role='status')
+                    span.sr-only Loading...
+            tr(*ngIf='(data.length == 0 && !isLoading)')
+                td No Entries Found
+            tr(*ngFor='let transfer of data; index as i')
+                td(*ngIf='isAdmin')
+                    ngb-highlight([result]='transfer.merchantName')
+                td(*ngIf='!transfer.bankAccountName')
+                    ngb-highlight([result]='transfer.accName')
+                td(*ngIf='transfer.bankAccountName')
+                    ngb-highlight([result]='transfer.bankAccountName')
+                td(*ngIf='!transfer.bankAccountName')
+                    ngb-highlight.ws-nowrap.tableClickEntryColor.myanchor([result]='transfer.accountId', 
+                    (click) = 'fetchDetails(transfer)')
+                td(*ngIf='transfer.bankAccountName')
+                    ngb-highlight([result]='transfer.accountId')
+                td
+                    ngb-highlight.ws-nowrap.tableClickEntryColor.myanchor([result]='transfer.transferId',
+                    (click)='showDetails(transfer)')
+                td
+                    ngb-highlight([result]='transfer.createdAt.substring(0,10)')
+                td
+                    ngb-highlight([result]='transfer.beneficiaryName')
+                td
+                    ngb-highlight([result]='"₹"+transfer.amount.toFixed(2)')
+                td
+                    ngb-highlight([result]='transfer.purpose')
+                td(style='text-align : center')
+                    input(type='checkbox', [(ngModel)]="isChecked ? true : transfer.isSelected", 
+                        (change)="checkValue($event,transfer)")
+.d-flex.justify-content-between.p-2
+    ngb-pagination(
+        [collectionSize]='total$',
+        [maxSize]='5',
+        [(page)]='page',
+        [pageSize]='pageSize',
+        [rotate]='true',
+        [ellipses]='false',
+        (pageChange)='pageChange($event)',
+        [boundaryLinks]='true'
+    )
+
+
+ng-template(#alert)
+    .flex-display-column(style='background: #FFFBF4')
+        div.bold.mt-5 Are you sure you want to
+        div.mt-0.bold {{ selectedStatus.includes('All') ? selectedStatus.trim().replace('All','')+" "+total$ : selectedStatus }}
+            | {{ selectedForOperation == 1 ? " entry" : " entries" }} ?
+        input#rejection.form-control.mt-1.w-75.mr-2(
+            *ngIf='selectedStatus.includes("Reject")',
+            type='text',
+            (input) = 'rejectionReasonChange($event)',
+            [(ngModel)] = 'rejectionReason',
+            ngbPopover='Rejection Reason',
+            placeholder='Enter Rejection Reason',
+            required,
+            ng-class='rejectionReason == "" ? "ng-invalid" : ""',
+        )
+        div.flex-display.mb-5.mt-3
+            button.btn.btn-light.mr-3(type='button', (click)='closeModal()') No, Go Back
+            button.btn(type='button', [disabled]='disableStatusButton',
+                [ngClass]='selectedStatus.includes("Approve") || selectedStatus.includes("approve") ? "btnColorGreen" : "btnColorRed"',
+                (click)='sendSingleApprovals()') {{ disableStatusButton ? "Loading..." : "Yes," }}
+                    | &nbsp;
+                    div(*ngIf='!disableStatusButton') {{ selectedStatus.includes('Approve') || selectedStatus.includes('approve') ? "Approve" : "Reject" }}

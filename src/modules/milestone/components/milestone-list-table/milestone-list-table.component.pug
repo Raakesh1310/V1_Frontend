@@ -1,0 +1,92 @@
+.table-responsive.pp-table-container
+  table.table.table-responsive-sm
+    thead
+      tr
+        th(scope='col', sbSortable='date', (sort)='onSort($event)')
+          span ID
+          sb-sort-icon(
+            *ngIf='sortedColumn === "date"',
+            [direction]='sortedDirection'
+          )
+        th(scope='col', sbSortable='date', (sort)='onSort($event)')
+          span Title
+          sb-sort-icon(
+            *ngIf='sortedColumn === "date"',
+            [direction]='sortedDirection'
+          )
+        th(scope='col', sbSortable='event', (sort)='onSort($event)')
+          span Description
+          sb-sort-icon(
+            *ngIf='sortedColumn === "event"',
+            [direction]='sortedDirection'
+          )
+        th(scope='col', sbSortable='event', (sort)='onSort($event)')
+          span Amount
+          sb-sort-icon(
+            *ngIf='sortedColumn === "event"',
+            [direction]='sortedDirection'
+          )
+        th(scope='col', sbSortable='time', (sort)='onSort($event)')
+          span.ws-nowrap Escrow
+          sb-sort-icon(
+            *ngIf='sortedColumn === "time"',
+            [direction]='sortedDirection'
+          )
+        th(scope='col', sbSortable='time', (sort)='onSort($event)')
+          span.ws-nowrap Payee
+          sb-sort-icon(
+            *ngIf='sortedColumn === "time"',
+            [direction]='sortedDirection'
+          )
+        th(scope='col', sbSortable='time', (sort)='onSort($event)')
+          span.ws-nowrap Payment Date
+          sb-sort-icon(
+            *ngIf='sortedColumn === "time"',
+            [direction]='sortedDirection'
+          )
+    tbody(*ngIf='(_milestones$ | async)?.length == 0')
+      tr
+        td(*ngIf='(_loading$ | async) === false') No Entries Found
+        td.spinner(*ngIf='_loading$ | async')
+          .spinner-border.text-primary(role='status')
+            span.sr-only Loading...
+    tbody(*ngIf='(_milestones$ | async)?.length > 0')
+      tr(*ngFor='let milestone of _milestones$ | async')
+        td
+          ngb-highlight(
+            [result]='milestone.milestoneId || "--"',
+            [term]='_searchTerm'
+          )
+        td
+          ngb-highlight(
+            [result]='milestone.title + " " || "--"',
+            [term]='_searchTerm'
+          )
+        td
+          ngb-highlight(
+            [result]='milestone.description + " " || "--"',
+            [term]='_searchTerm'
+          )
+        td
+          ngb-highlight([result]='milestone.amount || "--"', [term]='_searchTerm')
+        td
+          ngb-highlight(
+            [result]='milestone.accountId || "--"',
+            [term]='_searchTerm'
+          )
+        td
+          ngb-highlight([result]='milestone.payeeId || "--"', [term]='_searchTerm')
+        td
+          ngb-highlight.ws-nowrap(
+            [result]='milestone.paymentDate | date: "d MMM yyyy" || "--"',
+            [term]='_searchTerm'
+          )
+//.d-flex.justify-content-between.p-2
+//  ngb-pagination(
+//    [collectionSize]='total$ | async',
+//    [(page)]='_milestones$.page',
+//    [maxSize]='5',
+//    [rotate]='true',
+//    [ellipses]='false',
+//    [boundaryLinks]='true'
+//  )

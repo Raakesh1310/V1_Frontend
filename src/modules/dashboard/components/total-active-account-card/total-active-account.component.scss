@@ -1,0 +1,20 @@
+@import 'styles/variables.scss';
+
+.display {
+  display: flex;
+  flex-direction: row;
+}
+
+@media screen and (max-width: 900px) {
+  .display {
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: row;
+  }
+  .cardsWidth {
+    width: 100% !important;
+    margin-right: 0 !important;
+    padding: 0 !important;
+    margin-bottom: 35px !important;
+  }
+}

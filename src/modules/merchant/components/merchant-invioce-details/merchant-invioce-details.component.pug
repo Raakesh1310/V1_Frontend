@@ -1,0 +1,446 @@
+div(*ngIf='errors.length > 0')
+  sbpro-alert(classes='alert-danger', [dismissable]='true')
+    | {{ errors[0] }}
+div
+  form([formGroup]='feeDetailForm', autocomplete='off')
+    div
+      h4 Fee Details
+      hr
+    .form-group
+      label(for='setup-fee')
+        | One Time Set-up Fee
+      .row
+        .col-sm-12.col-md-3.col-lg-3
+          .input-group.input-group-joined
+            .input-group-prepend
+              span.input-group-text.form-control-sm
+                | ₹
+            input#setup-fee.form-control.form-control-sm(
+              type='number',
+              formControlName='setUpFee',
+              required,
+              (change)='hasChange()',
+              [attr.disabled]='readOnly ? true : null'
+            )
+    .form-group
+      label(for='virtual-acc-fee')
+        | Escrow Fee
+      .row
+        .col-sm-12.col-md-3.col-lg-3
+          select#virtual-acc-fee.form-control.form-control-sm(
+            formControlName='virtualAccountFeeSetting',
+            required,
+            (change)='hasChange()',
+            [attr.disabled]='readOnly ? true : null'
+          )
+            option(value='one-time') One Time
+            option(value='pay-as-you-go') Pay-as-you-go
+        .col-sm-12.col-md-3.col-lg-3
+          .input-group.input-group-joined
+            .input-group-prepend
+              span.input-group-text.form-control-sm
+                | ₹
+            input#virtual-acc-fee.form-control.form-control-sm(
+              type='number',
+              formControlName='virtualAccountFee',
+              required,
+              (change)='hasChange()',
+              [attr.disabled]='readOnly ? true : null'
+            )
+      .custom-control.custom-checkbox
+        input#customCheck1.custom-control-input(
+          type='checkbox',
+          (change)='hasChange()',
+          formControlName='isPaymentGateway'
+        )
+        label.custom-control-label(for='customCheck1') Pay via payment gateway.
+    .form-group
+      label(for='transaction-fee')
+        | Transaction Fee
+      .row
+        .col-sm-12.col-md-3.col-lg-3
+          select#transaction-fee.form-control.form-control-sm(
+            formControlName='transactionFeeSetting',
+            required,
+            (change)='hasChange()',
+            [attr.disabled]='readOnly ? true : null'
+          )
+            option(value='fixed-amount') Fixed Amount
+            option(value='percentage') Percentage(%)
+        .col-sm-12.col-md-3.col-lg-3
+          .input-group.input-group-joined
+            .input-group-prepend
+              span.input-group-text.form-control-sm
+                | ₹
+            input#transaction-fee.form-control.form-control-sm(
+              type='number',
+              formControlName='transactionFee',
+              required,
+              (change)='hasChange()',
+              [attr.disabled]='readOnly ? true : null'
+            )
+    .form-group(*ngIf='showIMPS')
+      label(for='imps-fee')
+        | IMPS Fee
+      .row
+        .col-sm-12.col-md-3.col-lg-3
+          .input-group.input-group-joined
+            .input-group-prepend
+              span.input-group-text.form-control-sm
+                | ₹
+            input#monthly-fee.form-control.form-control-sm(
+              type='number',
+              formControlName='impsFee',
+              required,
+              (change)='hasChange()',
+              [attr.disabled]='readOnly ? true : null'
+            )
+    .form-group
+      label(for='monthly-fee')
+        | Monthly Fee
+      .row
+        .col-sm-12.col-md-3.col-lg-3
+          .input-group.input-group-joined
+            .input-group-prepend
+              span.input-group-text.form-control-sm
+                | ₹
+            input#monthly-fee.form-control.form-control-sm(
+              type='number',
+              formControlName='monthlyFee',
+              required,
+              (change)='hasChange()',
+              [attr.disabled]='readOnly ? true : null'
+            )
+    .row(*ngIf='showKYC')
+      .col-sm-12.col-md-3.col-lg-3
+        label
+          | E-KYC
+    .row(*ngIf='showKYC')
+      .col-sm-12.col-md-3.col-lg-3
+        label(for='kyc-individual-fee')
+          | Individual KYC Fee
+      .col-sm-12.col-md-3.col-lg-3 
+        label(for='kyc-business-fee')
+          | Business KYC Fee
+    .form-group(*ngIf='showKYC')
+      .row
+        .col-sm-12.col-md-3.col-lg-3
+          .input-group.input-group-joined
+            .input-group-prepend
+              span.input-group-text.form-control-sm
+                | ₹
+            input#monthly-fee.form-control.form-control-sm(
+              type='number',
+              formControlName='kycIndividualFee',
+              (change)='hasChange()',
+              required
+            )
+        .col-sm-12.col-md-3.col-lg-3
+          .input-group.input-group-joined
+            .input-group-prepend
+              span.input-group-text.form-control-sm
+                | ₹
+            input#monthly-fee.form-control.form-control-sm(
+              type='number',
+              formControlName='kycBusinessFee',
+              required,
+              (change)='hasChange()',
+              [attr.disabled]='readOnly ? true : null'
+            )
+    .form-group(*ngIf='escrowPagePG')
+      label(for='escrow-page-fee')
+        | Escrow Page Fee
+      .row
+        .col-sm-12.col-md-3.col-lg-3
+          .custom-control.custom-checkbox
+            input#escrowFeePerPage.custom-control-input(
+              type='checkbox',
+              formControlName='escrowFeePerPage',
+              (change)='escrowFeePerPageCheck()'
+            )
+            label.custom-control-label(for='escrowFeePerPage') Fee per page
+        .col-sm-12.col-md-3.col-lg-3
+          .input-group.input-group-joined
+            .input-group-prepend
+              span.input-group-text.form-control-sm
+                | ₹
+            input#escrowFeePerPageFee.form-control.form-control-sm(
+              type='number',
+              formControlName='escrowFeePerPageFee',
+              required,
+              (change)='hasChange()',
+              [attr.disabled]='readOnly || !escrowFeePerPage ? true : null'
+            )
+      br
+      .row
+        .col-sm-12.col-md-3.col-lg-3
+          .custom-control.custom-checkbox
+            input#escrowFeePerTransaction.custom-control-input(
+              type='checkbox',
+              formControlName='escrowFeePerTransaction',
+              (change)='escrowFeePerTransactionCheck()'
+            )
+            label.custom-control-label(for='escrowFeePerTransaction') Fee per transaction
+      .row.pl-3.pb-2(*ngIf='escrowFeePertransaction')
+        .col-sm-12.col-md-3.col-lg-3
+          label(for='escrowFeePerTransaction') UPI
+        .col-sm-12.col-md-3.col-lg-3
+          select#transaction-fee.form-control.form-control-sm(
+            formControlName='upiFeeSetting',
+            (change)='onUPIFeeSettingChange()',
+            required
+          )
+            option(value='fixed-amount') Fixed Amount
+            option(value='percentage') Percentage(%)
+        .col-sm-12.col-md-3.col-lg-3
+          .input-group.input-group-joined
+            .input-group-prepend(*ngIf='upiFeeSettingFixedAmount')
+              span.input-group-text.form-control-sm
+                | ₹
+            input#escrowFeePerTransactionFee.form-control.form-control-sm(
+              type='number',
+              formControlName='upiFeeAmount',
+              (change)='hasChange()',
+              required,
+              [attr.disabled]='readOnly || !escrowFeePertransaction ? true : null'
+            )
+      .row.pl-3.pb-2(*ngIf='escrowFeePertransaction')
+        .col-sm-12.col-md-3.col-lg-3
+          label(for='escrowFeePerTransaction') Net Banking
+        .col-sm-12.col-md-3.col-lg-3
+          select#transaction-fee.form-control.form-control-sm(
+            formControlName='netBankingFeeSetting',
+            (change)='onNBFeeSettingChange()',
+            required
+          )
+            option(value='fixed-amount') Fixed Amount
+            option(value='percentage') Percentage(%)
+        .col-sm-12.col-md-3.col-lg-3
+          .input-group.input-group-joined
+            .input-group-prepend(*ngIf='nbFeeSettingFixedAmount')
+              span.input-group-text.form-control-sm
+                | ₹
+            input#escrowFeePerTransactionFee.form-control.form-control-sm(
+              type='number',
+              formControlName='netBankingFeeAmount',
+              required,
+              (change)='hasChange()',
+              [attr.disabled]='readOnly || !escrowFeePertransaction ? true : null'
+            )
+      .row.pl-3.pb-2(*ngIf='escrowFeePertransaction')
+        .col-sm-12.col-md-3.col-lg-3
+          label(for='escrowFeePerTransaction') Debit Card
+        .col-sm-12.col-md-3.col-lg-3
+          select#transaction-fee.form-control.form-control-sm(
+            formControlName='debitCardFeeSetting',
+            (change)='onDBFeeSettingChange()',
+            required
+          )
+            option(value='fixed-amount') Fixed Amount
+            option(value='percentage') Percentage(%)
+        .col-sm-12.col-md-3.col-lg-3
+          .input-group.input-group-joined
+            .input-group-prepend(*ngIf='dbFeeSettingFixedAmount')
+              span.input-group-text.form-control-sm
+                | ₹
+            input#escrowFeePerTransactionFee.form-control.form-control-sm(
+              type='number',
+              formControlName='debitCardFeeAmount',
+              required,
+              (change)='hasChange()',
+              [attr.disabled]='readOnly || !escrowFeePertransaction ? true : null'
+            )
+    br(*ngIf='showPennyTest')
+    .form-group(*ngIf='showPennyTest')
+      label(for='penny-test-fee')
+        | Payee Penny Testing Fee
+      .row
+        .col-sm-12.col-md-3.col-lg-3
+          .input-group.input-group-joined
+            .input-group-prepend
+              span.input-group-text.form-control-sm
+                | ₹
+            input#penny-test-fee.form-control.form-control-sm(
+              type='number',
+              formControlName='pennyTestFee',
+              required,
+              (change)='hasChange()',
+              [attr.disabled]='readOnly ? true : null'
+            )
+    br
+    .form-group
+      label(for='miscellanousFee')
+        | Miscellaneous Fee
+      button.btn.btn-light.btn-sm.ml-5((click)='addMiscellanousFee()')
+        span + Add
+      span.text-danger.pl-5(*ngIf='miscellanousFeeError') Please fill all details first.
+      span.text-danger.pl-5(*ngIf='misAmountError') Please enter a valid amount.
+      br
+      .col-sm-12
+        .authorizer-list(
+          formArrayName='miscellanousFees',
+          (cdkDropListDropped)='dropMiscellanousFee($event)',
+          [cdkDropListData]='miscellanousFeeFormGroup.controls',
+          cdkDropList
+        )
+          .authorizer-box(
+            *ngFor='let miscellanousFee of miscellanousFeeFormGroup.controls; let i = index',
+            cdkDrag
+          )
+            .row.authorizer([formGroupName]='i')
+              .col
+                .form-group 
+                  label Fee Name*
+                  input#authoriser-name.form-control.form-control-sm(
+                    type='text',
+                    placeholder='Fee Name',
+                    formControlName='feeName',
+                    (change)='hasChange()',
+                    required
+                  )
+              .col
+                .form-group
+                  label Billing Frequency*
+                  select#transaction-fee.form-control.form-control-sm(
+                    formControlName='frequency',
+                    placeholder='Billing Frequency',
+                    (change)='onFrequencyChange($event, i)',
+                    required
+                  )
+                    option(value='one-time') One Time
+                    option(value='weekly') Weekly
+                    option(value='monthly') Monthly
+                    option(value='quarterly') Quarterly
+                    option(value='half-yearly') Half Yearly
+                    option(value='yearly') Yearly
+              .col
+                .form-group
+                  label Amount*
+                  .input-group.input-group-joined
+                    .input-group-prepend
+                      span.input-group-text.form-control-sm
+                        | ₹
+                    input#authoriser-mobile.form-control.form-control-sm(
+                      type='text',
+                      formControlName='amount',
+                      placeholder='Amount',
+                      (change)='onAmountChange($event, i)',
+                      required,
+                      appTwoDigitDecimalNumber
+                    )
+              .col
+                .form-group
+                  label Effective Date*
+                  input#authoriser-mobile.form-control.form-control-sm(
+                    type='text',
+                    name='effDate',
+                    placeholder='Start Date',
+                    autocomplete='off',
+                    ngbDatepicker,
+                    outsideDays='hidden',
+                    #effDate='ngbDatepicker',
+                    (click)='effDate.toggle()',
+                    formControlName='effectiveDate',
+                    (change)='hasChange()',
+                    (keydown)='onKeyPress($event)'
+                  )
+              .col
+                .form-group(*ngIf='!readOnly')
+                  button.btn.btn-light.float-right.mt-2(
+                    (click)='removeMiscellanousFee(i)'
+                  ) 
+                    i-feather(name='trash-2')
+    br
+    .form-group
+      label(for='depositFees')
+        | Deposit Fees
+      button.btn.btn-light.btn-sm.ml-5((click)='addDepositFee()')
+        span + Add
+      span.text-danger.pl-5(*ngIf='depositFeeError') Please fill all details first.
+      span.text-danger.pl-5(*ngIf='depositPercentError') Please provide a valid percentage.
+      span.text-danger.pl-5(*ngIf='depositFeeRangeError') To amount should be greater than from amount.
+      span.text-danger.pl-5(*ngIf='depositFeeOverlapError') Overlapping amount in amount range.
+      br
+      .col-sm-12
+        .authorizer-list(
+          formArrayName='depositFees',
+          (cdkDropListDropped)='drop($event)',
+          [cdkDropListData]='depositFeeFormGroup.controls',
+          cdkDropList
+        )
+          .authorizer-box.pt-3(
+            *ngFor='let depositFee of depositFeeFormGroup.controls; let i = index',
+            cdkDrag
+          )
+            .row.authorizer([formGroupName]='i')
+              .col
+                .form-group(*ngIf='i !== depositFeeList.length - 1')
+                  label Amount (in INR) - From
+                  input#authoriser-name.form-control.form-control-sm(
+                    type='text',
+                    placeholder='Amount',
+                    formControlName='startRange',
+                    (focusout)='onFromChange($event, i)',
+                    appTwoDigitDecimalNumber,
+                    (change)='hasChange()',
+                    required,
+                    [attr.disabled]='readOnly ? true : null'
+                  )
+                span.text-center(
+                  *ngIf='i === depositFeeList.length - 1',
+                  style='padding-top:25px; display:block;'
+                ) Above
+              .col
+                .form-group(*ngIf='i !== depositFeeList.length - 1')
+                  label Amount (in INR) - To
+                  input#authoriser-mobile.form-control.form-control-sm(
+                    type='text',
+                    formControlName='endRange',
+                    placeholder='Amount',
+                    (change)='hasChange()',
+                    (focusout)='onChange($event, i)',
+                    appTwoDigitDecimalNumber,
+                    required,
+                    [attr.disabled]='readOnly ? true : null'
+                  )
+                .form-group(*ngIf='i === depositFeeList.length - 1')
+                  label Amount (in INR)
+                  input#authoriser-mobile.form-control.form-control-sm(
+                    type='text',
+                    formControlName='startRange',
+                    placeholder='Amount',
+                    (change)='onChange($event, i)',
+                    appTwoDigitDecimalNumber,
+                    required,
+                    [attr.disabled]='true'
+                  )
+              .col
+                .form-group
+                  label Fee(in %)
+                  input#authoriser-mobile.form-control.form-control-sm(
+                    type='text',
+                    formControlName='percentage',
+                    placeholder='Percentage',
+                    percentValidate,
+                    (change)='onFeeChange($event)',
+                    required,
+                    [attr.disabled]='readOnly ? true : null'
+                  )
+              .col-sm-12.col-md-2.col-lg-2
+                .form-group(*ngIf='!readOnly')
+                  button.btn.btn-light.float-right.mt-2(
+                    (click)='removeDepositFee(i)'
+                  ) 
+                    i-feather(name='trash-2') 
+    .form-group(*ngIf='!readOnly')
+      .row(*ngIf='!hasChanged')
+        .col-sm-6.col-md-4
+          button.btn.castlerButtonColor(disabled)
+            span Update
+      .row(*ngIf='hasChanged')
+        .col-sm-6.col-md-4
+          button.btn.castlerButtonColor((click)='onSubmit()')
+            span Update
+
+ngx-spinner
+  p(style='font-size: 20px; color: white') Processing request. Please wait...

@@ -1,0 +1,126 @@
+sbpro-card([headerActions]='true')
+  .card-header(class='logoColor')
+    | Payment Status
+    button.btn.btn-icon.btn-link.btn-sm((click)='close()', class='castlerButtonColor1')
+      i-feather(name='x-circle')
+  .card-body 
+    div 
+      .table-responsive.pp-table-container.table-responsive-sm
+        table.table
+          thead
+            tr
+              //- th(scope='col')
+              //-   span Name
+              //- th(scope='col')
+              //-   span Email
+              th(scope='col')
+                span Approval From
+              th(scope='col')
+                span Amount
+              th(scope='col')
+                span Payment Type
+              th(scope='col')
+                span Created On
+              th(scope='col')
+                span Reason
+              th(scope='col')
+                span Status
+
+          tbody
+            tr(*ngFor='let party of deal.verification; let i = index')
+              //- td
+              //-   span {{ getMyParty(deal.dealParties, party.email)[0]["name"] }}
+
+              td
+                span {{ getMyParty(deal.dealParties, party.email)[0]["name"] }} &nbsp; ( {{ getMyParty(deal.dealParties, party.email)[0]["role"] }} )
+              td
+                span {{ party.data.amount }}
+              td
+                span {{ party.data.paymentType }}
+              td 
+                ngb-highlight(
+                  [result]='party.createdAt | date: "d MMM yyyy" || "--"'
+                )
+              td 
+                span {{ party.data.reason }}
+              td
+                span(*ngIf='!party.verified') Pending for approval
+                span(*ngIf='party.verified') {{ party.data.approved ? "Approved" : "Rejected" }}
+
+  .card-footer 
+    span(
+      *ngIf='verificationEntry && verificationEntry.email === authService.getEmail()'
+    )
+      button.btn.btn-sm.btn-success.float-right(
+        (click)='approve(verificationEntry.data.paymentType)'
+      ) Approve
+      span.float-right &nbsp;&nbsp;
+      button.btn.btn-sm.btn-danger.float-right(
+        (click)='reject(verificationEntry.data.paymentType)'
+      ) Reject
+      span.float-right &nbsp;&nbsp;
+      button.btn.btn-sm.btn-primary.float-right(
+        (click)='claim(claimTemplate)',
+        *ngIf='verificationEntry.data.paymentType === "refund"'
+      ) Claim
+    span &nbsp;&nbsp;
+    span(*ngIf='!verificationEntry')
+      button.btn.btn-sm.btn-link.float-right((click)='close()', class='castlerButtonColor') Close
+
+//- ng-template(#claimTemplate)
+//-   .modal-header Claim Details
+//-   .modal-body 
+//-     div(*ngIf='claimErrors.length > 0')
+//-       sbpro-alert(classes='alert-danger')
+//-         | {{ claimErrors[0] }}
+//-     form([formGroup]='claimForm')
+//-       .form-group 
+//-         label Claim Amount
+//-         span.text-danger *
+//-         input.form-control(type='number', formControlName='amount')
+//-       .form-group 
+//-         label Claim Reason
+//-         span.text-danger *
+//-         input.form-control(type='text', formControlName='reason')
+//-   .modal-footer 
+//-     button.btn.btn-link.float-right((click)='claimModal.close()') close
+//-     button.btn.btn-primary.float-right(
+//-       [disabled]='!claimForm.valid',
+//-       (click)='openOTP()'
+//-     ) Next
+
+ng-template(#claimTemplate)
+  sbpro-card([headerActions]='true')
+    .card-header 
+      | Payment Status
+      button.btn.btn-icon.btn-link.btn-sm(
+        (click)='claimForm.reset(); claimCheck = false; claimModal.close()'
+      )
+        i-feather(name='x-circle')
+    .card-body 
+      div(*ngIf='claimErrors.length > 0')
+        sbpro-alert(classes='alert-danger')
+          | {{ claimErrors[0] }}
+      .form-group
+        label Refund Amount
+        span.form-control 
+          b {{ deal.dealData.securityDeposit - amount }}
+
+      //- .custom-control.custom-checkbox
+      //-   input#customCheck1.custom-control-input(
+      //-     type='checkbox',
+      //-     [(ngModel)]='claimCheck'
+      //-   )
+      //-   label.custom-control-label(for='customCheck1') Add Claim
+
+      form([formGroup]='claimForm')
+        .form-group 
+          label Claim Amount
+          span.text-danger *
+          input.form-control(type='number', formControlName='amount')
+        .form-group 
+          label Claim Reason
+          span.text-danger *
+          input.form-control(type='text', formControlName='reason')
+    .card-footer 
+      button.btn.float-right((click)='openOTP()', class='castlerButtonColor') Next

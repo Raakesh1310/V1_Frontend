@@ -1,0 +1,12 @@
+.form-group
+  label(*ngIf='!editMode') {{ label }} :
+  | &nbsp;
+  span.linker(*ngIf='editable && !editMode')
+    i-feather(name='edit', (click)='editLabel()')
+  input.form-control-sm.input(type='text', [(ngModel)]='label' [value]='label' , *ngIf='editMode' , autofocus , (focusout)='doneEdit()')
+  | &nbsp;
+  button.btn.btn-sm.btn-primary((click)='doneEdit()', *ngIf='editMode') Done
+  span.linker.float-right(*ngIf='removable')
+    i-feather(name='trash-2', (click)='rmField()')
+  span.text-danger(*ngIf='required') *
+  input.form-control.form-control-sm(type='text',[(ngModel)]='value', (keyup)='doneEdit()',[placeholder]='label || ""')

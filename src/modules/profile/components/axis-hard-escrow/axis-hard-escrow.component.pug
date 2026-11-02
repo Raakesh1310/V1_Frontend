@@ -1,0 +1,187 @@
+sbpro-card([headerActions]='true')
+  .card-header
+    | Axis Hard Escrow Details
+    button.btn.btn-icon.btn-link.btn-xl((click)='closeModal()')
+      i-feather(name='x-circle')
+  .card-body
+    div(*ngIf='errors && errors.length > 0')
+      sbpro-alert(classes='alert-danger')
+        | {{ errors[0] }}
+    form([formGroup]='hardEscrowForm')
+      .d-flex
+        .form-group.w-100.mr-2
+          label(for='frm-cntrl-accountNo') Account No
+          span.text-danger *
+          input#frm-cntrl-accountNo.form-control.form-control-sm(
+            type='string',
+            [readonly]="isEdit",
+            formControlName='accountNo',
+            placeholder='Account No'
+          )
+        .form-group.w-100
+          label(for='frm-cntrl-accountName') Account Name
+          span.text-danger *
+          input#frm-cntrl-accountName.form-control.form-control-sm(
+            type='string',
+            formControlName='accountName',
+            placeholder='Account Name'
+          )
+      .d-flex
+        .form-group.w-100.mr-2
+          label(for='frm-cntrl-clientId') Client ID
+          span.text-danger *
+          input#frm-cntrl-clientId.form-control.form-control-sm(
+            type='string',
+            formControlName='clientId',
+            placeholder='Client Id'
+          )
+        .form-group.w-100
+          label(for='frm-cntrl-clientSecret') Client Secret
+          span.text-danger *
+          input#frm-cntrl-clientSecret.form-control.form-control-sm(
+            type='password',
+            formControlName='clientSecret',
+            placeholder='Client Secret'
+          )
+      .d-flex
+        .form-group.w-100.mr-2
+          label(for='frm-cntrl-corpCode') Corp Code
+          span.text-danger *
+          input#frm-cntrl-corpCode.form-control.form-control-sm(
+            type='string',
+            formControlName='corpCode',
+            placeholder='Corp Code',
+          )
+        .form-group.w-100.mr-2
+          label(for='frm-cntrl-channelId') Channel Id
+          span.text-danger *
+          input#frm-cntrl-channelId.form-control.form-control-sm(
+            type='string',
+            formControlName='channelId',
+            placeholder='Channel Code',
+          )
+      .d-flex
+        .form-group.w-100.mr-2
+          label(for='frm-cntrl-prefixCode') Prefix Code
+          span.text-danger *
+          input#frm-cntrl-prefixCode.form-control.form-control-sm(
+            type='string',
+            formControlName='prefixCode',
+            placeholder='prefix',
+          )
+        .form-group.w-100
+          label(for='frm-cntrl-emailId') Emial ID
+          span.text-danger *
+          input#frm-cntrl-emailId.form-control.form-control-sm(
+            type='string',
+            formControlName='emailId',
+            placeholder='Email ID',
+          )  
+      .d-flex
+        .form-group.w-100.mr-2
+          label(for='frm-cntrl-userId') User Id
+          span.text-danger *
+          input#frm-cntrl-userId.form-control.form-control-sm(
+            type='string',
+            formControlName='userId',
+            placeholder='User Id'
+          )
+        .form-group.w-100
+          label(for='frm-cntrl-secretKey') Secret Key
+          span.text-danger *
+          input#frm-cntrl-secretKey.form-control.form-control-sm(
+            type='password',
+            formControlName='secretKey',
+            placeholder='Secret Key',
+            autocomplete='new-password'
+          )
+
+      .d-flex
+        .form-group.w-100.mr-2
+          label(for='frm-cntrl-pan') PAN
+          span.text-danger *
+          input#frm-cntrl-pan.form-control.form-control-sm(
+            type='string',
+            formControlName='pan',
+            placeholder='PAN'
+          )
+        .form-group.w-100
+          label(for='frm-cntrl-address') Address
+          span.text-danger *
+          input#frm-cntrl-address.form-control.form-control-sm(
+            type='string',
+            formControlName='address',
+            placeholder='Address'
+          )
+      .d-flex
+        .form-group.w-100.mr-2
+          label(for='frm-cntrl-ifsc') IFSC
+          span.text-danger *
+          input#frm-cntrl-ifsc.form-control.form-control-sm(
+            type='string',
+            formControlName='ifsc',
+            placeholder='IFSC'
+          )
+        .form-group.w-100
+          label(for='frm-cntrl-trusteeMsil') Trustee Email (Optional)
+          input#frm-cntrl-trusteeMsil.form-control.form-control-sm(
+            type='string',
+            formControlName='trusteeMail',
+            placeholder='Trustee Email',
+          )
+      .d-flex
+        .form-group.w-50.mr-2
+          .row
+            .col-sm-12.col-md-9.col-lg-9
+              label(for='frm-cntrl-cb') Enable Connected Banking
+            .col-sm-12.col-md-3.col-lg-3
+              input#frm-cntrl-cb.form-control.form-control-sm.float-left(
+                type='checkbox',
+                #checkbox,
+                name='enableConnectedBanking',
+                formControlName='enableConnectedBanking',
+                [disabled]='hide'
+              )
+      .d-flex 
+        .form-group.w-100.mr-2(*ngIf="hardEscrowForm.get('enableConnectedBanking').value")
+          .row
+            .col-sm-4
+              label(for='frm-cntrl-cb') With Digital Escrow
+              input.ml-2(
+                type='radio',
+                name='enableConnectedBankingWithVA',
+                formControlName='enableConnectedBankingWithVA',
+                [value]="true",
+                (change)="updateEnableConnectedBanking(true)"
+              )
+            .col-sm-4
+              label(for='frm-cntrl-cb') Without Digital Escrow
+              input.ml-2(
+                type='radio',
+                name='enableConnectedBankingWithVA',
+                formControlName='enableConnectedBankingWithVA',
+                [value]="false",
+                (change)="updateEnableConnectedBanking(false)"
+              )
+      .d-flex(*ngIf="hardEscrowForm.get('enableConnectedBanking').value")
+        .form-group.w-100.mr-2
+          label(for='frm-cntrl-accountType') Account Type
+          select#frm-cntrl-accountType.form-control.form-control-sm(
+            formControlName='accountType'
+          )
+            option(value='escrow') Escrow Account
+            option(value='current') Current Account
+    sbpro-app-button.float-right(
+      *ngIf='!isEdit',
+      (click)='onSubmit()',
+      [loading]='submitting',
+      text='Submit',
+      loadingText='Submitting'
+    )
+    sbpro-app-button.float-right(
+      *ngIf='isEdit',
+      (click)='onSubmit()',
+      [loading]='submitting',
+      text='Update',
+      loadingText='Submitting'
+    )

@@ -1,0 +1,193 @@
+div
+  .flex-container.align-self-stretch 
+    .w-100
+      form.pb-2
+        .d-flex.mb-2
+          select#statusList.mt-1.form-control.w-25.mr-2(
+            name='status',
+            [(ngModel)]='fdService.status'
+          )
+            option(value='') Select Status
+            option(value='Open') Open
+            option(value='Close') Close
+          input#start-date.mt-1.form-control.w-25.mr-2(
+            type='text',
+            name='sd',
+            placeholder='Start Date',
+            autocomplete='off',
+            ngbDatepicker,
+            outsideDays='hidden',
+            #sd='ngbDatepicker',
+            (click)='sd.toggle()',
+            [(ngModel)]='fdService.dateFrom',
+            [minDate]='fdService.dateFromMin',
+            [maxDate]='fdService.dateFromMax'
+          )
+          input#end-date.mt-1.form-control.w-25.mr-2(
+            type='text',
+            name='ed',
+            placeholder='End Date',
+            autocomplete='off',
+            ngbDatepicker,
+            outsideDays='hidden',
+            #ed='ngbDatepicker',
+            (click)='ed.toggle()',
+            [(ngModel)]='fdService.dateTo',
+            [minDate]='fdService.dateToMin',
+            [maxDate]='fdService.dateToMax'
+          )
+          button.btn.mr-2.ws-wrap.mt-1.castlerButtonColor(
+            type='button',
+            (click)='loadData()'
+          )
+            span 
+              | search
+          button.btn.btn-link.mr-2.logoColor(
+            type='button',
+            (click)='clearForm()'
+          ) Clear
+          .justify-content-end.w-25
+            button.btn.mr-2.ws-wrap.mt-1.castlerButtonColor(
+              type='button',
+              (click)='createFD()'
+            )
+              span + Create
+          .justify-content-end 
+            a.btn.btn-success.mb-1.mt-1.mr-2.ws-nowrap.btn-icon(
+              style = 'color : white',
+              type='button',
+              (click)='downloadExcel()'
+            )
+              fa-icon.d-flex.flex-row.align-items-center(
+                [icon]='["fas", "arrow-down"]'
+              )
+        .d-flex(*ngIf='(fds$ | async)?.length > 0') 
+          .flex-row
+            small.mb-2.mt-2 Showing {{ (fdService.page - 1) * 10 + 1 }} to {{ (fdService.page - 1) * 10 + (fds$ | async)?.length }} of {{ total$ | async }}
+
+    .table-responsive.pp-table-container.align-self-stretch.flex-grow-1.flex-stretch-1.table-striped
+      table.table
+        thead
+          tr
+            th.th-sticky-top(scope='col', sbSortable='date', (sort)='onSort($event)')
+              span.ws-nowrap ID
+              sb-sort-icon(
+                *ngIf='sortedColumn === "date"',
+                [direction]='sortedDirection'
+              )
+            th.th-sticky-top(scope='col', sbSortable='date', (sort)='onSort($event)')
+              span.ws-nowrap Amount (in Rs.)
+              sb-sort-icon(
+                *ngIf='sortedColumn === "date"',
+                [direction]='sortedDirection'
+              )
+            th.th-sticky-top(scope='col', sbSortable='date', (sort)='onSort($event)')
+              span.ws-nowrap Amount Blocked (in Rs.)
+              sb-sort-icon(
+                *ngIf='sortedColumn === "date"',
+                [direction]='sortedDirection'
+              )
+            th.th-sticky-top(scope='col', sbSortable='date', (sort)='onSort($event)')
+              span.ws-nowrap Value Date
+              sb-sort-icon(
+                *ngIf='sortedColumn === "date"',
+                [direction]='sortedDirection'
+              )
+            th.th-sticky-top(
+              scope='col',
+              sbSortable='event',
+              (sort)='onSort($event)'
+            )
+              span.ws-nowrap Tenure
+              sb-sort-icon(
+                *ngIf='sortedColumn === "event"',
+                [direction]='sortedDirection'
+              )
+            th.th-sticky-top(
+              scope='col',
+              sbSortable='event',
+              (sort)='onSort($event)'
+            )
+              span.ws-nowrap Maturity Date
+              sb-sort-icon(
+                *ngIf='sortedColumn === "date"',
+                [direction]='sortedDirection'
+              )
+            th.th-sticky-top(
+              scope='col',
+              sbSortable='event',
+              (sort)='onSort($event)'
+            )
+              span.ws-nowrap Interest
+              sb-sort-icon(
+                *ngIf='sortedColumn === "date"',
+                [direction]='sortedDirection'
+              )
+
+            th.th-sticky-top(scope='col', sbSortable='time', (sort)='onSort($event)')
+              span.ws-nowrap Acc. Number
+              sb-sort-icon(
+                *ngIf='sortedColumn === "time"',
+                [direction]='sortedDirection'
+              )
+            th.th-sticky-top(scope='col', sbSortable='time', (sort)='onSort($event)')
+              span.ws-nowrap Status
+              sb-sort-icon(
+                *ngIf='sortedColumn === "time"',
+                [direction]='sortedDirection'
+              )
+            th.th-sticky-top(scope='col', sbSortable='time', (sort)='onSort($event)')
+              span.ws-nowrap Action
+              sb-sort-icon(
+                *ngIf='sortedColumn === "time"',
+                [direction]='sortedDirection'
+              )
+
+        tbody(*ngIf='(fds$ | async)?.length > 0')
+          tr(*ngFor='let fd of fds$ | async')
+            td
+              ngb-highlight([result]='fd.fixedDepositId || "--"')
+            td
+              ngb-highlight([result]='fd.amount || "--"')
+            td
+              ngb-highlight([result]='fd.amountBlocked || "--"')
+            td
+              ngb-highlight([result]='fd.valueDate | date: "d MMM yyyy" || "--"')
+            td
+              ngb-highlight([result]='fd.tenure || "--"')
+            td
+              ngb-highlight(
+                [result]='fd.maturityDate | date: "d MMM yyyy" || "--"'
+              )
+            td
+              ngb-highlight([result]='fd.interestINR || "--"')
+            td
+              ngb-highlight([result]='fd.fdAccountNo || "--"')
+            td
+              ngb-highlight([result]='fd.status || "--"')
+            td 
+              button.btn.btn-sm.mr-2.mb-1.castlerButtonColor(
+                (click)='updateFD(fd)',
+                *ngIf='fd.status === "Open"'
+              ) Edit
+              button.btn.btn-sm.mb-1.castlerButtonColor(
+                (click)='closeFD(fd)',
+                *ngIf='fd.status === "Open"'
+              ) Close
+    .flex-container.flex-row(
+      *ngIf='(fds$ | async)?.length <= 0 && !(loadingList$ | async)'
+    )
+      .align-self-center No Data available
+    .flex-container.flex-row(*ngIf='loadingList$ | async')
+      .align-self-center Please wait...
+    .d-flex.justify-content-between.pt-2.align-self-end(
+      *ngIf='(fds$ | async)?.length > 0 && !(loadingList$ | async)'
+    )
+      ngb-pagination(
+        [collectionSize]='total$ | async',
+        [(page)]='fdService.page',
+        [maxSize]='5',
+        [rotate]='true',
+        [ellipses]='false',
+        [boundaryLinks]='true'
+      )

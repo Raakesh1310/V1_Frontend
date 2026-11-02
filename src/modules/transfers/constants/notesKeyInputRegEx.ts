@@ -1,0 +1,1 @@
+export const alphaNumericRegex = /^[A-Za-z0-9_]+$/

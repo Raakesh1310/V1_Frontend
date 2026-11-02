@@ -1,0 +1,232 @@
+div
+	form
+		.d-flex.mb-2
+			input#search-box.mt-1.form-control.w-50.mr-2(
+				placement='top',
+				ngbPopover='Search by CRN',
+				type='text',
+				name='s',
+				[(ngModel)]='searchTerm',
+				autocomplete='off',
+				placeholder='Search by Business Name, CRN'
+			)
+
+			select#statusList.mt-1.form-control.w-25.mr-2(
+				name='status',
+				(change)='showStatus($event)',
+				[(ngModel)]="selectedStatus"
+			)
+				option(value='') Status
+				option(*ngFor='let st of statusList', [ngValue]='st') {{ st }}
+
+			button.btn.mr-2.ws-wrap.mt-1.castlerButtonColor(
+				type='submit',
+				(click)='loadData()'
+			)
+				fa-icon.d-flex.flex-row.align-items-center([icon]='["fas", "search"]')
+
+			button.btn.btn-link.mt-1.mb-1.mr-2.logoColor(
+				type='button',
+				(click)='ngOnInit()'
+			)
+				| Clear
+			.justify-content-end.pr-5
+				a.btn.mt-1.mb-1.btn-success.ws-nowrap.btn-icon(
+					style='color: white',
+					type='button',
+					target='_blank',
+					[href]='downloadLink'
+				)
+					fa-icon.d-flex.flex-row.align-items-center(
+						[icon]='["fas", "arrow-down"]'
+					)
+
+			button.btn.mr-2.ws-nowrap.mt-1.castlerButtonColor(
+				type='submit',
+				(click)='openModal(alert)'
+			) Send KYC Link
+
+//-     .d-flex(*ngIf='(account$ | async)?.length > 0') 
+//-       .flex-row
+//-         small.mb-2.mt-2 Showing {{ (accountsService.page - 1) * 10 + 1 }} to {{ (accountsService.page - 1) * 10 + (account$ | async)?.length }} of {{ total$ | async }}
+
+.table-responsive.pp-table-container.align-self-stretch.flex-grow-1.flex-stretch-1.table-striped(
+	*ngIf='!(loadingList$ | async)'
+)
+	table.table
+		thead
+			tr
+				th.th-sticky-top(
+					scope='col',
+					sbSortable='date',
+					(sort)='onSort($event)',
+					*ngIf='isSuperAdmin'
+				)
+					span.ws-nowrap Created By
+				th.th-sticky-top(scope='col' sbSortable='date', (sort)='onSort($event)')
+					span.ws-nowrap CRN
+				th.th-sticky-top(scope='col' sbSortable='date', (sort)='onSort($event)')
+					span.ws-nowrap Name
+				th.th-sticky-top(scope='col' sbSortable='date', (sort)='onSort($event)')
+					span.ws-nowrap Email ID
+				th.th-sticky-top(scope='col' sbSortable='date', (sort)='onSort($event)')
+					span.ws-nowrap Business Name
+				th.th-sticky-top(scope='col' sbSortable='date', (sort)='onSort($event)')
+					span.ws-nowrap Status
+				th.th-sticky-top(scope='col' sbSortable='date', (sort)='onSort($event)')
+					span.ws-nowrap KYC Link
+				th.th-sticky-top(scope='col' sbSortable='date', (sort)='onSort($event)')
+					span.ws-nowrap Date
+				th.th-sticky-top(*ngIf='isSuperAdmin' scope='col' sbSortable='date')
+					span.ws-nowrap Action
+
+		tbody
+			tr(*ngIf='data.length == 0')
+				td No Entries Found
+			tr(*ngFor='let it of data; index as i')
+				td(*ngIf='isSuperAdmin')
+					span.ws-nowrap {{ it.merchantTitle ? it.merchantTitle : "Admin" }}
+				td((click)='moveToDetails(it.crnId)')
+					span.ws-nowrap.tableClickEntryColor.myanchor {{ it.crnId }}
+				td
+					span.ws-nowrap {{ it.sendKycToName }}
+				td
+					span.ws-nowrap {{ it.sendKycToEmail }}
+				td
+					span.ws-nowrap {{ it.businessName }}
+				td
+					a.nav-link.p-0(
+						class='tableClickEntryColor',
+						href='javascript:void(0);',
+						(click)='selectedKYCLink = it; openStatusMapModal(statusMap)',
+					)
+						ngb-highlight(
+							[result]='it.status',
+						)
+				td
+					span.ws-nowrap {{ it.kycLink }}
+				td 
+					span.ws-nowrap {{ it.createdAt }}
+				td(*ngIf='it.status === "Completed" && isSuperAdmin')
+					button.ws-nowrap.btn.btn-xs.createMerchantButton(
+						(click)='sendLink(it.crnId)'
+					) Create Merchant
+				td.text-center(*ngIf='it.status !== "Completed" && isSuperAdmin')
+					| --
+		.d-flex.justify-content-between.p-2
+			ngb-pagination(
+				[collectionSize]='total$',
+				[maxSize]='5',
+				[(page)]='page',
+				[pageSize]='pageSize',
+				[rotate]='true',
+				[ellipses]='false',
+				(pageChange)='pageChange($event)',
+				[boundaryLinks]='true'
+			)
+	input(
+		#inputLogo,
+		type='file',
+		accept='.png, .jpg, .jpeg',
+		(click)='$event.target.value = null',
+		(change)='uploadImage($event, 1)'
+	)
+ng-template(#statusMap)
+	.modal-header(class='logoColor') KYC Status
+	.modal-body
+		.div(*ngIf="selectedKYCLink.statusMilestone")
+			div(*ngIf='selectedKYCLink.statusMilestone.length === 0')
+				p No milestones found for this transaction.
+			div(*ngIf='selectedKYCLink.statusMilestone.length > 0')
+				.container.mb-5
+					.row
+						.col
+							h4 Status Milestones
+							ul.timeline
+								li.green(*ngFor='let mileStone of selectedKYCLink.statusMilestone')
+									h3
+										p {{ mileStone.status }}
+									i {{ mileStone.createdAt | date:'medium'}}
+	.modal-footer
+		button.btn.btn-sm((click)='closeModal()' class='castlerButtonColor') Close
+
+ng-template(#alert)
+	.flex-display-column.border.rounded(style='background: #FFFBF4')
+		.bold.mt-5.d-flex.justify-content-center(
+			style='color: #825E3A;font-size: 22px'
+		) Details for Sending KYC Link
+		.container-form.col-sm-12
+			form.p-3([formGroup]='descForm')
+				.alert.alert-danger.alert-dismissible.fade.show(
+					role='alert',
+					*ngIf='errors.length > 0'
+				)
+					ul
+						li(*ngFor='let error of errors')
+							p.redDot {{ error }}
+				.mt-3.d-flex.justify-content-between
+					label.mt-1(for='frm-cntrl-name') Name*
+					input#frm-cntrl-name.form-control.form-control-sm.inputModal(
+						type='text',
+						style='width: 350px',
+						placeholder='Enter Name',
+						formControlName='name',
+						name='name',
+						[(ngModel)]='name',
+						(keydown)='utilityService.validateName($event)'
+					)
+				.mt-3.d-flex.justify-content-between
+					label.mt-1(for='frm-cntrl-email') Email*
+					.col(style='margin-left: 30px')
+						input#frm-cntrl-email.form-control.form-control-sm.inputModal(
+							type='text',    
+							style='width: 350px',
+							placeholder='Enter Email',
+							formControlName='email',
+							name='email',
+							[(ngModel)]='email',
+							required,
+							[class.is-valid]='emailControlValid',
+							[class.is-invalid]='emailControlInvalid'
+						)
+						.invalid-feedback(*ngIf='emailControl.hasError("required")')
+							.text-danger Email required.
+						.invalid-feedback(*ngIf='emailControl.hasError("email")')
+							.text-danger Email is not valid.
+
+				.mt-3.d-flex.justify-content-between
+					label.mt-1(for='inputIndustry') Link Type
+					select#inputIndustry.form-control.form-control-sm.inputModal(
+						[(ngModel)]='kycType',
+						style='width: 350px',
+						(change)='setPages($event.target.value)',
+						[ngModelOptions]='{ standalone: true }'
+					)
+						option Individual
+						option Business
+				//- .mt-3.d-flex
+				//-   label.mt-1 Logo 
+				//-   button.btn.castlerButtonColor.btn-xs((click)='selectLogo()') Upload &nbsp;
+				//-     svg.bi.bi-upload(
+				//-       xmlns='http://www.w3.org/2000/svg',
+				//-       width='16',
+				//-       height='16',
+				//-       fill='currentColor',
+				//-       viewbox='0 0 16 16'
+				//-     )
+				//-       path(
+				//-         d='M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z'
+				//-       )
+				//-       path(
+				//-         d='M7.646 1.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 2.707V11.5a.5.5 0 0 1-1 0V2.707L5.354 4.854a.5.5 0 1 1-.708-.708l3-3z'
+				//-       ) 
+				//-   p(*ngIf='logo' style='margin-left:10px') {{logo.name}}
+				.flex-display.mb-3.mt-3.float-right
+					button.btn.ws-nowrap.btn.btn-outline-danger.mr-3(
+						type='button',
+						(click)='closeModal()'
+					) Close
+					button.btn.ws-nowrap.btn-green.createMerchantButton(
+						type='button',
+						(click)='onSubmit()'
+					) Send Link

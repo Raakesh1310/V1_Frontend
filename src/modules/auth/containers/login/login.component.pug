@@ -1,0 +1,199 @@
+sb-layout-auth
+  .container
+    .row.justify-content-center
+      .col-lg-5
+        .card.shadow-lg.border-0.rounded-lg.mt-5
+          .card-header.justify-content-center
+            img.logoImage(
+              src='/assets/img/Castler_logo.png',
+              width='100',
+              height='50'
+            )
+
+          .card-body
+            div(*ngIf='message')
+              sbpro-alert([icon]='true', classes='alert-success sb-alert-solid')
+                p {{ message }}
+            div(*ngIf='errors.length > 0')
+              sbpro-alert(classes='alert-danger', dismissable='true')
+                | {{ errors[0] }}
+                br
+                small
+                  span(*ngIf='resend') Didn't receive email verification link?&nbsp;
+                  span.linker((click)='resendLink()', *ngIf='resend') Resend
+            form([formGroup]='loginForm', autocomplete='off')
+              input(
+                autocomplete='false',
+                name='hidden',
+                type='text',
+                style='display:none;'
+              )
+              .form-group
+                label.small.mb-1(for='inputEmailAddress') Email
+                input#inputEmailAddress.form-control.py-4(
+                  style='',
+                  data-cy='emailInput',
+                  type='email',
+                  placeholder='Enter email address',
+                  aria-describedby='emailHelp',
+                  formControlName='email',
+                  [class.is-valid]='emailControlValid',
+                  [class.is-invalid]='emailControlInvalid'
+                )
+                .invalid-feedback(*ngIf='emailControl.hasError("required")')
+                  | Email required.
+                .invalid-feedback(*ngIf='emailControl.hasError("pattern")')
+                  | Enter valid Email ID in Email input box.
+
+              .form-group
+                label.small.mb-1(for='inputPassword') Password &nbsp;
+                a.small(
+                  *ngIf='!gAuthEnabled',
+                  style='color: #417505;font-weight: 500',
+                  routerLink='/auth/forgot-password'
+                ) (Forgot?)
+                input(
+                  autocomplete='new-password',
+                  name='hidden',
+                  type='password',
+                  style='display:none;'
+                )
+                input#inputPassword.form-control.py-4(
+                  data-cy='passwordInput',
+                  type='password',
+                  autocomplete='new-password',
+                  placeholder='Enter password',
+                  formControlName='password',
+                  [class.is-valid]='passwordControlValid',
+                  [class.is-invalid]='passwordControlInvalid'
+                )
+                .invalid-feedback(*ngIf='passwordControl.hasError("required")')
+                  | Password required.
+                .invalid-feedback(*ngIf='passwordControl.hasError("minlength")')
+                  | Password must be at least 8 characters.
+
+              .form-group(*ngIf='gAuthEnabled')
+                label.small.mb-1(for='inputTOTP') Enter Google Authenticator OTP
+                input#inputTOTP.form-control.py-4(
+                  data-cy='totp',
+                  type='text',
+                  placeholder='Enter Google Authenticator OTP',
+                  formControlName='totp',
+                  [class.is-valid]='totpControlValid',
+                  [class.is-invalid]='totpControlInvalid',
+                  maxLength=6
+                )
+                .invalid-feedback(*ngIf='totpControl.hasError?.required')
+                  | OTP is required.
+                .invalid-feedback(*ngIf='totpControl.hasError("minlength")')
+                  | Enter the 6 digit OTP.
+                .invalid-feedback(*ngIf='totpControl.hasError("maxlength")')
+                  | Enter the 6 digit OTP.
+              .form-group(*ngIf='loginOTPEnabled')
+                label.small.mb-1(for='inputOTP') OTP
+                input#inputOTP.form-control.py-4(
+                  data-cy='otp',
+                  type='text',
+                  placeholder='Enter OTP sent on registered mobile number',
+                  formControlName='otp',
+                  [class.is-valid]='otpControlInvalid',
+                  [class.is-invalid]='otpControlInvalid',
+                  maxLength=6
+                )
+                .invalid-feedback(*ngIf='otpControl.hasError?.required')
+                  | OTP is required.
+                .invalid-feedback(*ngIf='otpControl.hasError("minlength")')
+                  | Enter the 4 to 6 digit OTP.
+                .invalid-feedback(*ngIf='otpControl.hasError("maxlength")')
+                  | Enter the 4 to 6 digit OTP.
+              span(*ngIf='loginOTPEnabled') Didn't receive an OTP? &nbsp;
+                span(
+                  (click)='resendOTP()',
+                  [class.linker]='!timer',
+                  style='color: #417505; font-weight:bold'
+                ) Resend
+                span(*ngIf='timer') ({{ counter }})
+
+              .form-group.d-flex.align-items-center.justify-content-between.mt-5.mb-0(
+                *ngIf='!captchaDisabled'
+              )
+                //sbpro-app-button(
+                //  routerLink='/auth/login',
+                //  (click)='captchaRef.execute()',
+                //  text='Login1',
+                //  [disabled]='loginForm.invalid'
+                //)
+                button.btn.btn-primary.btn-block(
+                  data-cy='loginButton',
+                  (click)='captchaRef.execute()',
+                  [disabled]='loginForm.invalid'
+                ) Login
+
+              .form-group.d-flex.align-items-center.justify-content-between.mt-1.mb-0(
+                *ngIf='captchaDisabled'
+              )
+                sbpro-app-button(
+                  routerLink='/auth/login',
+                  (click)='onSubmit(null)',
+                  text='Login',
+                  [loading]='loading$ | async',
+                  loadingText='Logging in..',
+                  [btnClass]='{ "btn-block": true, "btn-primary": true }',
+                  [disabled]='loginForm.invalid'
+                )
+                //button.btn.btn-primary.btn-block(
+                //  data-cy='loginButton',
+                //  (click)='onSubmit()',
+                //  [disabled]='loginForm.invalid'
+                //) Login
+              re-captcha(
+                #captchaRef='reCaptcha',
+                (resolved)='onSubmit($event)',
+                siteKey='6Lf0kNoZAAAAADrWAgykSPTJC-6JZu5xsfkvPkJb',
+                size='invisible',
+                *ngIf='!captchaDisabled'
+              )
+              center.captchaCredit(*ngIf='!captchaDisabled')
+                br
+                | Powered by reCAPTCHA and the Google &nbsp;
+                a(href='https://policies.google.com/privacy', target='_blank') Privacy Policy&nbsp;
+                | and&nbsp;
+                a(href='https://policies.google.com/terms', target='_blank') Terms of Service&nbsp;
+                | apply
+
+          div(*ngIf='!gAuthEnabled')
+            .card-footer.text-center
+              .small
+                //a(
+                //  routerLink='/auth/register',
+                //  style='color: #417505;font-weight: 500;'
+                //) Need an account? Sign up!
+          div(*ngIf='gAuthEnabled || loginOTPEnabled')
+            .card-footer.text-center
+              .small
+                a(
+                  routerLink='/auth/login',
+                  (click)='reset()',
+                  style='color: #417505;font-weight: 500;'
+                ) Login as another user
+
+ng-template(#confirmationModal, let-modal)
+  .modal-header
+    h5.modal-title Login Form Data
+    button.close(
+      type='button',
+      aria-label='Close',
+      (click)='modal.dismiss("Cross click")'
+    )
+      span(aria-hidden='true') ×
+  .modal-body.
+    Wired up and ready to go. Just add a backend.
+    <br><br>
+    email: <code>{{loginForm.value.email}}</code>
+    <br>
+    password: <code>{{loginForm.value.password}}</code>
+    <br>
+    remember password: <code>{{loginForm.value.checkbox}}</code>
+  .modal-footer
+    button.btn.btn-secondary(type='button', (click)='modal.close()') Close
+    button.btn.btn-primary(type='button', (click)='modal.close("DASHBOARD")') Proceed back to Dashboard

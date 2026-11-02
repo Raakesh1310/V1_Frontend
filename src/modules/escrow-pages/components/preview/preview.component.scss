@@ -1,0 +1,278 @@
+@import 'styles/variables.scss';
+.main {
+  background-image: url('https://img.freepik.com/free-vector/3d-perspective-style-diamond-shape-white-background_1017-27556.jpg?size=626&ext=jpg');
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+.card-body {
+  // overflow-y: scroll;
+  // scroll-behavior: smooth;
+  zoom: 0.95;
+  padding-bottom: 1rem;
+  height: 100%;
+}
+.text-lg {
+  font-size: large;
+}
+
+
+.verify-view {
+  margin-left: 5%;
+  padding: 1% 2%;
+}
+
+.step {
+  height: 7.5rem;
+}
+.header-row {
+  // height: 50px;
+  margin-bottom: 5%;
+  // box-shadow: 0 2px 2px -1px #cfcfcf;
+}
+.hidden {
+  visibility: hidden;
+}
+.body-row {
+  border-radius: 25px;
+  margin: auto;
+  width: 100%;
+  align-self: center;
+}
+hr {
+  border: none;
+  height: 2px;
+  /* Set the hr color */
+  color: #333; /* old IE */
+  background-color: #333; /* Modern Browsers */
+}
+
+.bussiness-name {
+  font-size: 2vh;
+  font-weight: bold;
+  color: rgb(13, 35, 102);
+  text-align: right;
+}
+
+.bussiness-name-print {
+  font-size: 50px;
+  font-weight: bold;
+  color: rgb(13, 35, 102);
+  text-align: right;
+}
+
+.customer-col {
+  background-color: whitesmoke;
+  border-radius: 25px;
+  align-self: center;
+  padding-bottom: 2%;
+  width: 100%;
+  float: left;
+  .row:nth-child(odd) {
+    border-bottom: 1px solid rgb(216, 213, 213);
+  }
+
+  box-shadow: 0 8px 6px -6px rgb(13, 35, 102);
+}
+.steps {
+  text-align: center;
+  button {
+    margin: 0% 5%;
+  }
+}
+
+.modalBtn {
+  margin: 0px 5px;
+}
+
+.title {
+  border-bottom: 1px solid lightgray;
+  font-weight: bolder;
+  color: rgb(13, 35, 102);
+  float: left;
+  width: 100%;
+  margin-bottom: 10%;
+  // text-shadow: 0 1px 0 #ccc, 0 2px 0 #c9c9c9, 0 3px 0 #bbb, 0 4px 0 #b9b9b9,
+  //   0 5px 0 #aaa, 0 6px 1px rgba(0, 0, 0, 0.1), 0 0 5px rgba(0, 0, 0, 0.1),
+  //   0 1px 3px rgba(0, 0, 0, 0.3), 0 3px 5px rgba(0, 0, 0, 0.2),
+  //   0 5px 10px rgba(0, 0, 0, 0.25), 0 10px 10px rgba(0, 0, 0, 0.2),
+  //   0 20px 20px rgba(0, 0, 0, 0.15);
+  font-size: 220%;
+  // align-self: center;
+  // justify-self: center;
+  // margin: auto;
+}
+
+.productDetail {
+  align-items: center;
+  padding: 0% 20%;
+  float: left;
+  margin-bottom: 5%;
+  width: 100%;
+}
+
+@media only screen and (max-width: 767px) {
+  .logo {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .bussiness-name {
+    font-size: 5vh;
+    font-weight: bold;
+    color: rgb(13, 35, 102);
+    text-align: center;
+    text-justify: auto;
+    border-bottom: 1px solid gray;
+  }
+
+  .mobile {
+    display: inline-block;
+  }
+  .live-logo {
+    height: 40px;
+    background-color: rgb(48, 52, 222);
+  }
+  .customer-col {
+    background-color: whitesmoke;
+    border-radius: 25px;
+    align-self: center;
+    padding-bottom: 5%;
+    float: left;
+    .row:nth-child(odd) {
+      border-bottom: 1px solid rgb(216, 213, 213);
+    }
+
+    box-shadow: 0 8px 6px -6px rgb(13, 35, 102);
+  }
+
+  .productDetail {
+    align-items: center;
+    padding: 0% 0%;
+    float: left;
+    margin-bottom: 10%;
+    width: 96%;
+    .label {
+      font-size: 180%;
+      font-weight: bold;
+      color: rgb(13, 35, 102);
+    }
+    p {
+      font-size: 120%;
+      color: grey;
+    }
+  }
+}
+.customerDetail {
+  padding: 5% 2%;
+  padding-bottom: 5%;
+}
+
+.inner-card {
+  .card-body {
+    height: auto;
+  }
+}
+.opacity {
+  //   border: 1px solid black;
+  border-radius: 25px;
+  font-size: 120%;
+  color: rgb(13, 35, 102);
+  .title {
+    padding-left: 5%;
+  }
+  .label {
+    font-weight: bold;
+    color: rgb(13, 35, 102);
+  }
+  form {
+    .form-group {
+      padding-bottom: 5%;
+      padding-left: 5%;
+    }
+  }
+}
+.hidden {
+  display: none;
+}
+
+.mobile {
+  display: none;
+}
+
+.wrapper-progressBar {
+  margin: 0% 0%;
+  width: 100%;
+}
+
+.progressBar li {
+  list-style-type: none;
+  float: left;
+  width: 30%;
+  padding: 0px 2px;
+  position: relative;
+  text-align: center;
+}
+
+.progressBar li:before {
+  content: ' ';
+  line-height: 15px;
+  border-radius: 50%;
+  width: 15px;
+  height: 15px;
+  border: 1px solid #ddd;
+  display: block;
+  text-align: center;
+  margin: 0 auto 10px;
+  background-color: white;
+}
+
+.progressBar li:after {
+  content: '';
+  position: absolute;
+  width: 100%;
+  height: 2px;
+  background-color: rgb(13, 35, 102);
+  top: 15px;
+  left: -50%;
+  z-index: -1;
+}
+
+.progressBar li:first-child:after {
+  content: none;
+}
+
+.progressBar li.active {
+  color: rgb(13, 35, 102);
+}
+
+.progressBar li.active:before {
+  border-color: rgb(13, 35, 102);
+  background-color: rgb(13, 35, 102);
+}
+
+.progressBar li.active + li:after {
+  background-color: rgb(13, 35, 102);
+}
+
+.no-scroll {
+  ::-webkit-scrollbar {
+    width: 0px; /* Remove scrollbar space */
+    background: transparent; /* Optional: just make scrollbar invisible */
+  }
+  /* Optional: show position indicator in red */
+  ::-webkit-scrollbar-thumb {
+    background: #ff0000;
+  }
+}
+
+*:focus {
+  outline: none;
+  border-color: #1bc1d5;
+  border-radius: 5px;
+}
+
+.cdk-drop-list{
+  background: #222346;
+  color: white;
+}

@@ -1,0 +1,78 @@
+div
+    div
+        .text-warning(*ngIf='processingErrors && processingErrors.length > 0'
+        )
+            sbpro-alert([icon]='true', classes='alert-danger sb-alert-solid', [dismissable]='true')
+                ul
+                    li(*ngFor='let error of processingErrors') {{ error }}
+        form([formGroup]='descForm', autocomplete="off")
+            .form-group
+                label(for='remitterName') Remitter Name
+                input#remitterName.form-control.form-control-sm(
+                    type='text',
+                    placeholder='Remitter Name',
+                    formControlName = 'remitterName',
+                    name = 'remitterName')
+
+
+            .form-group
+                label(for='remitterBank') Remitter Bank Account Number
+                input#remitterBank.form-control.form-control-sm(
+                    type='text',
+                    placeholder='Remitter Bank A/c No',
+                    formControlName = 'remitterBank',
+                    name = 'remitterBank')
+
+            .form-group
+                label(for='ifsc') Remitter IFSC
+                input#ifsc.form-control.form-control-sm(
+                    type='text',
+                    placeholder='Remitter IFSC',
+                    formControlName = 'remitterIFSC',
+                    name = 'remitterIFSC')
+
+            .form-group
+                label(for='amount') Amount
+                input#amount.form-control.form-control-sm(
+                    type='text',
+                    placeholder='Amount',
+                    formControlName='amount',
+                    appTwoDigitDecimalNumber,
+                    (input)='amountChanged($event)',
+                    name='amount',
+                )
+
+            .form-group
+                label(for='utr') UTR
+                input#utr.form-control.form-control-sm(
+                    type='text',
+                    placeholder='UTR',
+                    formControlName='utr',
+                    name='utr'
+            )
+
+            .form-group
+                label Deposit Date
+                input.form-control(
+                    type='text',
+                    placeholder='DD MM YYY',
+                    autocomplete='off',
+                    name='selectedDate',
+                    ngbDatepicker,
+                    outsideDays='hidden',
+                    #selectedDate='ngbDatepicker',
+                    (click)='selectedDate.toggle()',
+                    [(ngModel)]='depositDate',
+                    (ngModelChange)='dateChange()',
+                    [ngModelOptions]="{standalone: true}",
+                    [maxDate]="maxDate"
+                )
+            .form-group
+                label(for='remarks') Remarks
+                input#remarks.form-control.form-control-sm(
+                    type='text',
+                    placeholder='Remarks',
+                    formControlName='remarks',
+                    name='remarks'
+                )
+            button.btn.btn-primary((click)='onSubmit()', class='castlerButtonColor') {{ loading ? 'Loading...' : 'Deposit Funds'}}

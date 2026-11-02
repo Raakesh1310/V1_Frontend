@@ -1,0 +1,10 @@
+sbpro-layout-dashboard([light]='true')
+  router-outlet
+    sbpro-dashboard-head(icon='book', title='Payee')
+    .container-fluid.mt-n10
+      .row
+        .col-lg-12
+          sbpro-card
+            .card-header(class='logoColor') Payee List
+            .card-body
+              sbpro-payee-list([pageSize]='10')

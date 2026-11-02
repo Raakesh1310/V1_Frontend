@@ -1,0 +1,307 @@
+sbpro-card([headerActions]='true')
+  .card-header
+    | Form
+    button.btn.btn-icon.btn-link.btn-xl((click)='closeModal()')
+      i-feather(name='x-circle')
+  .card-body
+    div(*ngIf='errors && errors.length > 0')
+      sbpro-alert(classes='alert-danger')
+        | {{ errors[0] }}
+    form([formGroup]='hardEscrowForm' autocomplete='off')
+      .d-flex
+        .form-group.w-50.mr-2
+          .row
+            .col-sm-12.col-md-9.col-lg-9
+              label(for='frm-cntrl-cb') Enable High TPS
+              |
+              i-feather.ml-1(
+                name="info",
+                ngbTooltip="When high TPS is enabled, transfer will bypass trustee and admin approval flow and will directly go to bank for processing",
+                container="body"
+              )
+            .col-sm-12.col-md-3.col-lg-3
+              input#frm-cntrl-cb.form-control.form-control-sm.float-left(
+                type='checkbox',
+                #checkbox,
+                name='enableHighTPS',
+                formControlName='enableHighTPS',
+                (change)='highTPS($event)'
+              )
+      .d-flex
+        .form-group.w-100.mr-2
+          label(for='frm-cntrl-accountNo') Account No
+          span.text-danger *
+          input#frm-cntrl-accountNo.form-control.form-control-sm(
+            type='string',
+            [readonly]="isEdit",
+            formControlName='accountNo',
+            placeholder='Account No'
+          )
+        .form-group.w-100
+          label(for='frm-cntrl-accountName') Account Name
+          span.text-danger *
+          input#frm-cntrl-accountName.form-control.form-control-sm(
+            type='string',
+            formControlName='accountName',
+            placeholder='Account Name'
+          )
+      .d-flex
+        .form-group.w-100.mr-2
+          label(for='frm-cntrl-corpID') Corp ID
+          span.text-danger *
+          input#frm-cntrl-corpID.form-control.form-control-sm(
+            type='string',
+            formControlName='corpID',
+            placeholder='Corp ID',
+          )
+        .form-group.w-100.mr-2
+          label(for='frm-cntrl-makerID') Maker ID
+          span.text-danger *
+          input#frm-cntrl-makerID.form-control.form-control-sm(
+            type='string',
+            formControlName='makerID',
+            placeholder='Maker ID',
+          )
+      .d-flex
+        .form-group.w-100.mr-2
+          label(for='frm-cntrl-checkerID') Checker ID
+          span.text-danger *
+          input#frm-cntrl-checkerID.form-control.form-control-sm(
+            type='string',
+            formControlName='checkerID',
+            placeholder='Checker ID',
+          )
+        .form-group.w-100
+          label(for='frm-cntrl-approverID') Approver ID
+          span.text-danger *
+          input#frm-cntrl-approverID.form-control.form-control-sm(
+            type='string',
+            formControlName='approverID',
+            placeholder='Approver ID',
+          )  
+      .d-flex
+        .form-group.w-100.mr-2
+          label(for='frm-cntrl-ldapUser') LDAP User
+          span.text-danger *
+          input#frm-cntrl-ldapUser.form-control.form-control-sm(
+            type='string',
+            formControlName='ldapUser',
+            placeholder='LDAP User'
+          )
+        .form-group.w-100
+          label(for='frm-cntrl-ldapPassword') LDAP Password
+          span.text-danger *
+          input#frm-cntrl-ldapPassword.form-control.form-control-sm(
+            type='password',
+            formControlName='ldapPassword',
+            placeholder='LDAP password',
+            autocomplete='new-password'
+          )
+      .d-flex
+        .form-group.w-100.mr-2
+          label(for='frm-cntrl-clientID') Client ID
+          span.text-danger *
+          input#frm-cntrl-clientID.form-control.form-control-sm(
+            type='string',
+            formControlName='clientID',
+            placeholder='Client ID'
+          )
+        .form-group.w-100
+          label(for='frm-cntrl-clientSecret') Client Secret
+          span.text-danger *
+          input#frm-cntrl-clientSecret.form-control.form-control-sm(
+            type='password',
+            formControlName='clientSecret',
+            placeholder='Client Secret'
+          )
+      .d-flex
+        .form-group.w-100.mr-2
+          label(for='frm-cntrl-cifID') CIF ID (Optional)
+          input#frm-cntrl-cifID.form-control.form-control-sm(
+            type='string',
+            formControlName='cifID',
+            placeholder='CIF ID'
+          )
+        .form-group.w-100
+          label(for='frm-cntrl-accountClientId') Account Client ID
+          span.text-danger *
+          input#frm-cntrl-accountClientId.form-control.form-control-sm(
+            type='string',
+            formControlName='accountClientId',
+            placeholder='Account Client ID'
+          )
+      .d-flex
+        .form-group.w-100.mr-2
+          label(for='frm-cntrl-sftpUser') SFTP User (Optional)
+          input#frm-cntrl-sftpUser.form-control.form-control-sm(
+            type='string',
+            formControlName='sftpUser',
+            placeholder='SFTP Username'
+          )
+        .form-group.w-100
+          label(for='frm-cntrl-sftpPassword') SFTP Password (Optional)
+          input#frm-cntrl-sftpPassword.form-control.form-control-sm(
+            type='password',
+            formControlName='sftpPassword',
+            placeholder='SFTP Password'
+          )
+      .d-flex
+        .form-group.w-50.mr-2
+          label(for='frm-cntrl-sftpFolderName') SFTP Folder Name (Optional)
+          input#frm-cntrl-sftpFolderName.form-control.form-control-sm(
+            type='string',
+            formControlName='sftpFolderName',
+            placeholder='SFTP Folder Name'
+          )
+        .form-group.w-50.mr-2
+          label(for='frm-cntrl-ifsc') IFSC (Optional)
+          input#frm-cntrl-trusteeMail.form-control.form-control-sm(
+            type='string',
+            formControlName='ifsc',
+            placeholder='IFSC'
+          )
+      .d-flex
+        .form-group.w-50.mr-2
+          label(for='frm-cntrl-upiId') UPI ID (Optional)
+          input#frm-cntrl-upiId.form-control.form-control-sm(
+            type='string',
+            formControlName='upiId',
+            placeholder='UPI ID'
+          )
+      .d-flex
+        .form-group.w-50.mr-2
+          label(for='frm-cntrl-upihostname') UPI Hostname (Optional)
+          input#frm-cntrl-upihostname.form-control.form-control-sm(
+            type='string',
+            formControlName='upiHostname',
+            placeholder='UPI Hostname'
+          )
+        .form-group.w-50.mr-2
+          label(for='frm-cntrl-upiDecriptionKey') UPI Decription Key (Optional)
+          input#frm-cntrl-upiDecriptionKey.form-control.form-control-sm(
+            type='string',
+            formControlName='upiDecriptionKey',
+            placeholder='UPI Decription Key'
+          )
+      .d-flex
+        .form-group.w-50.mr-2
+          label(for='frm-cntrl-upiusername') UPI UserName (Optional)
+          input#frm-cntrl-upiusername.form-control.form-control-sm(
+            type='string',
+            formControlName='upiUserName',
+            placeholder='UPI Username'
+          )
+        .form-group.w-50.mr-2
+          label(for='frm-cntrl-upipassword') UPI Password (Optional)
+          input#frm-cntrl-upipassword.form-control.form-control-sm(
+            type='string',
+            formControlName='upiPassword',
+            placeholder='UPI Password'
+          )
+      .d-flex
+        .form-group.w-50.mr-2
+          label(for='frm-cntrl-upibcagent') UPI BC Agent (Optional)
+          input#frm-cntrl-upibcagent.form-control.form-control-sm(
+            type='string',
+            formControlName='upiBCAgent',
+            placeholder='UPI BC Agent'
+          )
+        .form-group.w-50.mr-2
+          label(for='frm-cntrl-upihmac') UPI HMAC (Optional)
+          input#frm-cntrl-upihmac.form-control.form-control-sm(
+            type='string',
+            formControlName='upiHMAC',
+            placeholder='UPI HMAC'
+          )
+      .d-flex
+        .form-group.w-50.mr-2
+          label(for='frm-cntrl-upiMrchOrgId') UPI MrchOrgId (Optional)
+          input#frm-cntrl-upiMrchOrgId.form-control.form-control-sm(
+            type='string',
+            formControlName='upiMrchOrgId',
+            placeholder='UPI MrchOrgId'
+          )
+        .form-group.w-50.mr-2
+          label(for='frm-cntrl-upiAggrorgId') UPI AggrorgId (Optional)
+          input#frm-cntrl-upiAggrorgId.form-control.form-control-sm(
+            type='string',
+            formControlName='upiAggrorgId',
+            placeholder='UPI AggrorgId'
+          )
+      .d-flex
+        .form-group.w-50.mr-2
+          label(for='frm-cntrl-trusteeMsil') Trustee Email (Optional)
+          input#frm-cntrl-trusteeMsil.form-control.form-control-sm(
+            type='string',
+            formControlName='trusteeMail',
+            placeholder='Trustee Email',
+            [readOnly]='hardEscrowForm.get("enableHighTPS").value'
+          )
+      .d-flex
+        .form-group.w-50.mr-2
+          .row
+            .col-sm-12.col-md-9.col-lg-9
+              label(for='frm-cntrl-cb') Enable Connected Banking
+            .col-sm-12.col-md-3.col-lg-3
+              input#frm-cntrl-cb.form-control.form-control-sm.float-left(
+                type='checkbox',
+                #checkbox,
+                name='enableConnectedBanking',
+                formControlName='enableConnectedBanking',
+                [disabled]='hide'
+              )
+      .d-flex 
+        .form-group.w-100.mr-2(*ngIf="hardEscrowForm.get('enableConnectedBanking').value")
+          .row
+            .col-sm-4
+              label(for='frm-cntrl-cb') With Digital Escrow
+              input.ml-2(
+                type='radio',
+                name='enableConnectedBankingWithVA',
+                formControlName='enableConnectedBankingWithVA',
+                [value]="true",
+                (change)="updateEnableConnectedBanking(true)"
+              )
+            .col-sm-4
+              label(for='frm-cntrl-cb') Without Digital Escrow
+              input.ml-2(
+                type='radio',
+                name='enableConnectedBankingWithVA',
+                formControlName='enableConnectedBankingWithVA',
+                [value]="false",
+                (change)="updateEnableConnectedBanking(false)"
+              )
+      .d-flex(*ngIf="hardEscrowForm.get('enableConnectedBanking').value")
+        .form-group.w-100.mr-2
+          label(for='frm-cntrl-accountType') Account Type
+          select#frm-cntrl-accountType.form-control.form-control-sm(
+            formControlName='accountType'
+          )
+            option(value='Escrow Account') Escrow Account
+            option(value='Current Account') Current Account
+      //- .row
+      //-   .col-sm-12.col-md-3.col-lg-3
+      //-     label(for='isDefault') 
+      //-       | Is Default
+      //-   .col-sm-12.col-md-3.col-lg-3
+      //-     input(
+      //-       type='checkbox',
+      //-       #checkbox,
+      //-       name='isDefault',
+      //-       formControlName='isDefault',
+      //-       (change)='updateCheckBoxVal("isDefault", $event)'
+      //-     )
+    sbpro-app-button.float-right(
+      *ngIf='!isEdit',
+      (click)='onSubmit()',
+      [loading]='submitting',
+      text='Submit',
+      loadingText='Submitting'
+    )
+    sbpro-app-button.float-right(
+      *ngIf='isEdit',
+      (click)='onSubmit()',
+      [loading]='submitting',
+      text='Update',
+      loadingText='Submitting'
+    )

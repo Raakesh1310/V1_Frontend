@@ -1,0 +1,66 @@
+.flex-container
+
+    .dashboard-card.table-accounts(*ngIf='loadingData')
+        div(*ngFor = 'let item of [1,2,3,4,5,6,7,8,9,10]')
+            .row
+                .col.table-accounts
+                    ngx-skeleton-loader(count='2', [theme]='{ height: "20px", width: "100px"}')
+                    ngx-skeleton-loader(count='2', [theme]='{ height: "20px", width: "50px"}')
+                .col.table-accounts
+                    ngx-skeleton-loader(count='2', [theme]='{ height: "20px", width: "100px"}')
+                    ngx-skeleton-loader(count='2', [theme]='{ height: "20px", width: "50px"}')
+
+    .table-dashboard.flex-grow-1
+        .row(*ngIf="(bankStatements$ | async)?.length > 0 && !(loadingList$ | async)")
+            ng-container(*ngFor='let bankStatement of bankStatements$ | async | slice: 0:9; let i = index')
+                .col-md-6.col-sm-12(*ngIf="i % 2 === 0")
+                    .column-container.mb-4
+                        img(
+                            *ngIf="bankStatement.bankName",
+                            [src]="'/assets/img/' + bankStatement.bankName.toUpperCase() + '.png'",
+                            width="80",
+                            height="30",
+                            style= "margin-right:40px;"
+                        )
+                        span.text-success.align-items-center(style="font-size:12px;") {{ bankStatement.balance ? toINR(bankStatement.balance) : toINR(0) }}
+                        p.font-weight-normal.small.lead(
+                            *ngIf="bankStatement.bankAccountNo",
+                            style="font-size:10px;"
+                        ) A/C- {{ bankStatement.bankAccountNo }}
+                .col-md-6.col-sm-12(*ngIf="i % 2 !== 0")
+                    .column-container.mb-4
+                        img(
+                            *ngIf="bankStatement.bankName",
+                            [src]="'/assets/img/' + bankStatement.bankName.toUpperCase() + '.png'",
+                            width="80",
+                            height="30",
+                            style= "margin-right:40px;"
+                        )
+                        span.text-success.align-items-center(style="font-size:12px") {{ bankStatement.balance ? toINR(bankStatement.balance) : toINR(0) }}
+                        p.font-weight-normal.small.lead(
+                            *ngIf="bankStatement.bankAccountNo",
+                            style="font-size:10px;"
+                        ) A/C- {{ bankStatement.bankAccountNo }}
+
+    div
+        .flex-container
+            span.btn.btn-xs.btn-outline.btn-view.mt-3.align-self-center(
+                (click)="redirectToBankAccounts()"
+            )
+                i-feather.mr-1.justify-content-center(name='book')
+                span.text-center View more
+                i-feather.ml-1.justify-content-center(name='arrow-down')
+
+//- div
+//-   container(*ngIf = '(bankStatements$ |async)?.length > 0 && !(loadingList$ | async)')
+//-     div(*ngFor = 'let bankStatement of bankStatements$| async| slice:0:9; index as i')
+//-       .row.align-items-start 
+//-         .col
+//-           img(*ngIf='bankStatement.bankName',
+//-                       src ='/assets/img/{{bankStatement.bankName.toUpperCase()}}.png',
+//-                       width ='100%',
+//-                       height='30')
+//-           br     
+//-           p.sub-option.font-weight-normal.small.text-muted(*ngIf = 'bankStatement.bankAccountNo') A/C- {{bankStatement.bankAccountNo}}
+//-         .col.align-items-right
+//-           span.text-success {{ toINR(bankStatement.balance)}}

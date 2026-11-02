@@ -1,0 +1,140 @@
+@import './sb-admin-pro/variables.scss';
+@import './project-variables.scss';
+
+.castlerButtonColor {
+  background: #bc8e32;
+  color: white;
+}
+
+.castlerButtonColor1{
+  color: #bc8e32;
+}
+
+.castlerButtonColor3 {
+  background: #417505;
+  color: white;
+}
+
+.logoColor {
+  color: #417505 !important;
+}
+
+.card:not([class*=bg-]) ::ng-deep.card-header {
+    color: #417505;
+}
+
+.tableClickEntryColor {
+  color: #417505;
+  font-weight: bold;
+}
+
+.logoColor:hover {
+  color: #417505;
+}
+
+.textColor {
+  background: #F5A500;
+  color: white;
+}
+
+ngb-pagination ::ng-deep.page-item.active .page-link {
+  background-color: #417505;
+  color: white;
+}
+
+ngb-pagination ::ng-deep .page-link {
+  color: #417505;
+}
+
+.dropdown-item ::ng-deep.active {
+  //@include gradient-bg()
+  background-color: #417505 !important;
+}
+
+input:checked + .slider {
+    background-color: #417505 !important;
+}
+
+
+//.my {
+//  box-sizing: border-box;
+//  -webkit-appearance: none;
+//     -moz-appearance: none;
+//          appearance: none;
+//  background-color: transparent;
+//  border: 2px solid #bc8e32;
+//  border-radius: 0.6em;
+//  color: #bc8e32;
+//  cursor: pointer;
+//  display: -webkit-box;
+//  display: -webkit-flex;
+//  display: -ms-flexbox;
+//  display: flex;
+//  -webkit-align-self: center;
+//      -ms-flex-item-align: center;
+//          align-self: center;
+//  font-size: 1rem;
+//  line-height: 1;
+//  padding: 0.8em 2.8em;
+//  text-decoration: none;
+//  text-align: center;
+//  text-transform: uppercase;
+//  font-family: 'Montserrat', sans-serif;
+//}
+//
+//.green-color-my {
+//  box-sizing: border-box;
+//  -webkit-appearance: none;
+//     -moz-appearance: none;
+//          appearance: none;
+//  background-color: transparent;
+//  border: 2px solid #417505;
+//  border-radius: 0.6em;
+//  color: #417505;
+//  cursor: pointer;
+//  display: -webkit-box;
+//  display: -webkit-flex;
+//  display: -ms-flexbox;
+//  display: flex;
+//  -webkit-align-self: center;
+//      -ms-flex-item-align: center;
+//          align-self: center;
+//  font-size: 1rem;
+//  line-height: 1;
+//  padding: 0.8em 2.8em;
+//  text-decoration: none;
+//  text-align: center;
+//  text-transform: uppercase;
+//  font-family: 'Montserrat', sans-serif;
+//}
+//
+//.green-color-box {
+//  border-color: #417505;
+//  color: #fff;
+//  box-shadow: 0 0 40px 40px #417505 inset, 0 0 0 0 #417505;
+//  -webkit-transition: all 150ms ease-in-out;
+//  transition: all 150ms ease-in-out;
+//}
+//
+//
+//.green-color-box:hover {
+//  box-shadow: 0 0 10px 0 #417505 inset, 0 0 10px 4px #417505;
+//  color: #417505;
+//}
+//
+//
+//
+//.third {
+//  border-color: #bc8e32;
+//  color: #fff;
+//  box-shadow: 0 0 40px 40px #bc8e32 inset, 0 0 0 0 #bc8e32;
+//  -webkit-transition: all 150ms ease-in-out;
+//  transition: all 150ms ease-in-out;
+//}
+//
+//
+//.third:hover {
+//  box-shadow: 0 0 10px 0 #bc8e32 inset, 0 0 10px 4px #bc8e32;
+//  color: #bc8e32;
+//}
+//

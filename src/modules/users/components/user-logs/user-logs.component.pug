@@ -1,0 +1,131 @@
+div
+	.row.align-items-stretch
+		div
+			form.pb-2
+				.d-flex.mb-2
+					//- input#search-box.mt-1.form-control.w-100.mr-2(
+					//- 	placement='top',
+					//- 	ngbPopover='Search by lockLog Name, Email ID, Business Name, Mobile No.',
+					//- 	type='text',
+					//- 	name='s',
+					//- 	autocomplete='off',
+					//- 	placeholder='Search by lockLog Name, Email ID, Business Name, Mobile No.',
+					//- 	[(ngModel)]='lockLogsService.searchTerm'
+					//- )
+
+					input#start-date.mt-1.form-control.w-25.mr-2(
+						type='text',
+						name='sd',
+						placeholder='Start Date',
+						autocomplete='off',
+						ngbDatepicker,
+						outsideDays='hidden',
+						#sd='ngbDatepicker',
+						(click)='sd.toggle()',
+						[(ngModel)]='lockLogsService.dateFrom',
+						[minDate]='lockLogsService.dateFromMin',
+						[maxDate]='lockLogsService.dateFromMax'
+					)
+					input#end-date.mt-1.form-control.w-25.mr-2(
+						type='text',
+						name='ed',
+						placeholder='End Date',
+						autocomplete='off',
+						ngbDatepicker,
+						outsideDays='hidden',
+						#ed='ngbDatepicker',
+						(click)='ed.toggle()',
+						[(ngModel)]='lockLogsService.dateTo',
+						[minDate]='lockLogsService.dateToMin',
+						[maxDate]='lockLogsService.dateToMax'
+					)
+					button.btn.mr-2.ws-wrap.mt-1.mb-1.castlerButtonColor(
+						type='submit',
+						(click)='submitSearchForm()'
+					)
+						fa-icon.d-flex.flex-row.align-items-center(
+							[icon]='["fas", "search"]'
+						)
+					button.btn.btn-link.mr-2.logoColor(type='button', (click)='clearForm()') Clear
+					.justify-content-end 
+						a.btn.btn-success.mt-1.mb-1.mr-2.ws-nowrap.btn-icon(
+							type='button',
+							target='_blank',
+							[href]='lockLogsService.reportDownloadLink$ | async'
+						)
+							fa-icon.d-flex.flex-row.align-items-center(
+								[icon]='["fas", "arrow-down"]'
+							)
+				.d-flex(*ngIf='(lockLogs$ | async)?.length > 0') 
+					.flex-row
+						small.mb-2.mt-2 Showing {{ (lockLogsService.page - 1) * 10 + 1 }} to {{ (lockLogsService.page - 1) * 10 + (lockLogs$ | async)?.length }} of {{ total$ | async }}
+		.table-responsive.pp-table-container.align-self-stretch.flex-grow-1.flex-stretch-1.table-striped(
+			*ngIf='(lockLogs$ | async)?.length > 0 && !(loadingList$ | async)'
+		)
+			table.table
+				thead
+					tr
+						th.th-sticky-top(
+							scope='col',
+							sbSortable='event',
+							(sort)='onSort($event)'
+						)
+							span.ws-nowrap Action
+						th.th-sticky-top(
+							scope='col',
+							sbSortable='event',
+							(sort)='onSort($event)'
+						)
+							span.ws-nowrap Locked/Activated By 
+						th.th-sticky-top(
+							scope='col',
+							sbSortable='event',
+							(sort)='onSort($event)'
+						)
+							span.ws-nowrap Locked/Activated At 
+						th.th-sticky-top(
+							scope='col',
+							sbSortable='event',
+							(sort)='onSort($event)'
+						)
+							span.ws-nowrap Lock Type  
+				tbody
+					tr(*ngFor='let lockLog of lockLogs$ | async')
+						td
+							ngb-highlight(
+								[result]='lockLog.removedBy?.firstName ? "Activated" : "Locked"',
+								[term]='lockLogsService.searchTerm'
+							)
+						td
+							ngb-highlight(
+								[result]='lockLog.removedBy?.firstName ? lockLog?.removedBy?.firstName : lockLog?.lockedBy?.firstName',
+								[term]='lockLogsService.searchTerm'
+							)
+						td
+							ngb-highlight(
+								[result]='lockLog.removedBy?.firstName ? lockLog?.removedAt : lockLog?.lockedAt',
+								[term]='lockLogsService.searchTerm'
+							)
+						td
+							ngb-highlight(
+								[result]='lockLog.lockType',
+								[term]='lockLogsService.searchTerm'
+							)
+		.flex-container.flex-row(
+			*ngIf='(lockLogs$ | async)?.length <= 0 && !(loadingList$ | async)'
+		)
+			.align-self-center No Data available
+		.flex-container.flex-row(*ngIf='loadingList$ | async')
+			.align-self-center Please wait...
+		.d-flex.justify-content-between.pt-2.align-self-end(
+			*ngIf='(lockLogs$ | async)?.length > 0 && !(loadingList$ | async)'
+		)
+			ngb-pagination(
+				[collectionSize]='total$ | async',
+				[(page)]='lockLogsService.page',
+				[pageSize]='10',
+				[maxSize]='5',
+				[rotate]='true',
+				[ellipses]='false',
+				[boundaryLinks]='true'
+			)

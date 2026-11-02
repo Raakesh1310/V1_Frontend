@@ -1,0 +1,138 @@
+div
+  div
+    div
+      form.pb-2
+        .d-flex.mb-2
+          ng-multiselect-dropdown.w-100.mr-2.mt-custom(
+            *ngIf='!merchantId',
+            name='email',
+            [placeholder]='"Select Merchant"',
+            [settings]='dropdownSettings',
+            [data]='merchants',
+            [(ngModel)]='selectedItems',
+            [disabled]='disabled'
+          )
+
+          input#wildSearch.mt-1.form-control.w-100.mr-3(
+            type='text',
+            name='s',
+            placement='top',
+            autocomplete='off',
+            ngbPopover='Search by invoice ID',
+            placeholder='Search by invoice ID',
+            [(ngModel)]='invoiceService.searchTerm'
+          )
+
+          select#monthList.mt-1.form-control.mr-2.w-50(
+            name='month',
+            [(ngModel)]='invoiceService.month'
+          )
+            option(value='0') Month
+            option(
+              *ngFor='let month of months',
+              [ngValue]='months.indexOf(month) + 1'
+            ) {{ month }}
+
+          select#yearList.mt-1.form-control.mr-3.w-50(
+            name='year',
+            [(ngModel)]='invoiceService.year'
+          )
+            option(value='0') Year
+            option(
+              *ngFor='let year of years',
+              [ngValue]='year'
+            ) {{ year }}
+
+          button.btn.mr-3.ws-nowrap.mt-1.mb-1(
+            type='submit',
+            (click)='submitSearchForm()',
+            class='castlerButtonColor'
+          )
+            fa-icon.d-flex.flex-row.align-items-center(
+              [icon]='["fas", "search"]'
+            )
+          button.btn.btn-link.mr-2.mb-1.mt-1(type='button', (click)='clearForm()', class='logoColor') Clear
+
+          .justify-content-end 
+            a.btn.btn-success.mb-1.mt-1.mr-2.ws-nowrap.btn-icon(
+              type='button',
+              target='_blank',
+              [href]='invoiceService.reportDownloadLink$ | async'
+            )
+              fa-icon.d-flex.flex-row.align-items-center(
+                [icon]='["fas", "arrow-down"]'
+              )
+
+        .d-flex(*ngIf='(invoiceService.invoices$ | async)?.length > 0') 
+          .flex-row
+            small.mb-2.mt-2 Showing {{ (invoiceService.page - 1) * 10 + 1 }} to {{ (invoiceService.page - 1) * 10 + (invoiceService.invoices$ | async)?.length }} of {{ invoiceService.total$ | async }}
+
+      .table-responsive.pp-table-container.table-responsive-sm
+        table.table
+          thead
+            tr
+              th(scope='col', sbSortable='event', (sort)='onSort($event)')
+                span.ws-nowrap Invoice ID
+                sb-sort-icon(
+                  *ngIf='sortedColumn === "event"',
+                  [direction]='sortedDirection'
+                )
+              th(
+                *ngIf='!merchantId',
+                scope='col',
+                sbSortable='time',
+                (sort)='onSort($event)'
+              )
+                span Merchant Name
+                sb-sort-icon(
+                  *ngIf='sortedColumn === "time"',
+                  [direction]='sortedDirection'
+                )
+              th(scope='col', sbSortable='time', (sort)='onSort($event)')
+                span.ws-nowrap Month
+                sb-sort-icon(
+                  *ngIf='sortedColumn === "time"',
+                  [direction]='sortedDirection'
+                )
+              th(scope='col', sbSortable='time', (sort)='onSort($event)')
+                span.ws-nowrap Amount (in Rs.)
+                sb-sort-icon(
+                  *ngIf='sortedColumn === "time"',
+                  [direction]='sortedDirection'
+                )
+              th(scope='col', sbSortable='time', (sort)='onSort($event)')
+                span.ws-nowrap Invoice
+                sb-sort-icon(
+                  *ngIf='sortedColumn === "time"',
+                  [direction]='sortedDirection'
+                )
+
+          tbody 
+            tr(*ngFor='let invoice of invoiceService.invoices$ | async')
+              td
+                ngb-highlight.myanchor(
+                  class='tableClickEntryColor',
+                  [result]='invoice.invoiceId',
+                  (click)='summaryPage(invoice.invoiceId, invoice.merchantId, invoice.month, invoice.year)'
+                )
+
+              td(*ngIf='!merchantId')
+                ngb-highlight([result]='invoice.merchantName')
+
+              td
+                ngb-highlight([result]='months[invoice.month - 1]')
+
+              td
+                ngb-highlight([result]='invoice.totalAmount')
+              td 
+                button.btn.btn-sm((click)='viewModal(invoice)', class='castlerButtonColor') View
+
+      .d-flex.justify-content-between.p-2
+        ngb-pagination(
+          [collectionSize]='invoiceService.total$ | async',
+          [(page)]='invoiceService.page',
+          [maxSize]='5',
+          [rotate]='true',
+          [ellipses]='false',
+          [boundaryLinks]='true'
+        )

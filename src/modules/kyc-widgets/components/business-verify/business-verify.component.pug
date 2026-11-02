@@ -1,0 +1,43 @@
+.container-fluid(*ngIf='!kycAllDetailsVerified', style="padding-left:0 !important; padding-right:0 !important;")
+  .row
+    .col-xl-5.mb-3
+        p.headingText Getting Started
+        p.mb-2 Give us some basic details about your business
+        div(*ngFor='let option of options')
+            div.mt-3.flex-display.justify-content-start.rounded(
+                    [ngClass]='option.isSelected ? "optionDivStyling1" : "optionDivStyling2" ')
+                p.ml-2.rounded-circle([ngClass]='option.isSelected ? "optionNumberColor1" : "optionNumberColor2"')
+                    | {{ option.value }}
+                p.ml-3.optionsColor {{ option.text }}
+
+    .col-xl-7.background-color.d-flex.justify-content-center(*ngIf='isLoading')
+        .spinner-border.spinnerStyle(role='status')
+            span.sr-only Loading...
+    .col-xl-7.background-color.justify-content-center(*ngIf='kycType === "All" && !isLoading')
+        sbpro-business-details(*ngIf='componentToRender == options[0].text', (valueChange)='changeComponent($event)',
+                        (kycType)='individualKyc($event)', [userKycData]='data',
+                        (kycDataUpgrade)='kycDataUpgraded($event)', [crnId] = 'crnId')
+        sbpro-business-kyc(*ngIf='componentToRender == options[1].text', (valueChange)='changeComponent($event)',
+                            [userKycData]='data', (kycDataUpgrade)='kycDataUpgraded($event)', [crnId] = 'crnId')
+        sbpro-bank-details(*ngIf='componentToRender == options[2].text', (valueChange)='changeComponent($event)',
+                            [kycType]='kycType', (kycDataUpgrade)='kycDataUpgraded($event)',
+                            [userKycData]='data', [crnId] = 'crnId')
+        sbpro-signatory-kyc(*ngIf='componentToRender == options[3].text', (valueChange)='changeComponent($event)',
+                        [userKycData]='data', (kycDataUpgrade)='kycDataUpgraded($event)', [crnId] = 'crnId')
+        sbpro-kyc-documents(*ngIf='componentToRender == options[4].text', (valueChange)='changeComponent($event)',
+                            (kycProcessDone)='renderSuccess($event)', [userKycData]='data',
+            (kycDataUpgrade)='kycDataUpgraded($event)', [crnId] = 'crnId', [gstAvailable] = 'gstAvailable')
+
+    .col-xl-7.background-color.d-flex.justify-content-center(*ngIf='kycType == "Individual" && !isLoading')
+        //sbpro-business-details(*ngIf='componentToRender == options[0].text', (valueChange)='changeComponent($event)',
+        //    (kycType)='individualKyc($event)', [userKycData]='data', [crnId] = 'crnId')
+        sbpro-individual-kyc(*ngIf='componentToRender == options[0].text', (valueChange)='changeComponent($event)',
+            (kycProcessDone)='renderSuccess($event)', [userKycData]='data',
+            (kycDataUpgrade)='kycDataUpgraded($event)', [crnId] = 'crnId')
+        sbpro-bank-details(*ngIf='componentToRender == options[1].text', (valueChange)='changeComponent($event)',
+                            [kycType]='kycType', (kycProcessDone)='renderSuccess($event)',
+            (kycDataUpgrade)='kycDataUpgraded($event)', [userKycData]='data', [crnId] = 'crnId')
+
+
+div(*ngIf='kycAllDetailsVerified')
+    sbpro-kyc-success

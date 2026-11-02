@@ -1,0 +1,191 @@
+form.details(*ngIf='account && !(loading$ | async) && !editMode')
+    .row
+        .col
+            .form-group
+                label(for='frm-cntrl-name') Escrow Name
+                p(*ngIf='account.name') {{ name }}
+                p(*ngIf='!name') --
+            .form-group
+                label(for='frm-cntrl-name') Email
+                p(*ngIf='account.email') {{ email }}
+                p(*ngIf='!email') --
+            .form-group 
+                label(for='frm-cntrl-name') IFSC
+                p(*ngIf='account.ifsc') {{ account.ifsc }}
+                p(*ngIf='!account.ifsc') --
+            .form-group
+                label(for='frm-cntrl-name') Expected Volume
+                p(*ngIf='account.expectedVolume') {{ account.expectedVolume }}
+                p(*ngIf='!account.expectedVolume') --
+            .form-group
+                label(for='frm-cntrl-name') Available Balance
+                p(*ngIf='account.balance') {{ account.balance.toFixed(2) }}
+                p(*ngIf='!account.balance') 0
+            .form-group(*ngIf='account.vpa')
+                label(for='frm-cntrl-name') UPI ID
+                p {{account.vpa}}
+            .form-group
+                label(for='frm-cntrl-name') Auto-Transfer Enabled
+                p(*ngIf='account.isAutoTransfer') Yes
+                p(*ngIf='!account.isAutoTransfer') No
+
+        .col
+            .form-group
+                label(for='frm-cntrl-name') Escrow ID
+                p(*ngIf='account.accountId') {{ account.accountId }}
+                p(*ngIf='!account.accountId') --
+            .form-group
+                label(for='frm-cntrl-name') Purpose
+                p(*ngIf='account.purpose') {{ account.purpose }}
+                p(*ngIf='!account.purpose') --
+            .form-group
+                label(for='frm-cntrl-name') Start Date
+                p(*ngIf='account.startDate') {{ account.startDate | date:"dd MMM yyyy" }}
+                p(*ngIf='!account.startDate') --
+            .form-group
+                label(for='frm-cntrl-name') Validity
+                p(*ngIf='account.validity') {{ account.validity }}
+                p(*ngIf='!account.validity') --
+            .form-group
+                label(for='frm-cntrl-createdBy') Created By
+                p(*ngIf='account.createdBy') {{ account.createdBy }}
+                p(*ngIf='!account.createdBy') --
+            .form-group(*ngIf='account.retentionAmount && account.isAutoTransfer')
+                label(for='frm-cntrl-retention') Retention Amount
+                p(*ngIf='account.retentionAmount') {{ account.retentionAmount }}
+                p(*ngIf='!account.retentionAmount') 0
+            .form-group(*ngIf='account.vpa')
+                label(for='frm-cntrl-retention') QR
+                p 
+                  button.btn.btn-sm.btn-primary(
+                    type='button',
+                    (click)='showQRCode(account.accountId, account.vpa)'
+                  ) View QR
+
+    div
+        button.btn.btn-light((click)='goBack()') Back
+        | &nbsp;&nbsp;&nbsp;
+        button.btn((click)='editMode = true', *ngIf='isAdmin && !readOnly', class='castlerButtonColor') Edit
+
+form(*ngIf='editMode', [formGroup]='accountForm')
+  div(*ngIf='errors.length > 0')
+    sbpro-alert(classes='alert-danger', [dismissable]='true')
+      | {{ errors[0] }}
+  .form-group
+    label(for='frm-cntrl-purpose') Escrow Name
+    input#frm-cntrl-name.form-control.form-control-sm(
+        type='text',
+        placeholder='Enter the name of escrow',
+        formControlName='name',
+        name='name',
+        autocomplete='off'
+    )
+    
+
+  .form-group
+    label(for='frm-cntrl-purpose') Purpose
+    input#frm-cntrl-purpose.form-control.form-control-sm(
+          type='text',
+          placeholder='Enter the purpose of escrow',
+          formControlName='purpose',
+          name='purpose',
+          autocomplete='off'
+        )
+    
+  .form-group
+    label(for='frm-cntrl-email') Email
+    span.text-danger *
+    input#frm-cntrl-email.form-control.form-control-sm(
+      type='email',
+      placeholder='Enter email addresses that will receive email notifications regarding Deposits and Transfers in the account (You can enter multiple email addresses separated by a comma.)',
+      formControlName='email',
+      [class.is-valid]='emailControlValid',
+      [class.is-invalid]='emailControlInvalid'
+      autocomplete='off'
+    )
+    .invalid-feedback(*ngIf='emailControl.hasError("required")')
+      | Email required.
+    .invalid-feedback(*ngIf='emailControl.hasError("emailValidationError")')
+      | Email {{invalidEmails.join(", ")}} is not valid.
+
+  .form-group
+    label(for='frm-cntrl-validity') Validity
+    input#frm-cntrl-validity.form-control.form-control-sm(
+          type='number',
+          placeholder='Enter Validity of escrow (in days)',
+          formControlName='validity',
+          min='1',
+          autocomplete='off'
+        )
+    
+    
+  .form-group
+    label(for='frm-cntrl-start-date') Start Date
+    input#frm-cntrl-start-date.aria-readonly.form-control.form-control-sm(
+          type='text',
+          placeholder='DD MM YYYY',
+          autocomplete='off',
+          formControlName='startDate',
+          ngbDatepicker,
+          outsideDays='hidden',
+          #d='ngbDatepicker',
+          (click)='d.toggle()',
+          [minDate]='startDateMin'
+        )
+      
+  .form-group
+    label(for='frm-cntrl-end-date') Expected Volume
+    input#frm-cntrl-end-date.form-control.form-control-sm(
+          type='number',
+          placeholder='Enter the amount in INR',
+          formControlName='expectedVolume',
+          min='1',
+          autocomplete='off'
+        )
+  .form-group
+    button.btn.btn-light((click)='editMode=false') Back
+    | &nbsp;&nbsp;
+    sbpro-app-button(
+          text='update',
+          loadingText='updating',
+          [loading]='updating',
+          (click)='update()',
+          [btnClass]='{ "btn-block": false, "btn-primary": true }'
+        )
+
+center(*ngIf="(loading$ | async)")
+    | Please Wait...
+
+ng-template(#detailsTemplate)
+  sbpro-card([headerActions]='true')
+  #screen.div(style='background-color: white') 
+    .card-header.logoColor
+      | QR Code
+      img([src]="'/assets/img/Bhim-Upi-Logo.png'",alt='bhim-upi-logo',style="float: right; width: 150px; height: auto; margin-left: 10px;")
+    div.card-body.text-center.bg-white
+      small
+        small Powered By
+      p
+        img([src]='rbl' alt='RBL' height='50')
+      br
+      img#qrcode.svgIcon([src]='qrCode')
+      br
+      .bold
+        img([src]="'/assets/img/fast-forward-logo.png'",alt='fast-forward-logo',style="width: 25px; height: auto; margin-right: 10px;")
+        | Scan and Pay using any UPI App
+        .d-flex.justify-content-around.align-items-center(style='height: 70px;')
+          img.p-1.m-0([src]='paytm', alt='Paytm', width='100px')
+          img.p-1.m-0([src]='phonepe', alt='PhonePe', width='150px')
+          img.p-1.m-0([src]='gpay', alt='GPay', width='95px')
+      br
+      strong {{ merchantName }}
+      br
+  .card-footer
+    span
+      button.btn.btn-sm.btn-success.float-right((click)='downloadQR(upiId)') Download QR
+      span.float-right &nbsp;&nbsp;
+      button.btn.btn-sm.btn-danger.float-right((click)='onCancel()') Close
+  span.float-right &nbsp;&nbsp;
+
+ngx-spinner
+  p(style='font-size: 20px; color: white') Processing. Please wait...

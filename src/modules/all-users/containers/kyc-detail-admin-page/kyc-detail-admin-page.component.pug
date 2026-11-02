@@ -1,0 +1,82 @@
+.flex-container
+  sbpro-dashboard-head(
+    icon='book',
+    title='{{isSuperAdmin ? "All KYC" : "KYC"}}',
+    description='View All Users KYC'
+  )
+  .container-fluid.mt-n10.responsiveForm
+    sbpro-card-navigation.navigationCSS(
+      sbproTocItem='Tabs',
+      [navNames]='documentTab ? ["Basic Details", "Business KYC", "Bank Details", "Signatory KYC", "Documents"] : ["Basic Details", "Bank Details", "Signatory KYC"]',
+      [templates]='documentTab ? [basicDetails, businessKYC, bankDetails, signatoryKYC, documents] : [basicDetails, bankDetails, signatoryKYC]'
+    )
+      ng-template(#basicDetails)
+        sbpro-kyc-basic-details.card-body.flex-container.align-self-stretch(
+          *ngIf='dataLoaded',
+          [businessName]='businessName',
+          [email]='email',
+          [name]='name',
+          [mobile]='mobile',
+          [status]='status',
+          [industryType]='industryType',
+          [businessType]='businessType',
+          [importExport]='importExport',
+          [latitude]='latitude',
+          [longitude]='longitude',
+          [selfieHash]= 'selfieHash',
+          [sendKycToName]= 'sendKycToName',
+          [sendKycToEmail]= 'sendKycToEmail',
+        )
+      ng-template(#businessKYC)
+        .card-body.card-body-height-fixed.flex-container.align-self-stretch
+          sbpro-kyc-business-kyc(
+            *ngIf='dataLoaded',
+            [name]='name',
+            [gstin]='gstin',
+            [gstAvailable]='gstAvailable',
+            [gstVerified]='gstVerified',
+            [gstVerifiedAt]='gstVerifiedAt',
+            [businessPan]='businessPan',
+            [businessPanVerified]='businessPanVerified',
+            [businessPanVerifiedAt]='businessPanVerifiedAt',
+            [cin]='cin',
+            [cinVerified]='cinVerified',
+            [cinVerifiedAt]='cinVerifiedAt',
+            [address]='address',
+            [businessType]='businessType',
+            [industryType]='industryType',
+            [dateOfRegistration]='dateOfRegistration',
+            [businessName]='businessName',
+            [companyStatus]='companyStatus',
+          )
+      ng-template(#bankDetails)
+        sbpro-kyc-bank-details(
+          *ngIf='dataLoaded',
+          [accountHolderName]='accountHolderName',
+          [bankAccNumber]='bankAccNumber',
+          [ifsc]='ifsc',
+          [bankName]='bankName',
+          [bankVerified]='bankVerified',
+          [bankVerifiedAt]='bankVerifiedAt',
+          [chequeHash]='chequeHash',
+          [chequeName]='chequeName'
+        )
+      ng-template(#signatoryKYC)
+        sbpro-kyc-signatory(*ngIf='dataLoaded')
+      ng-template(#documents)
+        sbpro-kyc-documents(
+          *ngIf='dataLoaded',
+          [businessType]='businessType',
+          [panHash]='companyPanHash',
+          [panName]='companyPanName',
+          [panDocId]='companyPanDocId',
+          [coiHash]='coiHash',
+          [coiName]='coiName',
+          [coiDocId]='coiDocId',
+          [gstHash]='gstHash',
+          [gstName]='gstName',
+          [gstDocId]='gstDocId',
+          [brHash]='brHash',
+          [brName]='brName',
+          [brDocId]='brDocId',
+        )

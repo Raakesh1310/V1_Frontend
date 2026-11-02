@@ -1,0 +1,101 @@
+// Show error first
+// at the top of the file
+div(*ngIf='_errors && _errors.length > 0')
+  .alert.alert-danger
+    ul(*ngFor='let error of _errors')
+      li {{ error }}
+
+// Form for the current page
+// Starts from here
+form((ngSubmit)='submit()')
+  .form-group
+    label(for='account-form-cntrl') Escrow
+    ng-select#account-form-cntrl(
+      [items]='_accounts$ | async',
+      bindLabel='name',
+      [(ngModel)]='_accountSelected',
+      loadingText='Loading...',
+      placeholder='Search By Escrow Name',
+      (change)='updateAccountSelected()',
+      name='account',
+      (search)='fetchAccounts($event)'
+    )
+      ng-template(ng-label-tmp='', let-item='item')
+        span(*ngIf='_accountSelected') {{ item?.name }} &nbsp;
+          span.faker - {{ item?.accountId }}
+
+      ng-template(
+        ng-option-tmp='',
+        let-item='item',
+        let-search='searchTerm',
+        let-index='index'
+      )
+        span.sup-option {{ item?.name }}
+        br
+        span.sub-option {{ item?.accountId.toUpperCase() }}
+
+  div(*ngIf='_accountSelected')
+    .subTextAmount(*ngIf='_accountSelected?.balance >= 0')
+      p Available Balance:
+        b &nbsp; Rs. {{ _accountSelected?.balance }} /-
+
+  .form-group
+    label Payee
+    ng-select(
+      [items]='_payees',
+      bindLabel='accountHolder',
+      [(ngModel)]='_payeeSelected',
+      loadingText='Loading...',
+      placeholder='Search By Payee name',
+      [disabled]='!_accountSelected',
+      name='payee'
+    )
+      ng-template(ng-label-tmp='', let-item='item')
+        span(*ngIf='_payeeSelected') {{ _payeeSelected?.accountHolder }} &nbsp;
+          span.fader - {{ _payeeSelected?.accountNumber }} - {{ _payeeSelected?.ifscCode }}
+
+      ng-template(
+        ng-option-tmp='',
+        let-item='item',
+        let-search='searchTerm',
+        let-index='index',
+        *ngIf='_payees && _payees.length > 0'
+      )
+        span.sup-option {{ item?.accountHolder }}
+        br
+        span.sup-option {{ item?.accountNumber?.toUpperCase() }} | {{ item?.ifscCode?.toUpperCase() }}
+
+    .subTextAmount(*ngIf='_payeeSelected')
+      p Maximum Transfer Limit:
+        b &nbsp; Rs. {{ _payeeSelected?.balance }} /-
+
+  .form-group
+    label(for='frm-cntrl-title') Title
+    input#frm-cntrl-title.form-control.form-control-sm(
+      type='text',
+      placeholder='Enter Title',
+      name='title'
+    )
+
+  .form-group
+    label(for='frm-cntrl-description') Description
+    textarea#frm-cntrl-description.form-control.form-control-sm(
+      placeholder='Enter Description',
+      name='description'
+    )
+
+  .form-group
+    label(for='frm-cntrl-amount') Amount
+    input#frm-cntrl-amount.form-control.form-control-sm(
+      type='number',
+      placeholder='Enter Amount',
+      name='amount'
+    )
+
+  sbpro-app-button(
+    [loading]='_disableForm',
+    [disabled]='_disableForm',
+    text='One',
+    loadingText='nothing',
+    (submit)='submit()'
+  )

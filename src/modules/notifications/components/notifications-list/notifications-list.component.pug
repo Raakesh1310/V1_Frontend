@@ -1,0 +1,106 @@
+.flex-container
+  sbpro-dashboard-head(
+    icon='book',
+    title='All Notifications',
+    description='View all notifications'
+  )
+  .container-fluid.mt-n10.responsiveForm.flex-grow-1
+    sbpro-card
+      .card-header.logoColor Notifications List
+      .card-body
+        .div(*ngIf='_loading$ | async',style='text-align:center;')
+          span Please wait....
+        .div(*ngIf='notifications?.length === 0 && !(_loading$ | async)', style='text-align:center;')
+          span No notifications found
+        .table-responsive.pp-table-container.table-responsive-sm
+          table.table(*ngIf='notifications?.length > 0 && !(_loading$ | async)')
+            thead
+              tr
+                th.th-sticky-top
+                  span Title
+                th.th-sticky-top
+                  span Start Time
+                th.th-sticky-top
+                  span End Time
+                th.th-sticky-top
+                  span Created By
+                th.th-sticky-top
+                  span Created At
+                th.th-sticky-top
+                  span Status
+                th.th-sticky-top
+                  span Action
+            tbody
+              tr(*ngFor='let entry of notifications')
+                td
+                  span(
+                    style='color: #417505; font-weight: bold;cursor:pointer;',
+                    (click)='openNoticeModal(entry)'
+                  ) {{ entry.title }}
+                td
+                  span {{ formatDate(entry.startDate) }}
+                td
+                  span {{ formatDate(entry.endDate) }}
+                td
+                  span {{ entry.createdBy }}
+                td
+                  span {{ formatDate(entry.createdAt) }}
+                td(*ngIf='entry.active')
+                  span(style='font-weight:bold;color: #417505;') Active
+                td(*ngIf='!entry.active')
+                  span(style='font-weight:bold;color: red;') Inactive
+                td
+                  span(*ngIf='entry.active')
+                    button.btn.btn-sm.mr-2(
+                      [ngClass]='"bg-danger text-white"',
+                      (click)='openDeletionConfirmationModal(entry)',
+                      title='Delete Notification',
+                      [disabled]='getLoadingState(entry._id)'
+                    )
+                      strong(*ngIf='!getLoadingState(entry._id)') Stop
+                      strong(*ngIf='getLoadingState(entry._id)') Stopping...
+
+          .d-flex.justify-content-between.pt-2(
+            *ngIf='notifications?.length > 0 && !(_loading$ | async)'
+          )
+            ngb-pagination.pagination(
+              [collectionSize]='totalItemsCount',
+              [(page)]='page',
+              [pageSize]='10'
+              [maxSize]='10',
+              [rotate]='true',
+              [ellipses]='false',
+              [boundaryLinks]='true',
+              (pageChange)='changePage($event)'
+            )
+
+ng-template(#NoticeModal)
+  sbpro-card([headerActions]='true', style='height: fit-content !important;')
+    .card-header.logoColor
+      div(style='word-break: break-word;text-align: center;width:100%;') 
+        h2.mb-0.logoColor {{ portalNotification.title }}
+    .card-body
+      span([innerHTML]='trustHtml(portalNotification.content)')
+    .card-footer.p-2
+      button.btn.float-right.castlerButtonColor(
+        type='button',
+        (click)='closeModal()'
+      ) Close
+
+ng-template(#DeletionConfirmation)
+  sbpro-card([headerActions]='true', style='height: fit-content !important;')
+    .card-header.logoColor
+      div(style='word-break: break-word;text-align: center;width:100%;') 
+        h2.mb-0.logoColor Confirm
+    .card-body
+      span Are you sure you want to stop this notification?
+    .card-footer.p-2
+      button.btn.float-right.castlerButtonColor.ml-2(
+        type='button',
+        (click)='deleteNotification()'
+      ) Yes
+      button.btn.float-right(
+        type='button',
+        (click)='closeModal()'
+      ) Close
+      

@@ -1,0 +1,21 @@
+//- //div([formGroupName]='formGroupName')
+//- p {{ label }}
+//- span.text-danger(*ngIf='required') *
+//- input
+
+.form-group
+  label(for='label') {{ label }}
+  span.linker.float-right(*ngIf='removable && !livePage')
+    i-feather(name='trash-2', (click)='rmField()')
+  span.text-danger(*ngIf='required') *
+  input.form-control.form-control-sm(
+    [id]='label',
+    type='text',
+    [placeholder]='livePage ? label || "" : "To be filled by customer"',
+    (change)='onChange()',
+    #defInput,
+    [value]='value',
+    autocomplete='off',
+    [class.disabled]='!livePage'
+  )
+  span.text-danger(*ngIf='errors.length > 0') {{ errors[0] }}

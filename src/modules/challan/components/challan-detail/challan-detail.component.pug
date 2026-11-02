@@ -1,0 +1,51 @@
+sbpro-card
+  .card-header(class='logoColor') Challan Details
+  .card-body
+    form
+      .form-group
+        label(for='payerdetail') Escrow ID
+        br
+        span 
+          b {{ challan?.accountId || "--" }}
+      .form-group
+        label(for='payerdetail') Payer Name
+        br
+        span 
+          b {{ challan?.payerName || "--" }}
+
+      .form-group
+        label(for='exampleSolidFormControlSelect2') Payer Details 1
+        br
+        span 
+          b {{ challan?.payerDetail1 || "--" }}
+      .form-group
+        label(for='exampleSolidFormControlSelect2') Payer Details 2
+        br
+        span 
+          b {{ challan?.payerDetail2 || "--" }}
+      .row
+        .col
+          .form-group
+            label(for='exampleSolidFormControlSelect3') Contact 1
+            br
+            span 
+              b {{ challan?.contact1 || "--" }}
+        .col
+          .form-group
+            label(for='exampleSolidFormControlSelect4') Contact 2
+            br
+            span
+              b {{ challan?.contact2 || "--" }}
+      .form-group
+        label(for='exampleSolidFormControlSelect5') Amount (in fig)
+        br
+        span 
+          b {{ convertToNumber(challan?.amount) || "--" }}
+      .form-group
+        label(for='exampleSolidFormControlTextarea6') Amount (in words)
+        br
+        span
+          b {{ challan?.amountWords || "--" }}
+
+      .form-group
+        button.btn((click)='goBack()', class='castlerButtonColor') Back

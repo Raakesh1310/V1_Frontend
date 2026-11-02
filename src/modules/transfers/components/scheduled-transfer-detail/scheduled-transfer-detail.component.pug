@@ -1,0 +1,107 @@
+sbpro-dashboard-head(icon='book' title='Scheduled Transfer Details')
+.container-fluid.mt-n10.responsiveForm
+  sbpro-card-navigation(
+    sbproTocItem='Tabs',
+    [navNames]='["Basic Details","Transfers Schedule"]',
+    [templates]='[transferDetails,paymentDetails]'
+  )
+    ng-template(#transferDetails)
+      .row
+        .col-lg-12
+          .card-body
+            form.details
+              .row
+                .col
+                  .form-group
+                    label Scheduled Transfer ID
+                    p(*ngIf='scheduledTransfer.scheduledTransferId') {{ scheduledTransfer.scheduledTransferId }}
+                    p(*ngIf='!scheduledTransfer.scheduledTransferId') {{ scheduledTransfer.scheduledTransferId }}
+                  .form-group
+                    label From Escrow ID
+                    p(*ngIf='scheduledTransfer.accountId') {{ scheduledTransfer.accountId }}
+                    p(*ngIf='!scheduledTransfer.accountId') --
+                  .form-group
+                    label Payee
+                    p(*ngIf='scheduledTransfer.payeeName') {{ scheduledTransfer.payeeName }}
+                    p(*ngIf='!scheduledTransfer.payeeName') --
+                  .form-group
+                    label Purpose
+                    p(*ngIf='scheduledTransfer.purpose') {{ scheduledTransfer.purpose }}
+                    p(*ngIf='!scheduledTransfer.purpose') --
+                  .form-group
+                    label Frequency
+                    p(*ngIf='scheduledTransfer.frequency') {{ scheduledTransfer.frequency }}
+                    p(*ngIf='!scheduledTransfer.frequency') --
+                  .form-group
+                    label Created by Id
+                    p(*ngIf='scheduledTransfer.createdByEmail') {{ scheduledTransfer.createdByEmail }}
+                    p(*ngIf='!scheduledTransfer.createdByEmail') --
+                  .form-group
+                    label Start Date
+                    p(*ngIf='scheduledTransfer.startingDate') {{ scheduledTransfer.startingDate }}
+                    p(*ngIf='!scheduledTransfer.startingDate') --
+
+                .col
+                  .form-group
+                    label Status
+                    p(*ngIf='scheduledTransfer.status') {{ scheduledTransfer.status }}
+                    p(*ngIf='!scheduledTransfer.status') --
+                  .form-group
+                    label Amount
+                    p(*ngIf='scheduledTransfer.amount') {{ "₹" + scheduledTransfer.amount.toFixed(2) }}
+                    p(*ngIf='!scheduledTransfer.amount') --
+                  .form-group
+                    label Remaining Payments
+                    p(*ngIf='scheduledTransfer.job.length') {{ scheduledTransfer.job.length }}
+                    p(*ngIf='!scheduledTransfer.job.length') --
+                  .form-group
+                    label No of Cycles
+                    p(*ngIf='objKeys(scheduledTransfer.paymentDates).length') {{ objKeys(scheduledTransfer.paymentDates).length }}
+                    p(*ngIf='!objKeys(scheduledTransfer.paymentDates).length') --
+                  .form-group
+                    label Creation date
+                    p(*ngIf='scheduledTransfer.createdAt') {{ getParsedDate(scheduledTransfer.createdAt) }}
+                    p(*ngIf='!scheduledTransfer.createdAt') --
+                  .form-group
+                    label Remarks
+                    p(*ngIf='scheduledTransfer.remarks') {{ scheduledTransfer.remarks }}
+                    p(*ngIf='!scheduledTransfer.remarks') --
+
+            button.btn.castlerButtonColor(
+              (click)='goBack()',
+              ) Back
+    ng-template(#paymentDetails)
+      .row
+        table.table
+          thead
+            tr
+              th(scope='col' sbSortable='date', (sort)='onSort($event)')
+                span Payee Name
+              th(scope='col' sbSortable='date', (sort)='onSort($event)')
+                span Amount
+              th(scope='col' sbSortable='date', (sort)='onSort($event)')
+                span Schedule Date
+              th(scope='col' sbSortable='event', (sort)='onSort($event)')
+                span Status
+              th(scope='col' sbSortable='event', (sort)='onSort($event)')
+                span Payment Attempt On
+              th(scope='col' sbSortable='event', (sort)='onSort($event)')
+                span Remarks
+            tr(*ngFor='let i of objKeys(scheduledTransfer.paymentDates)')
+              td
+                span(*ngIf='scheduledTransfer.payeeName') {{ scheduledTransfer.payeeName }}
+                span(*ngIf='!scheduledTransfer.payeeName') --
+              td
+                span(*ngIf='scheduledTransfer.amount') {{ scheduledTransfer.amount }}
+                span(*ngIf='!scheduledTransfer.amount') --
+              td
+                span(*ngIf='scheduledTransfer.paymentDates[i]["payDate"]') {{ getParsedDate(scheduledTransfer.paymentDates[i].payDate) }}
+                span(*ngIf='!scheduledTransfer.paymentDates[i]["payDate"]') --
+              td
+                span(*ngIf='scheduledTransfer.paymentDates[i]["status"]') {{ scheduledTransfer.paymentDates[i].status }}
+              td
+                span(*ngIf='scheduledTransfer.paymentDates[i]["paymentAttemptAt"]') {{ getParsedDate(scheduledTransfer.paymentDates[i].paymentAttemptAt) }}
+                span(*ngIf='!scheduledTransfer.paymentDates[i]["paymentAttemptAt"]') --
+              td
+                span(*ngIf='scheduledTransfer.paymentDates[i]["transferId"]') {{ scheduledTransfer.paymentDates[i].transferId }}
+                span(*ngIf='!scheduledTransfer.paymentDates[i]["transferId"]') {{ scheduledTransfer.paymentDates[i].remarks }}

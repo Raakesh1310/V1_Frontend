@@ -1,0 +1,400 @@
+sbpro-card([headerActions]='true')
+  .card-header(class='logoColor')
+    | All Deals
+    div
+      span.mr-2
+        .spinner-border.spinner-border-sm.mr-1(
+          role='status',
+          aria-hidden='true',
+          *ngIf='loadingList$ | async'
+        )
+        button.btn.btn-icon.btn-xs(
+          *ngIf='!(loadingList$ | async)',
+          class='castlerButtonColor',
+          (click)='loadData()'
+        )
+          i-feather(name='refresh-cw')
+      button.btn.btn-icon.btn-xs((click)='toggleFilters()', class='castlerButtonColor')
+        i-feather(name='filter')
+  .card-body
+    div
+      form.pb-2(*ngIf='filtersVisible')
+        .d-flex.mb-2
+          input#wildSearch.mt-1.form-control.w-100.mr-2(
+            placement='top',
+            [ngbPopover]='isSuperAdmin ? "Searh by Deal ID, virtual ID, Created By" : "Search by Deal ID, virtual ID"',
+            type='text',
+            autocomplete='off',
+            name='s',
+            [placeholder]='isSuperAdmin ? "Searh by Deal ID, virtual ID, Created By" : "Search by Deal ID, virtual ID"',
+            [(ngModel)]='dealService.searchTerm'
+          )
+          input#start-date.mt-1.form-control.w-25.mr-2(
+            type='text',
+            name='sd',
+            placeholder='Start Date',
+            autocomplete='off',
+            ngbDatepicker,
+            #sd='ngbDatepicker',
+            (click)='sd.toggle()',
+            [(ngModel)]='dealService.dateFrom',
+            [minDate]='dealService.dateFromMin',
+            [maxDate]='dealService.dateFromMax'
+          )
+          input#end-date.mt-1.form-control.w-25.mr-2(
+            type='text',
+            name='ed',
+            placeholder='End Date',
+            autocomplete='off',
+            ngbDatepicker,
+            #ed='ngbDatepicker',
+            (click)='ed.toggle()',
+            [(ngModel)]='dealService.dateTo',
+            [minDate]='dealService.dateToMin',
+            [maxDate]='dealService.dateToMax'
+          )
+
+          select#statusList.mt-1.form-control.w-25.mr-2(
+            name='status',
+            [(ngModel)]='dealService.status'
+          )
+            option(value='') Status
+            option(*ngFor='let st of statusList', [ngValue]='st') {{ st }}
+          button.btn.mt-1.mr-2.ws-nowrap.mr-2(
+            type='submit',
+            class='castlerButtonColor',
+            (click)='submitSearchForm()'
+          )
+            fa-icon.d-flex.flex-row.align-items-center(
+              [icon]='["fas", "search"]'
+            )
+          button.btn.btn-link.mr-2.mt-1(type='button', (click)='clearForm()', class='logoGreen') Clear
+
+        .d-flex(*ngIf='(deal$ | async)?.length > 0')
+          .flex-row
+            small.mb-2.mt-2 Showing {{ (dealService.page - 1) * 10 + 1 }} to {{ (dealService.page - 1) * 10 + (deal$ | async)?.length }} of {{ total$ | async }}
+          //- .mt-1.col-xl-2.col-sm-12.d-flex.flex-row
+          //-   a.btn.btn-success.btn-sm.mr-2.ws-nowrap.ml-auto(
+          //-     type='button',
+          //-     target='_blank',
+          //-     [href]='dealService.reportDownloadLink$ | async'
+          //-   )
+          //-     fa-icon.d-flex.flex-row.align-items-center.mr-2(
+          //-       [icon]='["fas", "arrow-down"]'
+          //-     )
+          //-     | Download
+
+    .table-responsive.pp-table-container.table-responsive-sm
+      .alert.alert-danger.alert-dismissible.fade.show(
+        role='alert',
+        *ngIf='balanceError.length > 0'
+      )
+        | {{ balanceError }}
+        button.close(
+          type='button',
+          (click)='balanceError = ""',
+          data-dismiss='alert',
+          aria-label='Close'
+        )
+          span(aria-hidden='true') ×
+      table.table
+        thead
+          tr
+            th(scope='col', sbSortable='event', (sort)='onSort($event)')
+              span.ws-nowrap Deal ID
+              sb-sort-icon(
+                *ngIf='sortedColumn === "event"',
+                [direction]='sortedDirection'
+              )
+
+            th(scope='col', sbSortable='event', (sort)='onSort($event)')
+              span.ws-nowrap Escrow ID
+            th(scope='col', sbSortable='event', (sort)='onSort($event)')
+              span.ws-nowrap IFSC
+            th(scope='col', sbSortable='time', (sort)='onSort($event)')
+              span.ws-nowrap Request Date
+            th(
+              scope='col',
+              sbSortable='time',
+              (sort)='onSort($event)',
+              *ngIf='!isSuperAdmin'
+            )
+              span.ws-nowrap My Role
+            th(scope='col', sbSortable='time', (sort)='onSort($event)')
+              span.ws-nowrap Purpose
+            //- th(scope='col', sbSortable='time', (sort)='onSort($event)')
+            //-   span.ws-nowrap Security Deposit
+            th(scope='col', sbSortable='time', (sort)='onSort($event)')
+              span.ws-nowrap Deal Balance
+            th(scope='col', sbSortable='time', (sort)='onSort($event)')
+              span.ws-nowrap Status
+            th(
+              *ngIf='!isSuperAdmin',
+              scope='col',
+              sbSortable='time',
+              (sort)='onSort($event)'
+            )
+              span Action
+            th(
+              *ngIf='isSuperAdmin',
+              scope='col',
+              sbSortable='time',
+              (sort)='onSort($event)'
+            )
+              span Created By
+        tbody(*ngIf='(deal$ | async)?.length > 0 && !(loadingList$ | async)')
+          tr(*ngFor='let deal of deal$ | async; index as i')
+            td
+              a.nav-link.p-0(
+                href='javascript:void(0);',
+                (click)='dealDetails(deal.dealId)',
+                class='tableClickEntryColor'
+              )
+                span(*ngIf='deal.account') {{ deal.dealId }}
+              span(*ngIf='!deal.account') --
+            td
+              span(*ngIf='deal.account') {{ deal.account.accountId }}
+              span(*ngIf='!deal.account') --
+            td
+              span(*ngIf='deal.account') {{ deal.account.ifsc }}
+              span(*ngIf='!deal.account') --
+            td
+              ngb-highlight.ws-nowrap(
+                [result]='deal.createdAt | date: "d MMM yyyy" || "--"',
+                [term]='dealService.searchTerm'
+              )
+            td(*ngIf='!isSuperAdmin')
+              span(*ngIf='deal') {{ getMyRole(deal.dealParties)[0]["role"] }}
+              span(*ngIf='!deal') --
+            td
+              span(*ngIf='deal.purpose') {{ deal.purpose }}
+              span(*ngIf='!deal.purpose') --
+            //- td
+            //-   span(*ngIf='deal.dealData && deal.dealData.securityDeposit') {{ deal.dealData.securityDeposit }}
+            //-   span(*ngIf='!deal.dealData || !deal.dealData.securityDeposit') --
+            td
+              span(*ngIf='deal.account && deal.account.balance') {{ deal.account.balance.toFixed(2) }}
+              span(*ngIf='!deal.account || !deal.account.balance') --
+            td
+              span(*ngIf='deal.status') {{ deal.status }}
+              span(*ngIf='!deal.status') --
+            td(*ngIf='isSuperAdmin')
+              span(*ngIf='deal.createdBy') {{ deal.createdBy }}
+              span(*ngIf='!deal.createdBy') --
+            td(*ngIf='!isSuperAdmin')
+              button.btn.btn-sm.action(
+                class='castlerButtonColor',
+                (click)='viewDeal(deal, detailTemplate)',
+                *ngIf='deal.status === "Pending for approval" && !getMyRole(deal.dealParties)[0]["approved"]'
+              ) Approve/Reject
+              button.btn.btn-sm.action(
+                class='castlerButtonColor',
+                (click)='editDeal(deal.dealId)',
+                *ngIf='deal.status === dealStatusConstants.DEAL_STATUS_PENDING_APPROVAL && isCreator(deal)'
+              ) Edit
+              button.btn.btn-sm.action(
+                class='castlerButtonColor',
+                *ngIf='deal.status === "Active"',
+                (click)='makePayment(deal)'
+              ) {{ getMyRole(deal.dealParties)[0]["role"] === "Tenant" ? "Refund" : "Refund/Claim" }}
+              button.btn.btn-sm.action(
+                class='castlerButtonColor',
+                *ngIf='deal.status !== dealStatusConstants.DEAL_STATUS_ACTIVE && deal.verification.length > 0',
+                (click)='viewPayment(deal)'
+              ) 
+                span(
+                  *ngIf='deal.status !== dealStatusConstants.DEAL_STATUS_ACTIVE && deal.status !== dealStatusConstants.REFUND_APPROVAL_PENDING && deal.status !== dealStatusConstants.CLAIM_APPROVAL_PENDING'
+                ) Payment Status
+                span(
+                  *ngIf='deal.status === dealStatusConstants.REFUND_APPROVAL_PENDING'
+                ) {{ getMyRole(deal.dealParties)[0]["role"] === "Landlord" ? "Refund/Claim" : "Payment Status" }}
+                span(
+                  *ngIf='deal.status === dealStatusConstants.CLAIM_APPROVAL_PENDING'
+                ) {{ getMyRole(deal.dealParties)[0]["role"] === "Tenant" ? "Refund/Claim" : "Payment Status" }}
+
+    .flex-container.flex-row(
+      *ngIf='(deal$ | async)?.length <= 0 && !(loadingList$ | async)'
+    )
+      .align-self-center No Data available
+    .flex-container.flex-row(*ngIf='loadingList$ | async')
+      .align-self-center Please wait...
+    .d-flex.justify-content-between.pt-2.align-self-end(
+      *ngIf='(deal$ | async)?.length > 0 && !(loadingList$ | async)'
+    )
+      ngb-pagination(
+        [collectionSize]='total$ | async',
+        [(page)]='dealService.page',
+        [maxSize]='5',
+        [rotate]='true',
+        [ellipses]='false',
+        [boundaryLinks]='true'
+      )
+
+ng-template(#detailTemplate)
+  sbpro-card([headerActions]='true')
+    .card-header(class='logoColor')
+      | Deal Details
+      span.nav-link((click)='modalRef.close()')
+        svg.feather-x-circle(
+          class='castlerButtonColor1',
+          xmlns='http://www.w3.org/2000/svg',
+          width='32',
+          height='32',
+          viewbox='0 0 24 24',
+          fill='none',
+          stroke='currentColor',
+          stroke-width='2',
+          stroke-linecap='round',
+          stroke-linejoin='round'
+        )
+          circle(cx='12', cy='12', r='10')
+          line(x1='15', y1='9', x2='9', y2='15')
+          line(x1='9', y1='9', x2='15', y2='15')
+    .card-body
+      .table-responsive.pp-table-container.table-responsive-sm
+        table.table
+          tr 
+            th Deal ID
+            td {{ selectedDeal.dealId }}
+          tr 
+            th Virtual account ID
+            td {{ selectedDeal.accountId }}
+          tr 
+            th Property Type
+            td {{ selectedDeal.dealData.propertyType }}
+          tr 
+            th Property Address
+            td {{ selectedDeal.dealData.propertyAddress }}
+          tr 
+            th City
+            td {{ selectedDeal.dealData.city }}
+          tr 
+            th State
+            td {{ selectedDeal.dealData.state }}
+          tr 
+            th Pincode
+            td {{ selectedDeal.dealData.pinCode }}
+          tr 
+            th Security Deposit
+            td {{ selectedDeal.dealData.securityDeposit }}
+          tr 
+            th Status
+            td {{ selectedDeal.status }}
+
+      h4 Deal Parties
+      div 
+        .table-responsive.pp-table-container.table-responsive-sm
+          table.table
+            thead
+              tr
+                th(scope='col')
+                  span Name
+                th(scope='col')
+                  span Email
+                th(scope='col')
+                  span Mobile
+                th(scope='col')
+                  span Role
+                th(scope='col')
+                  span Approved
+
+            tbody
+              tr(*ngFor='let party of selectedDeal.dealParties; let i = index')
+                td
+                  span {{ party.name }}
+                td
+                  span {{ party.email }}
+                td
+                  span {{ party.mobile }}
+                td
+                  span {{ party.role }}
+                td
+                  span(*ngIf='selectedDeal.status === "Pending for approval"') {{ party.approved ? "Approved" : "pending" }}
+                  span(*ngIf='selectedDeal.status !== "Pending for approval"') {{ party.approved ? "Approved" : "Rejected" }}
+
+      h4 Deal Documents
+
+      .table-responsive.pp-table-container.table-responsive-sm
+        table.table
+          tr(*ngFor='let doc of selectedDeal.documents; let i = index')
+            th {{ doc.docType }}
+            td 
+              a(
+                href='{{ docUrlPrefix+doc.hash }}',
+                target='_blank',
+                *ngIf='doc.hash'
+              ) {{ doc.name }}
+
+      center(*ngIf='detailError')
+        h6.text-danger {{ detailError }}
+
+    .card-footer
+      span(
+        *ngIf='selectedDeal.status === "Pending for approval" && !getMyRole(selectedDeal.dealParties)[0]["approved"]'
+      )
+        span
+          button.btn.btn-sm.btn-danger.float-right(
+            class='castlerButtonColor',
+            (click)='reject(selectedDeal.dealId)'
+          ) Reject
+          span.float-right &nbsp;&nbsp;
+          button.btn.btn-sm.btn-success.float-right(
+            class='castlerButtonColor',
+            (click)='approve(selectedDeal.dealId)'
+          ) Approve
+      span.float-right &nbsp;&nbsp;
+
+ng-template(#claimTemplate)
+  sbpro-card([headerActions]='true')
+    .card-header(class='logoColor')
+      span Initiate Refund
+      span.nav-link((click)='claimModal.close()')
+        svg.feather-x-circle(
+          class='castlerButtonColor1',
+          xmlns='http://www.w3.org/2000/svg',
+          width='32',
+          height='32',
+          viewbox='0 0 24 24',
+          fill='none',
+          stroke='currentColor',
+          stroke-width='2',
+          stroke-linecap='round',
+          stroke-linejoin='round'
+        )
+          circle(cx='12', cy='12', r='10')
+          line(x1='15', y1='9', x2='9', y2='15')
+          line(x1='9', y1='9', x2='15', y2='15')
+    .card-body 
+      div(*ngIf='claimErrors.length > 0')
+        .alert.alert-danger.alert-dismissible.fade.show(role='alert')
+          span {{ claimErrors[0] }}.
+          button.close(
+            type='button',
+            (click)='claimErrors = []',
+            data-dismiss='alert',
+            aria-label='Close'
+          )
+            span(aria-hidden='true') ×
+      .form-group
+        label Refund Amount
+        span.form-control 
+          b {{ selectedDeal.dealData.securityDeposit - amount }}
+
+      .custom-control.custom-checkbox
+        input#customCheck1.custom-control-input(
+          type='checkbox',
+          [(ngModel)]='claimCheck'
+        )
+        label.custom-control-label(for='customCheck1') Add Claim
+
+      form([formGroup]='claimForm', *ngIf='claimCheck')
+        .form-group 
+          label Claim Amount
+          span.text-danger *
+          input.form-control(type='number', formControlName='amount')
+        .form-group 
+          label Claim Reason
+          span.text-danger *
+          input.form-control(type='text', formControlName='reason')
+    .card-footer 
+      button.btn.float-right((click)='openOTP()', class='castlerButtonColor') Next

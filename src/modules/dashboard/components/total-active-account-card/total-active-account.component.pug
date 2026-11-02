@@ -1,0 +1,20 @@
+.row
+  .col-xl-6.col-md-6
+    sbpro-card([headerActions]='true', *ngIf='!loadingBlockedFund')
+      .card-header.text-white(style='background:#36B37E;font-size: 18px') No. of Active Escrows
+      .card-body.pt-3.pb-2.p-0(style='background: #FFFBF4;')
+        h4(style='margin-left: 20px;color:#417505;font-weight: 530;') {{ totalNumberOfActiveAccounts }}
+
+    .card-sekeleton.pt-3.pb-3.pl-4.pr-4.mb-4(*ngIf='loadingBlockedFund')
+      ngx-skeleton-loader(count='1', [theme]='{ height: "20px", width: "100px" }')
+      ngx-skeleton-loader(count='1', [theme]='{ height: "20px" }')
+
+  .col-xl-6.col-md-6
+    sbpro-card([headerActions]='true', *ngIf='!loadingActiveMerchants')
+      .card-header.text-white(style='background:#6DD5ED;font-size: 18px') No of Active Merchants
+      .card-body.pt-3.pb-2.p-0(style='background: #FFFBF4;')
+        h4(style='margin-left: 20px;color:#417505;font-weight: 530;') {{ totalNumberOfActiveMerchants }}
+
+    .dashboard-card.pt-3.pb-3.pl-4.pr-4.mb-4(*ngIf='loadingActiveMerchants')
+      ngx-skeleton-loader(count='1', [theme]='{ height: "20px", width: "100px" }')
+      ngx-skeleton-loader(count='1', [theme]='{ height: "20px" }')

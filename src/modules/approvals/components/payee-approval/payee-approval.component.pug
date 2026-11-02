@@ -1,0 +1,134 @@
+div
+    div(*ngIf='errors.length > 0')
+        sbpro-alert(classes='alert-danger', [dismissable]='true', (click)='errors = []')
+            | {{ errors[0] }}
+    form
+        .d-flex.mb-2
+            input#search-box.mt-1.form-control.w-100.mr-2(
+                type='text',
+                name='s',
+                placement='top',
+                autocomplete='off',
+                (input) = 'Search($event)',
+                [(ngModel)] = 'searchTerm',
+                ngbPopover='Search by Business ID, Merchant ID, Merchant Name',
+                placeholder='Search by Business ID, Merchant ID, Merchant Name',
+            )
+            input#date-from.mt-1.form-control.w-25.mr-2(
+                type='text',
+                placeholder='Start Date',
+                name='dateFrom',
+                ngbDatepicker,
+                outsideDays='hidden',
+                autocomplete='off',
+                #dateFrom='ngbDatepicker',
+                (click)='dateFrom.toggle()',
+                [(ngModel)] = 'startDate',
+                (ngModelChange)="startDateChange()",
+                [maxDate]="maxDate"
+            )
+            input#date-to.mt-1.form-control.w-25.mr-2(
+                type='text',
+                placeholder='End Date',
+                name='dateTo',
+                ngbDatepicker,
+                outsideDays='hidden',
+                autocomplete='off',
+                #dateTo='ngbDatepicker',
+                (click)='dateTo.toggle()',
+                [(ngModel)] = 'endDate',
+                (ngModelChange)="endDateChange()",
+                [maxDate]='maxDate',
+            )
+            button.btn.ws-nowrap.mt-1.mb-1(
+                class='castlerButtonColor',
+                type='submit',
+                (click)='filterData()'
+            )
+                fa-icon.d-flex.flex-row.align-items-center([icon]='["fas", "search"]')
+            button.btn.btn-link.mt-1.mb-1.mr-5(
+                type='button',
+                class='logoColor',
+                (click)='clearButtonClick()'
+            )
+                | Clear
+
+            select#statusList.mt-1.form-control.w-25.ml-2(
+                name='status',
+                (click)='setDataLocally()',
+                (change)= 'openModal(alert,$event)'
+            )
+                option(value='') Take Action
+                option(*ngFor='let st of approvalList', [ngValue]='st') {{ st }}
+
+
+    .table-responsive.pp-table-container.table-responsive-sm
+        table.table
+            thead
+                tr
+                    th(scope='col', sbSortable='event')
+                        span.ws-nowrap Account Holder Name
+                    th(scope='col', sbSortable='event')
+                        span.ws-nowrap Account Number 
+                    th(*ngIf='vpa',scope='col', sbSortable='event')
+                        span.ws-nowrap VPA 
+                    th(scope='col', sbSortable='time')
+                        span.ws-nowrap IFSC Code 
+                    th(scope='col', sbSortable='event')
+                        span.ws-nowrap Bank Name 
+                    th(scope='col', sbSortable='time', style='text-align : center')
+                        input(type='checkbox', [(ngModel)]="isChecked", (change)="selectAll($event)")
+            tbody
+                tr(*ngIf='isLoading')
+                    .spinner-border.text-primary(role='status')
+                        span.sr-only Loading...
+                tr(*ngIf='(data.length == 0 && !isLoading)')
+                    td No Entries Found
+                tr(*ngFor='let payeeApproval of data; index as i')
+                    td
+                        ngb-highlight([result]='payeeApproval.accountHolderName')
+                    td
+                        ngb-highlight([result]='payeeApproval.accountNumber ? payeeApproval.accountNumber: "--"')
+                    td(*ngIf='vpa')
+                        ngb-highlight([result]='payeeApproval.vpa ? payeeApproval.vpa : "--"')
+                    td
+                        ngb-highlight([result]='payeeApproval.ifsc')
+                    td
+                        ngb-highlight([result]='payeeApproval.bankName')
+                    td(style='text-align : center')
+                        input(type='checkbox', [(ngModel)]="isChecked ? true : payeeApproval.isSelected",
+                            (change)="checkValue($event, payeeApproval)")
+    .d-flex.justify-content-between.p-2
+        ngb-pagination(
+            [collectionSize]='total$',
+            [maxSize]='5',
+            [(page)]='page',
+            [pageSize]='pageSize',
+            [rotate]='true',
+            [ellipses]='false',
+            (pageChange)='pageChange($event)',
+            [boundaryLinks]='true'
+        )
+
+ng-template(#alert)
+    .flex-display-column(style='background: #FFFBF4')
+        div.bold.mt-5 Are you sure you want to
+        div.mt-0.bold {{ selectedStatus.includes('All') ? selectedStatus.trim().replace('All','')+" "+total$ : selectedStatus }}
+         | {{ selectedForOperation == 1 ? " entry" : " entries" }} ?
+        input#rejection.form-control.mt-1.w-75.mr-2(
+            *ngIf='selectedStatus.includes("Reject")',
+            type='text',
+            (input) = 'rejectionReasonChange($event)',
+            [(ngModel)] = 'rejectionReason',
+            ngbPopover='Rejection Reason',
+            placeholder='Enter Rejection Reason',
+            required,
+            ng-class='rejectionReason == "" ? "ng-invalid" : ""',
+        )
+        div.flex-display.mb-5.mt-3
+            button.btn.btn-light.mr-3(type='button', (click)='closeModal()') No, Go Back
+            button.btn(type='button', [disabled]='disableStatusButton',
+                [ngClass]='selectedStatus.includes("Approve") || selectedStatus.includes("approve") ? "btnColorGreen" : "btnColorRed"',
+                (click)='withOTP ? sendOTP(): sendPayeeApprovals()') {{ disableStatusButton ? "Loading..." : "Yes," }}
+                    | &nbsp;
+                    div(*ngIf='!disableStatusButton') {{ selectedStatus.includes('Approve') || selectedStatus.includes('approve') ? "Approve" : "Reject" }}

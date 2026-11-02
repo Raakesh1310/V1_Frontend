@@ -1,0 +1,42 @@
+div.statement-dashboard
+  .table-responsive.pp-table-container.align-self-stretch.flex-grow-1.flex-stretch-1.table-borderless(*ngIf = '!loadingData')
+    table.table 
+      thead.thead-light
+        tr
+          th(scope="col", sbSortable="event", (sort)="onSort($event)")
+            span.ws-nowrap Date
+          th(scope="col", sbSortable="time", (sort)="onSort($event)")
+            span.ws-nowrap Description 
+          th(scope="col", sbSortable="time", (sort)="onSort($event)")
+            span.ws-nowrap Withdraw (Dr)
+          th(scope="col", sbSortable="time", (sort)="onSort($event)")
+            span.ws-nowrap Credit (Cr)
+
+      tbody(
+        *ngIf="(bankStatements$ | async)?.length > 0 && !(loadingList$ | async)"
+      ) 
+        tr.text-small(
+          *ngFor="let bankStatement of bankStatements$ | async | slice: 0:5; index as i"
+        )
+          td
+            span {{ toIST(bankStatement.transactionTime) }}
+          td
+            span.text-break {{ bankStatement.narration }}
+          td
+            span {{ bankStatement.transactionType === 'debit' ? toINR(bankStatement.amount) : ' ' }}
+          td
+            span {{ bankStatement.transactionType === 'credit' ? toINR(bankStatement.amount) : '' }}
+
+      .flex-container.flex-row(style = 'position:absolute',*ngIf="(bankStatements$ | async)?.length > 0")
+            span.btn.btn-xs.btn-outline.btn-view.mt-3.align-self-center(
+            (click)="redirectToStatements(bankStatements$)"
+      )
+                i-feather.mr-1.justify-content-center(name='book')
+                span.text-center View more 
+                i-feather.ml-1.justify-content-center(name='arrow-down')
+  .flex-container.flex-row(
+    *ngIf="(bankStatements$ | async)?.length <= 0 && !loadingData"
+  )
+    .align-self-center No Data available
+  .flex-container.flex-row(*ngIf="loadingData")
+    .align-self-center Please wait...

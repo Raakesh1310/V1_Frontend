@@ -1,0 +1,164 @@
+div
+	.row.align-items-stretch
+		div
+			form.pb-2
+				.d-flex.mb-2
+					input#search-box.mt-1.form-control.w-100.mr-2(
+						placement='top',
+						ngbPopover='Search by User Name, Email ID, Business Name, Mobile No.',
+						type='text',
+						name='s',
+						autocomplete='off',
+						placeholder='Search by User Name, Email ID, Business Name, Mobile No.',
+						[(ngModel)]='allUsersService.searchTerm'
+					)
+
+					input#start-date.mt-1.form-control.w-25.mr-2(
+						type='text',
+						name='sd',
+						placeholder='Start Date',
+						autocomplete='off',
+						ngbDatepicker,
+						outsideDays='hidden',
+						#sd='ngbDatepicker',
+						(click)='sd.toggle()',
+						[(ngModel)]='allUsersService.dateFrom',
+						[minDate]='allUsersService.dateFromMin',
+						[maxDate]='allUsersService.dateFromMax'
+					)
+					input#end-date.mt-1.form-control.w-25.mr-2(
+						type='text',
+						name='ed',
+						placeholder='End Date',
+						autocomplete='off',
+						ngbDatepicker,
+						outsideDays='hidden',
+						#ed='ngbDatepicker',
+						(click)='ed.toggle()',
+						[(ngModel)]='allUsersService.dateTo',
+						[minDate]='allUsersService.dateToMin',
+						[maxDate]='allUsersService.dateToMax'
+					)
+					button.btn.mr-2.ws-wrap.mt-1.mb-1.castlerButtonColor(
+						type='submit',
+						(click)='submitSearchForm()'
+					)
+						fa-icon.d-flex.flex-row.align-items-center(
+							[icon]='["fas", "search"]'
+						)
+					button.btn.btn-link.mr-2.logoColor(type='button', (click)='clearForm()') Clear
+					.justify-content-end 
+						a.btn.btn-success.mt-1.mb-1.mr-2.ws-nowrap.btn-icon(
+							type='button',
+							target='_blank',
+							[href]='allUsersService.reportDownloadLink$ | async'
+						)
+							fa-icon.d-flex.flex-row.align-items-center(
+								[icon]='["fas", "arrow-down"]'
+							)
+				.d-flex(*ngIf='(users$ | async)?.length > 0') 
+					.flex-row
+						small.mb-2.mt-2 Showing {{ (allUsersService.page - 1) * 10 + 1 }} to {{ (allUsersService.page - 1) * 10 + (users$ | async)?.length }} of {{ total$ | async }}
+		.table-responsive.pp-table-container.align-self-stretch.flex-grow-1.flex-stretch-1.table-striped(
+			*ngIf='(users$ | async)?.length > 0 && !(loadingList$ | async)'
+		)
+			table.table
+				thead
+					tr
+						th.th-sticky-top(
+							scope='col',
+							sbSortable='event',
+							(sort)='onSort($event)'
+						)
+							span.ws-nowrap First Name 
+						th.th-sticky-top(
+							scope='col',
+							sbSortable='event',
+							(sort)='onSort($event)'
+						)
+							span.ws-nowrap Last Name 
+						th.th-sticky-top(
+							scope='col',
+							sbSortable='event',
+							(sort)='onSort($event)'
+						)
+							span.ws-nowrap Email Id 
+						th.th-sticky-top(scope='col' sbSortable='time', (sort)='onSort($event)')
+							span Mobile 
+						th.th-sticky-top(scope='col' sbSortable='time', (sort)='onSort($event)')
+							span.ws-nowrap Created At 
+						th.th-sticky-top(scope='col' sbSortable='time', (sort)='onSort($event)')
+							span.ws-nowrap Status 
+						th.th-sticky-top
+							span.ws-nowrap Action 
+				tbody
+					tr(*ngFor='let user of users$ | async')
+						td
+							ngb-highlight(
+								[result]='user.firstName',
+								[term]='allUsersService.searchTerm'
+							)
+						td
+							ngb-highlight(
+								[result]='user.lastName',
+								[term]='allUsersService.searchTerm'
+							)
+						td
+							a.nav-link.p-0.tableClickEntryColor(
+								href='javascript:void(0);',
+								(click)='showDetails(user._id)'
+							)
+								ngb-highlight(
+									[result]='user.email',
+									[term]='allUsersService.searchTerm'
+								)
+						td
+							ngb-highlight(
+								[result]='user.mobile',
+								[term]='allUsersService.searchTerm'
+							)
+						td
+							ngb-highlight(
+								[result]='user?.createdAtString',
+								[term]='allUsersService.searchTerm'
+							)
+						td
+							ngb-highlight(
+								[result]='user?.loginLock ? "Locked" : "Active"',
+								[term]='allUsersService.searchTerm'
+							)
+						td 
+							a.btn.btn-success.mt-1.mb-1.mr-2.ws-nowrap(,
+							type='button',
+							*ngIf="user?.loginLock",
+							(click)="allUsersService.changeLocks(user._id, user.firstName + ' ' + user.lastName,'remove_lock')"
+							target='_blank',
+							) 
+								span.text-white.font-weight-bold Activate
+							//- (click)=`allUsersService.changeLocks('${user._id}', 'attach_lock')` 
+							a.btn.btn-danger.mt-1.mb-1.mr-2.ws-nowrap(
+							type='button',
+							target='_blank',
+							*ngIf="!user?.loginLock",
+							(click)="allUsersService.changeLocks(user._id, user.firstName + ' ' + user.lastName, 'attach_lock')"
+							)
+								span.text-white.font-weight-bold Lock 	 		
+							//- (click)={{ `allUsersService.changeLocks('${user._id}', 'remove_lock')` }}
+		.flex-container.flex-row(
+			*ngIf='(users$ | async)?.length <= 0 && !(loadingList$ | async)'
+		)
+			.align-self-center No Data available
+		.flex-container.flex-row(*ngIf='loadingList$ | async')
+			.align-self-center Please wait...
+		.d-flex.justify-content-between.pt-2.align-self-end(
+			*ngIf='(users$ | async)?.length > 0 && !(loadingList$ | async)'
+		)
+			ngb-pagination(
+				[collectionSize]='total$ | async',
+				[(page)]='allUsersService.page',
+				[pageSize]='10',
+				[maxSize]='5',
+				[rotate]='true',
+				[ellipses]='false',
+				[boundaryLinks]='true'
+			)

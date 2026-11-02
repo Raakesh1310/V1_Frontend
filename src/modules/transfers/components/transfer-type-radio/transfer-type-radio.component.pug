@@ -1,0 +1,15 @@
+.d-flex.transfer-type-container
+  ng-container(*ngFor='let transferType of transferTypes', role='radio')
+    .transfer-type-select(
+      *ngIf='shouldDisplay(transferType.type)',
+      [ngClass]='{ disabled: isFTAllowed && transferType.type !== "FT" }'
+    )
+      .d-flex.align-items-center.justify-content-center.p-3.transfer-type-select-button(
+        [ngClass]='{ "transfer-type-selected": transferType.type === selectedTransferType, disabled: isFTAllowed && transferType.type !== "FT" }',
+        (click)='onSelect(transferType.type)',
+        tabindex='0'
+      )
+        b {{ transferType.type }}
+
+      .mt-2
+        p {{ transferType.desc }}

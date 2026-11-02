@@ -1,0 +1,13 @@
+.custom-file.mb-lg-3
+  input.form-control.custom-file-input.file-input(
+    type='file',
+    *ngIf='!hasFileUrl()',
+    [accept]='accept'
+  )
+  label.custom-file-label(
+    [ngClass]='{ "file-input-remove": isFileSelected(), disabled: disabled }'
+  )
+    p.m-0
+      a(*ngIf='hasFileUrl()', [href]='fileUrl', target='_blank') {{ widgetLabel }}
+      span(*ngIf='!hasFileUrl()') {{ widgetLabel }}
+      span.file-input-button((click)='handleLabelClick($event)')

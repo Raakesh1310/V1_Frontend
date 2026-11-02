@@ -1,0 +1,8 @@
+.card.card-icon.mb-4
+    .row.no-gutters
+        .col-auto.card-icon-aside(
+            [ngClass]='iconBackground'
+        )
+            ng-content(select='.card-icon')
+        .col
+            ng-content(select='.card-body')

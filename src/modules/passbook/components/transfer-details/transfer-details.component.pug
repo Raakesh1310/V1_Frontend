@@ -1,0 +1,212 @@
+sbpro-card
+  .card-header.logoColor Transfer Details
+  .card-body
+    form.details
+      .row
+        .col
+          .form-group
+            label Payment ID
+            p(*ngIf='transfer.transferId') {{ transfer.transferId }}
+            p(*ngIf='!transfer.transferId') {{ transfer.transferId }}
+          .form-group(*ngIf = 'transfer.accountId')
+            label From Escrow ID
+            p(*ngIf='transfer.accountId') {{ transfer.accountId }}
+            p(*ngIf='!transfer.accountId') --
+          .form-group(*ngIf = 'transfer.bankAccountNumber')
+            label From Bank Account 
+            p(*ngIf='transfer.bankAccountNumber') {{ transfer.bankAccountNumber }}
+            p(*ngIf='!transfer.bankAccountNumber') --          
+          .form-group
+            label Beneficiary Name
+            p(*ngIf='transfer.beneficiaryName') {{ transfer.beneficiaryName }}
+            p(*ngIf='!transfer.beneficiaryName') --
+          .form-group
+            label Beneficiary IFSC
+            p(*ngIf='transfer.beneficiaryIFSC') {{ transfer.beneficiaryIFSC }}
+            p(*ngIf='!transfer.beneficiaryIFSC') --
+          .form-group
+            label Purpose
+            p(*ngIf='transfer.purpose') {{ transfer.purpose }}
+            p(*ngIf='!transfer.purpose') --
+          .form-group
+            label Created by Id
+            p(*ngIf='transfer.createdBy') {{ transfer.createdBy }}
+            p(*ngIf='!transfer.createdBy') --
+          .form-group
+            label Audit Report
+            br
+            a.btn.btn-link.btn-sm.mr-2.ws-wrap.ml-auto(
+              target='_blank',
+              [href]='reportUrl'
+            )
+              b download audit report
+          .form-group(*ngIf='transfer.customerRefId')
+            label Customer Reference Id
+            p(*ngIf='transfer.customerRefId') {{ transfer.customerRefId }}
+        .col
+          .form-group(*ngIf='transfer.batchId')
+            label Batch Id
+            p(*ngIf='transfer.batchId') {{ transfer.batchId }}
+          .form-group
+            label Status
+            p(*ngIf='transfer.status') {{ transfer.status }}
+            p(*ngIf='!transfer.status') --
+          .form-group
+            label Amount
+            p(*ngIf='transfer.amount') {{ "₹" + transfer.amount.toFixed(2) }}
+            p(*ngIf='!transfer.amount') --
+          .form-group
+            label Beneficiary Account number
+            p(*ngIf='transfer.beneficiaryAccNumber') {{ transfer.beneficiaryAccNumber }}
+            p(*ngIf='!transfer.beneficiaryAccNumber') --
+          //- .form-group(*ngIf='upiPayoutEnabled')
+          //-   label Beneficiary VPA
+          //-   p(*ngIf='transfer.vpa') {{ transfer.vpa }}
+          //-   p(*ngIf='!transfer.vpa') --
+          .form-group
+            label utr
+            p(*ngIf='transfer.utr') {{ transfer.utr }}
+            p(*ngIf='!transfer.utr') --
+          .form-group
+            label Creation date
+            p(*ngIf='transfer.createdAt') {{ getParsedDate(transfer.createdAt) }}
+            p(*ngIf='!transfer.createdAt') --
+          .form-group
+            label Remarks
+            p(*ngIf='transfer.remarks') {{ transfer.remarks }}
+            p(*ngIf='!transfer.remarks') --
+          .form-group(*ngIf='transfer.transferType')
+            label Transfer Type 
+            p {{ transfer.transferType }}
+      .row.mt-4(*ngIf='supportingDocuments.length > 0')
+        .col
+          label Supporting Documents
+          .table-responsive.pp-table-container.mt-4
+            table.table
+              thead
+                tr
+                  th(scope='col', style='width: 10%')
+                    span S.No.
+                  th(scope='col', style='width: 80%')
+                    span Document
+              tbody(*ngIf='supportingDocuments.length > 0')
+                tr(*ngFor='let doc of supportingDocuments; let i = index')
+                  td
+                    | {{ i + 1 }}
+                  td
+                    a(
+									    href="#", (click)='downloadFile($event, doc.hash, doc?.name)',
+                      *ngIf='doc.hash'
+                    ) {{ doc.name }}
+      .row.mt-4(*ngIf='transfer?.notes != undefined')
+        .col
+          label Transfer Notes
+          .table-responsive.pp-table-container.mt-4
+            table.table
+              thead
+                tr
+                  th(scope='col', style='width: 50%')
+                    span Key
+                  th(scope='col', style='width: 50%')
+                    span Value
+              tbody(*ngIf='transfer?.notes != undefined')
+                tr(*ngFor='let note of transfer?.notes | keyvalue')
+                  td
+                    | {{ note.key }}
+                  td
+                    | {{ note.value }}
+
+  //- (*ngIf='supportingDocuments && supportingDocuments.length > 0')
+  .card-footer
+    button.btn.castlerButtonColor((click)='goBack()') Back
+    //- | &nbsp;&nbsp;&nbsp;&nbsp;
+    //- button.btn.btn-primary(
+    //-   printSectionId='print-section',
+    //-   ngxPrint,
+    //-   [useExistingCss]='true'
+    //- ) Print
+
+#print-section.hidden
+  center.report
+    br
+    br
+    br
+    img.logoImage(
+      src='/assets/img/Castler_logo.png',
+      width='650',
+      height='100',
+      alt='pp-logo'
+    )
+    br
+    br
+    br
+    h1(style='text-align:center;') 
+      b Transfer Details
+    br
+    br
+    table.table.table-striped
+      tbody
+        tr
+          th Payment ID
+          td(*ngIf='transfer.transferId') {{ transfer.transferId }}
+          td(*ngIf='!transfer.transferId') --
+        tr
+          th status
+          td(*ngIf='transfer.status') {{ transfer.status }}
+          td(*ngIf='!transfer.status') --
+        tr
+          th From Virtual Escrow
+          td(*ngIf='transfer.accountId') {{ transfer.accountId }}
+          td(*ngIf='!transfer.accountId') --
+        tr
+          th Amount
+          td(*ngIf='transfer.amount') {{ transfer.amount }}
+          td(*ngIf='!transfer.amount') --
+        tr
+          th Beneficiary Name
+          td(*ngIf='transfer.beneficiaryName') {{ transfer.beneficiaryName }}
+          td(*ngIf='!transfer.beneficiaryName') --
+        tr
+          th Beneficiary Account Number
+          td(*ngIf='transfer.beneficiaryAccNumber') {{ transfer.beneficiaryAccNumber }}
+          td(*ngIf='!transfer.beneficiaryAccNumber') --
+        tr
+          th Beneficiary IFSC
+          td(*ngIf='transfer.beneficiaryIFSC') {{ transfer.beneficiaryIFSC }}
+          td(*ngIf='!transfer.beneficiaryIFSC') --
+        tr
+          th Purpose
+          td(*ngIf='transfer.purpose') {{ transfer.purpose }}
+          td(*ngIf='!transfer.purpose') --
+        tr
+          th UTR
+          td(*ngIf='transfer.utr') {{ transfer.utr }}
+          td(*ngIf='!transfer.utr') --
+        tr
+          th Remarks
+          td(*ngIf='transfer.remarks') {{ transfer.remarks }}
+          td(*ngIf='!transfer.remarks') --
+        tr
+          th Creation Date
+          td(*ngIf='transfer.createdAt') {{ getParsedDate(transfer.createdAt) }}
+          td(*ngIf='!transfer.createdAt') --
+        tr(*ngIf='transfer.status === "Failed" || transfer.status === "Success"')
+          th Fund Transfer {{ transfer.status }}
+          td(*ngIf='transfer.updatedAt') {{ getParsedDate(transfer.updatedAt) }}
+          td(*ngIf='!transfer.updatedAt') --
+
+    br
+    br
+    div(*ngIf='transfer.authorization && transfer.authorization.length > 0')
+      h1 
+        b Approvals
+      br
+      br
+      table.table.table-striped
+        tbody
+          tr(*ngFor='let verification of transfer.authorization')
+            th(*ngIf='verification.verified && verification.data.approved') Approved By {{ verification.email }}
+            th(*ngIf='verification.verified && !verification.data.approved') Rejected By
+            th(*ngIf='!verification.verified') Pending Approval
+            td(*ngIf='verification.verifiedAt') {{ getParsedDate(transfer.updatedAt) }}
+            td(*ngIf='!verification.verifiedAt') --

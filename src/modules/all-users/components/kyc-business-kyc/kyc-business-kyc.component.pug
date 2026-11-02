@@ -1,0 +1,82 @@
+form.details
+  .container-fluid.pl-3.border.rounded.w-75.float-left.shadow-lg.p-3.mb-5.bg-white.rounded
+    .row.pt-2.pl-2
+      .col
+        H4 Pan Details
+      .col
+        div(style='display: flex')
+          div(style='display: flex; flex-direction: column')
+            input.non-editable.form-control(
+              type='text',
+              [(ngModel)]='businessPan',
+              [readOnly]='!panEdit',
+              [ngModelOptions]="{standalone: true}",
+            )
+            p(*ngIf='businessPanVerifiedAt.length > 0', style='color: green') Verified on
+              | &nbsp; {{ getDate(businessPanVerifiedAt) }}
+          button.btn.ml-3((click)='verifyPan()', class='castlerButtonColor', *ngIf='panEdit',
+          style='height: 40px') {{ panLoading ? "Verfying..." : "Verify"}}
+    hr
+    .row.pl-2
+      .col 
+        p.font-weight-normal.small Business Name
+        p.font-weight-bold {{ businessName }}
+    .row.pt-4.pl-2
+      .col(*ngIf='!gstAvailable')
+        H4 Merchant not registered under the Goods and Service Tax Act, 2017.
+      .col(*ngIf='gstAvailable')
+        H4 GSTIN Detail
+      .col(*ngIf='gstAvailable')
+        div(style='display: flex')
+          div(style='display: flex; flex-direction: column')
+            input.non-editable.form-control(
+              type='text',
+              [(ngModel)]='gstin',
+              [readOnly]='!gstEdit',
+              [ngModelOptions]="{standalone: true}",
+            )
+            p(*ngIf='gstVerifiedAt.length > 0', style='color: green') Verified on
+              | &nbsp; {{ getDate(gstVerifiedAt) }}
+          button.btn.ml-3((click)='verifyGst()', class='castlerButtonColor', *ngIf='gstEdit',
+          style='height: 40px') {{ gstLoading ? "Verfying..." : "Verify"}}
+    hr
+    .row.pl-2
+      .col
+        p.font-weight-normal.small Business Name
+        p.font-weight-bold {{ businessName }}
+      .col 
+        p.font-weight-normal.small Nature of Business
+        p.font-weight-bold {{ industryType }}
+    .row.pt-2.pl-2
+      .col
+        p.font-weight-normal.small Registered Address
+        p.font-weight-bold {{ address }}
+      .col 
+        p.font-weight-normal.small Date of Registration
+        p.font-weight-bold {{ dateOfRegistration }}
+    .row.pt-4.pl-2
+      .col 
+        H4 CIN Details
+      .col
+        div(style='display: flex; flex-direction: column')
+          label {{ cin }}
+          p(*ngIf='cinVerifiedAt.length > 0', style='color: green') Verified on
+            | &nbsp; {{ getDate(cinVerifiedAt) }}
+    hr
+    .row.pl-2
+      .col
+        p.font-weight-normal.small Business Name
+        p.font-weight-bold {{ businessName }}
+      .col 
+        p.font-weight-normal.small Nature of Business
+        p.font-weight-bold {{ companyStatus }}
+    .row.pt-2.pl-2
+      .col
+        p.font-weight-normal.small Registered Address
+        p.font-weight-bold {{ address }}
+      .col 
+        p.font-weight-normal.small Date of Registration
+        p.font-weight-bold {{ dateOfRegistration }}
+    //- .row.pl-3
+    //-   button.btn.btn-light.mr-3(type='button', *ngIf='gstEdit || panEdit', (click)='gstEdit = false; panEdit = false') Cancel
+    //-   button.btn((click)='gstEdit = true; panEdit = true', class='castlerButtonColor', *ngIf='!gstEdit && !panEdit') Edit

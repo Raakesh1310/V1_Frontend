@@ -1,0 +1,215 @@
+sbpro-card([headerActions]='true')
+  .card-header
+    | Form
+    button.btn.btn-icon.btn-link.btn-xl((click)='closeModal()')
+      i-feather(name='x-circle')
+  .card-body
+    div(*ngIf='errors && errors.length > 0')
+      sbpro-alert(classes='alert-danger')
+        | {{ errors[0] }}
+    form([formGroup]='hardEscrowForm')
+      .d-flex
+        .form-group.w-50.mr-2
+          .row
+            .col-sm-12.col-md-9.col-lg-9
+              label(for='frm-cntrl-cb') Enable Hgih TPS
+              |
+              i-feather.ml-1(
+                name="info",
+                ngbTooltip="When high TPS is enabled, transfer will bypass trustee and admin approval flow and will directly go to bank for processing",
+                container="body"
+              )
+            .col-sm-12.col-md-3.col-lg-3
+              input#frm-cntrl-cb.form-control.form-control-sm.float-left(
+                type='checkbox',
+                #checkbox,
+                name='enableHighTPS',
+                formControlName='enableHighTPS',
+                (change)='highTPS($event)'
+              )
+      .d-flex
+        .form-group.w-100.mr-2
+          label(for='frm-cntrl-accountNo') Account No
+          <span _ngcontent-hmy-c292="" class="text-danger">*</span>
+          input#frm-cntrl-accountNo.form-control.form-control-sm(
+            type='string',
+            [readonly]='isEdit',
+            formControlName='accountNo',
+            placeholder='Account No'
+          )
+        .form-group.w-100
+          label(for='frm-cntrl-accountName') Account Name
+          <span _ngcontent-hmy-c292="" class="text-danger">*</span>
+          input#frm-cntrl-accountName.form-control.form-control-sm(
+            type='string',
+            formControlName='accountName',
+            placeholder='Account Name'
+          )
+      .d-flex
+        .form-group.w-100.mr-2
+          label(for='frm-cntrl-clientCode') Client Code
+          <span _ngcontent-hmy-c292="" class="text-danger">*</span>
+          input#frm-cntrl-clientCode.form-control.form-control-sm(
+            type='string',
+            formControlName='clientCode',
+            placeholder='Client Code'
+          )
+        .form-group.w-100.mr-2
+          label(for='frm-cntrl-cryptoKey') Crypto Key (Optional)
+          input#frm-cntrl-secondId.form-control.form-control-sm(
+            type='password',
+            formControlName='cryptoKey',
+            placeholder='Crypto Key'
+          )
+      .d-flex
+        .form-group.w-100.mr-2
+          label(for='frm-cntrl-clientId') Client Id (Optional)
+          input#frm-cntrl-clientId.form-control.form-control-sm(
+            type='string',
+            formControlName='clientId',
+            placeholder='Client ID'
+          )
+        .form-group.w-100.mr-2
+          label(for='frm-cntrl-clientSecret') Client Secret (Optional)
+          input#frm-cntrl-.form-control.form-control-sm(
+            type='password',
+            formControlName='clientSecret',
+            placeholder='Client Secret',
+            autocomplete='new-password'
+          )
+      .d-flex
+        .form-group.w-100.mr-2
+          label(for='frm-cntrl-trusteeMail') Trustee Email (Optional)
+          input#frm-cntrl-trusteeMail.form-control.form-control-sm(
+            type='string',
+            formControlName='trusteeMail',
+            placeholder='Trustee Email',
+            [readOnly]='hardEscrowForm.get("enableHighTPS").value'
+          )
+        .form-group.w-100.mr-2
+          label(for='frm-cntrl-accountCode') Account Code
+          <span _ngcontent-hmy-c292="" class="text-danger">*</span>
+          input#frm-cntrl-.form-control.form-control-sm(
+            type='string',
+            formControlName='accountCode',
+            placeholder='Account Code'
+          )
+      .d-flex
+        .form-group.w-100.mr-2
+          label(for='frm-cntrl-kId') K Id (Optional)
+          input#frm-cntrl-trusteeMail.form-control.form-control-sm(
+            type='string',
+            formControlName='kId',
+            placeholder='K Id'
+          )
+        .form-group.w-100.mr-2
+          label(for='frm-cntrl-scope') Scope Code
+          <span _ngcontent-hmy-c292="" class="text-danger">*</span>
+          input#frm-cntrl-.form-control.form-control-sm(
+            type='string',
+            formControlName='scope',
+            placeholder='Scope'
+          )
+      .d-flex
+        .form-group.w-100.mr-2
+          label(for='frm-cntrl-ifsc') IFSC (Optional)
+          input#frm-cntrl-trusteeMail.form-control.form-control-sm(
+            type='string',
+            formControlName='ifsc',
+            placeholder='IFSC'
+          )
+        .form-group.w-100.mr-2
+          label(for='frm-cntrl-source') Source
+          <span _ngcontent-hmy-c292="" class="text-danger">*</span>
+          input#frm-cntrl-.form-control.form-control-sm(
+            type='string',
+            formControlName='source',
+            placeholder='Source'
+          )
+      .d-flex
+        .form-group.w-100.mr-2
+          label(for='frm-cntrl-h2hClientCode') H2H Client Code (Optional)
+          input#frm-cntrl-trusteeMail.form-control.form-control-sm(
+            type='string',
+            formControlName='h2hClientCode',
+            placeholder='H2H Client Code'
+          )
+        .form-group.w-100.mr-2
+          label(for='frm-cntrl-collectCryptoKey') Collection Crypto Key (Optional)
+          input#frm-cntrl-.form-control.form-control-sm(
+            type='string',
+            formControlName='collectCryptoKey',
+            placeholder='Collection Crypto Key'
+          )
+      .d-flex
+        .form-group.w-100.mr-2
+          label(for='frm-cntrl-accountPOBOCode') POBO Account Code (Optional)
+          input#frm-cntrl-trusteeMail.form-control.form-control-sm(
+            type='string',
+            formControlName='accountPOBOCode',
+            placeholder='POBO Account Code'
+          )
+        .form-group.w-100.mr-2
+          label(for='frm-cntrl-description') Description (Optional)
+          input#frm-cntrl-idfcDescription.form-control.form-control-sm(
+            type='string',
+            formControlName='description',
+            placeholder='Description'
+          )
+      .d-flex
+        .form-group.w-50.mr-2
+          .row
+            .col-sm-12.col-md-9.col-lg-9
+              label(for='frm-cntrl-cb') Enable Connected Banking
+            .col-sm-12.col-md-3.col-lg-3
+              input#frm-cntrl-cb.form-control.form-control-sm.float-left(
+                type='checkbox',
+                #checkbox,
+                name='enableConnectedBanking',
+                formControlName='enableConnectedBanking',
+                [disabled]='hide'
+              )
+      .d-flex 
+        .form-group.w-100.mr-2(*ngIf="hardEscrowForm.get('enableConnectedBanking').value")
+          .row
+            .col-sm-4
+              label(for='frm-cntrl-cb') With Digital Escrow
+              input.ml-2(
+                type='radio',
+                name='enableConnectedBankingWithVA',
+                formControlName='enableConnectedBankingWithVA',
+                [value]="true",
+                (change)="updateEnableConnectedBanking(true)"
+              )
+            .col-sm-4
+              label(for='frm-cntrl-cb') Without Digital Escrow
+              input.ml-2(
+                type='radio',
+                name='enableConnectedBankingWithVA',
+                formControlName='enableConnectedBankingWithVA',
+                [value]="false",
+                (change)="updateEnableConnectedBanking(false)"
+              )
+      .d-flex(*ngIf="hardEscrowForm.get('enableConnectedBanking').value")
+        .form-group.w-100.mr-2
+          label(for='frm-cntrl-accountType') Account Type
+          select#frm-cntrl-accountType.form-control.form-control-sm(
+            formControlName='accountType',
+            [value] = 'accountType',
+          )
+            option(value='Escrow Account') Escrow Account
+            option(value='Current Account') Current Account
+    sbpro-app-button.float-right(
+      *ngIf='!isEdit',
+      (click)='onSubmit()',
+      [loading]='submitting',
+      text='Submit',
+      loadingText='Submitting'
+    )
+    sbpro-app-button.float-right(
+      *ngIf='isEdit',
+      (click)='onSubmit()',
+      [loading]='submitting',
+      text='Update',
+      loadingText='Submitting'
+    )

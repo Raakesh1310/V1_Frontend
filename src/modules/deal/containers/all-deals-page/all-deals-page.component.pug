@@ -1,0 +1,10 @@
+.flex-container
+  sbpro-dashboard-head(
+    icon='package',
+    title='All Deals',
+    description='View all deals'
+  )
+  .container-fluid.mt-n10.responsiveForm
+    .row.h-100
+      .col-lg-12.h-100
+        sbpro-deal-list([isSuperAdmin]='true')

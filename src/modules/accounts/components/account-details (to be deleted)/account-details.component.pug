@@ -1,0 +1,73 @@
+sbpro-card
+  .card
+  .card-header 
+  .card-body
+    .row
+      .col
+        h4.display-6 Details
+    br
+    table.table
+      tr
+        td Virtual ID
+        td(*ngIf='acc') {{ acc.accountId }}
+      tr
+        td Escrow Name
+        td(*ngIf='acc') {{ acc.name }}
+      tr
+        td Escrow Status
+        td(*ngIf='acc') 
+          .custom-control.custom-checkbox
+            input#status.custom-control-input(
+              type='checkbox',
+              (change)='updateStatus($event)',
+              name='status',
+              [(ngModel)]='acc.isActive'
+            )
+            label.custom-control-label(*ngIf='acc.isActive', for='status') Active
+            label.custom-control-label(*ngIf='!acc.isActive', for='status') InActive
+    .row
+      .col
+        h4.display-6 Payees
+
+    br
+    .sb-preview
+      .sbp-preview-content
+        .table-responsive.pp-table-container
+          table.table
+            thead
+              tr 
+                th(scope='col', sbSortable='date', (sort)='onSort($event)')
+                  span Payee Name
+                th(scope='col', sbSortable='date', (sort)='onSort($event)')
+                  span Payout share
+                th(scope='col', sbSortable='date', (sort)='onSort($event)')
+                  span Unit
+            tbody(*ngIf='account?.length == 0')
+              tr
+                td No Payees
+            tbody(*ngIf='account?.length > 0')
+              tr(*ngFor='let acc of account; index as i')
+                td
+                  ngb-highlight(
+                    [result]='acc.payees.payeeDetails[0].accountHolder'
+                  )
+                td
+                  ngb-highlight([result]='acc.payees.share')
+                td
+                  ngb-highlight([result]='acc.payees.balance')
+    .row
+      .col
+        h4.display-6 Documents
+
+    br
+    .sb-preview
+      .sbp-preview-content
+        form 
+          table.table
+            tbody(*ngIf='acc == null')
+              tr
+                td No Documents
+            tbody(*ngIf='acc')
+              tr(*ngFor='let doc of acc.docs; index as i')
+                td
+                  a(href='{{ downloadDoc(doc) }}', target='_blank') {{ i + 1 }}. {{ doc.type }}

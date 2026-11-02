@@ -1,0 +1,214 @@
+div.rightSideWidthHeight(style='margin: auto;')
+    div.flex-display.mt-3.justify-content-between
+        p.promotersText.mr-3 PROMOTER DETAILS
+        div.flex-display.justify-content-center.orangeBorder.mt-2.rounded((click)='openModal(alert,$event)')
+            div.m-1(style='') + Add Signatory
+    div(style='font-size: 12px; margin-top: 8px; margin-bottom: 4px;',
+        *ngIf='(userKycData.businessType == "Company" && promotersData.length > 0)') *
+        | KYC of all directors signing the Board Resolution required
+    div.overflow-auto.scrollBoxWidthHeight(style='', id='boxes')
+        div.flex-display-column.align-items-center(*ngIf='promotersData.length == 0',
+            style='top: 50%;position: relative;-ms-transform: translateY(-50%);transform: translateY(-50%);')
+            div.promotersEmptyText No Promoters added yet
+            svg(width='88', height='88', viewbox='0 0 88 88', fill='none', xmlns='http://www.w3.org/2000/svg')
+                path(d='M25.667 36.6667H62.3337V51.3334H25.667V36.6667Z' fill='black' fill-opacity='0.1')
+                path(d='M43.9997 7.33325C23.7817 7.33325 7.33301 23.7819 7.33301 43.9999C7.33301 64.2179 23.7817 80.6666 43.9997 80.6666C64.2177 80.6666 80.6664 64.2179 80.6664 43.9999C80.6664 23.7819 64.2177 7.33325 43.9997 7.33325ZM43.9997 73.3333C27.826 73.3333 14.6663 60.1736 14.6663 43.9999C14.6663 27.8263 27.826 14.6666 43.9997 14.6666C60.1734 14.6666 73.333 27.8263 73.333 43.9999C73.333 60.1736 60.1734 73.3333 43.9997 73.3333Z' fill='black' fill-opacity='0.1')
+        div.flex-display-column.justify-content-center.mb-3(*ngFor='let promoter of promotersData, index as i',
+            [ngClass]='(promoter.aadharUploaded || promoter.panUploaded) ? "scrollBoxesAfter" : "scrollBoxesBefore"')
+            div(style='').scrollBoxesIndex {{ i+1 }}
+            div(style='').flex-display.justify-content-between
+                div.scrollBoxesNameText {{ promoter.name }}
+                div.scrollBoxesDinText.mt-2(*ngIf='userKycData.businessType === "Company"') DIN: {{ promoter.din }}
+                div.scrollBoxesDinText.mt-2(*ngIf='userKycData.businessType === "PartnerShip"') {{ promoter.designation }}
+            div.flex-display.mt-2
+                p.scrollBoxesPanText.mr-3 Email
+                .col
+                    input#inputBusiness.form-control-sm.mt-1(
+                        style='background: #E2E2E2; border: none; width : 100%',
+                        [(ngModel)]="promoter.email",
+                        (input)='promoterEmailUpdate(promoter.email, promoter)',
+                        type='text',
+                        placeholder='Enter Email',
+                        (change)='addErrors($event.target.value)'
+                    )
+                    span(*ngIf='emailErrorsList[promoter.email]')
+                        span.text-danger {{ emailErrorsList[promoter.email] }}
+            .container-fluid.no-padding
+                .row
+                    .col-md
+                        p.scrollBoxesPanText.mr-2 PAN
+                        div(style='width: 100%')
+                            ng-template(#uploadPanImage)
+                                sbpro-document-upload-modal((uploadData)='uploadPanData($event,promoter)',
+                                    (dismissModal)= 'dismissPanModal(promoter)', [imgSrc] = 'imgSrc',
+                                    (closeModal)='closePanModal($event,promoter)', [documentType] = '"Pan"', [isLoading]='isLoading')
+                            .chip.mt-1.whiteBackground.myanchor(#parentElement, *ngIf='!promoter.panUploaded',
+                                (click)='openModal(uploadPanImage,$event)')
+                                p(style='font-size: 10px; color: rgba(62, 40, 8, 0.65)') Upload
+                                svg.mt-1.ml-2(width='15' height='12' viewbox='0 0 15 12' fill='none' xmlns='http://www.w3.org/2000/svg')
+                                    path(d='M5.45874 3.03455H6.83841V8.39601C6.83841 8.46575 6.90561 8.5228 6.98776 8.5228H8.10792C8.19006 8.5228 8.25727 8.46575 8.25727 8.39601V3.03455H9.64067C9.76575 3.03455 9.83483 2.91252 9.75829 2.83011L7.66732 0.582826C7.65335 0.567672 7.6355 0.555417 7.61512 0.546988C7.59475 0.53856 7.57237 0.53418 7.54971 0.53418C7.52704 0.53418 7.50467 0.53856 7.48429 0.546988C7.46391 0.555417 7.44606 0.567672 7.43209 0.582826L5.34113 2.82852C5.26458 2.91252 5.33366 3.03455 5.45874 3.03455ZM14.3827 7.92057H13.2625C13.1804 7.92057 13.1132 7.97762 13.1132 8.04735V10.488H1.98625V8.04735C1.98625 7.97762 1.91904 7.92057 1.8369 7.92057H0.716737C0.634592 7.92057 0.567383 7.97762 0.567383 8.04735V11.1853C0.567383 11.4658 0.834354 11.6924 1.1648 11.6924H13.9346C14.2651 11.6924 14.532 11.4658 14.532 11.1853V8.04735C14.532 7.97762 14.4648 7.92057 14.3827 7.92057Z' fill='black' fill-opacity='0.46')
+                                //span.closeBtn((click)="closeChip()") &times;
+                            .chip.mt-1.brownBackground.myanchor(#parentElement, *ngIf='promoter.panUploaded')
+                                a(style='font-size: 10px; color: #001AFF', target='_blank',
+                                    [href]='apiStartUrl + "/kyclink/download-file/" + promoter.panFront') PAN
+                            div.mt-2.flex-display.greenBorder.mt-1.rounded.justify-content-around(*ngIf='promoter.panUploaded')
+                                div(style='color: #201F1D') {{ promoter.pan }}
+                                svg.mt-1(width='14', height='12', viewbox='0 0 14 12', fill='none', xmlns='http://www.w3.org/2000/svg')
+                                    path(d='M11.704 0.149902L5.83898 7.8824L2.37148 4.4174L0.771484 6.0174L6.10398 11.3499L13.5715 1.7499L11.704 0.149902Z' fill='#15AD1C')
+                    .col-md
+                       p.scrollBoxesPanText.ml-2 Aadhar
+                       ng-template(#uploadAadharFrontImage)
+                           sbpro-document-upload-modal((uploadData)='uploadAadharFrontData($event,promoter)',
+                               (dismissModal)= 'dismissAadharFrontModal(promoter)', [imgSrc] = 'imgSrc',
+                               (closeModal)='closeAadharFrontModal($event,promoter)', [documentType] = '"Aadhar Front"')
+                       ng-template(#uploadAadharBackImage)
+                           sbpro-document-upload-modal((uploadData)='uploadAadharBackData($event,promoter)',
+                               (dismissModal)= 'dismissAadharBackModal(promoter)', [imgSrc] = 'imgSrc',
+                               (closeModal)='closeAadharBackModal(promoter)')
+                       div.d-flex(style="flex-wrap: wrap;")
+                           .chip.mt-1.mr-2.whiteBackground.myanchor(#parentElement, *ngIf='!promoter.aadharFrontUploaded',
+                               (click)='openModal(uploadAadharFrontImage,$event)')
+                               p(style='font-size: 10px; color: rgba(62, 40, 8, 0.65)') Front
+                               svg.mt-2.ml-2(width='15' height='12' viewbox='615*0 0 15 12' fill='none' xmlns='http://www.w3.org/2000/svg')
+                                   path(d='M5.45874 3.03455H6.83841V8.39601C6.83841 8.46575 6.90561 8.5228 6.98776 8.5228H8.10792C8.19006 8.5228 8.25727 8.46575 8.25727 8.39601V3.03455H9.64067C9.76575 3.03455 9.83483 2.91252 9.75829 2.83011L7.66732 0.582826C7.65335 0.567672 7.6355 0.555417 7.61512 0.546988C7.59475 0.53856 7.57237 0.53418 7.54971 0.53418C7.52704 0.53418 7.50467 0.53856 7.48429 0.546988C7.46391 0.555417 7.44606 0.567672 7.43209 0.582826L5.34113 2.82852C5.26458 2.91252 5.33366 3.03455 5.45874 3.03455ZM14.3827 7.92057H13.2625C13.1804 7.92057 13.1132 7.97762 13.1132 8.04735V10.488H1.98625V8.04735C1.98625 7.97762 1.91904 7.92057 1.8369 7.92057H0.716737C0.634592 7.92057 0.567383 7.97762 0.567383 8.04735V11.1853C0.567383 11.4658 0.834354 11.6924 1.1648 11.6924H13.9346C14.2651 11.6924 14.532 11.4658 14.532 11.1853V8.04735C14.532 7.97762 14.4648 7.92057 14.3827 7.92057Z' fill='black' fill-opacity='0.46')
+                           .chip.mr-2.brownBackground(#parentElement, *ngIf='promoter.aadharFrontUploaded')
+                               a(style='font-size: 10px; color: #001AFF', target='_blank',
+                                   [href]='apiStartUrl + "/kyclink/download-file/" + promoter.aadharFront') Ac_Front
+                               span.closeBtn((click)="dismissAadharFrontModal(promoter)", *ngIf='!notDeletable') &times;
+                           .chip.mt-1.whiteBackground.myanchor(#parentElement, *ngIf='!promoter.aadharBackUploaded',
+                               (click)='openModal(uploadAadharBackImage,$event)')
+                               p(style='font-size: 10px; color: rgba(62, 40, 8, 0.65)') Back
+                               svg.mt-2.ml-2(width='15' height='12' viewbox='0 0 15 12' fill='none' xmlns='http://www.w3.org/2000/svg')
+                                   path(d='M5.45874 3.03455H6.83841V8.39601C6.83841 8.46575 6.90561 8.5228 6.98776 8.5228H8.10792C8.19006 8.5228 8.25727 8.46575 8.25727 8.39601V3.03455H9.64067C9.76575 3.03455 9.83483 2.91252 9.75829 2.83011L7.66732 0.582826C7.65335 0.567672 7.6355 0.555417 7.61512 0.546988C7.59475 0.53856 7.57237 0.53418 7.54971 0.53418C7.52704 0.53418 7.50467 0.53856 7.48429 0.546988C7.46391 0.555417 7.44606 0.567672 7.43209 0.582826L5.34113 2.82852C5.26458 2.91252 5.33366 3.03455 5.45874 3.03455ZM14.3827 7.92057H13.2625C13.1804 7.92057 13.1132 7.97762 13.1132 8.04735V10.488H1.98625V8.04735C1.98625 7.97762 1.91904 7.92057 1.8369 7.92057H0.716737C0.634592 7.92057 0.567383 7.97762 0.567383 8.04735V11.1853C0.567383 11.4658 0.834354 11.6924 1.1648 11.6924H13.9346C14.2651 11.6924 14.532 11.4658 14.532 11.1853V8.04735C14.532 7.97762 14.4648 7.92057 14.3827 7.92057Z' fill='black' fill-opacity='0.46')
+                           .chip.brownBackground(#parentElement, *ngIf='promoter.aadharBackUploaded')
+                               a(style='font-size: 10px; color: #001AFF', target='_blank',
+                                   [href]='apiStartUrl + "/kyclink/download-file/" + promoter.aadharBack') Ac_Back
+                               span.closeBtn((click)="dismissAadharBackModal(promoter)", *ngIf='!notDeletable') &times;
+                       div.flex-display.greenBorder.mt-2.rounded.justify-content-around(
+                           *ngIf='(promoter.aadharBackUploaded && promoter.aadharFrontUploaded)')
+                           div(style='color: #201F1D') {{ promoter.aadhar }}
+                           svg.mt-1(width='14', height='12', viewbox='0 0 14 12', fill='none', xmlns='http://www.w3.org/2000/svg')
+                               path(d='M11.704 0.149902L5.83898 7.8824L2.37148 4.4174L0.771484 6.0174L6.10398 11.3499L13.5715 1.7499L11.704 0.149902Z' fill='#15AD1C')
+            //div.flex-display
+            //    p.scrollBoxesPanText.mr-2 PAN
+            //    div(style='width: 100%')
+            //        ng-template(#uploadPanImage)
+            //            sbpro-document-upload-modal((uploadData)='uploadPanData($event,promoter)',
+            //                (dismissModal)= 'dismissPanModal(promoter)', [imgSrc] = 'imgSrc',
+            //                (closeModal)='closePanModal($event,promoter)', [documentType] = '"Pan"', [isLoading]='isLoading')
+            //        .chip.ml-2.mt-2.whiteBackground.myanchor(#parentElement, *ngIf='!promoter.panUploaded',
+            //            (click)='openModal(uploadPanImage,$event)')
+            //            p(style='font-size: 8px; color: rgba(62, 40, 8, 0.65)') Upload
+            //            svg.mt-2.ml-2(width='15' height='12' viewbox='0 0 15 12' fill='none' xmlns='http://www.w3.org/2000/svg')
+            //                path(d='M5.45874 3.03455H6.83841V8.39601C6.83841 8.46575 6.90561 8.5228 6.98776 8.5228H8.10792C8.19006 8.5228 8.25727 8.46575 8.25727 8.39601V3.03455H9.64067C9.76575 3.03455 9.83483 2.91252 9.75829 2.83011L7.66732 0.582826C7.65335 0.567672 7.6355 0.555417 7.61512 0.546988C7.59475 0.53856 7.57237 0.53418 7.54971 0.53418C7.52704 0.53418 7.50467 0.53856 7.48429 0.546988C7.46391 0.555417 7.44606 0.567672 7.43209 0.582826L5.34113 2.82852C5.26458 2.91252 5.33366 3.03455 5.45874 3.03455ZM14.3827 7.92057H13.2625C13.1804 7.92057 13.1132 7.97762 13.1132 8.04735V10.488H1.98625V8.04735C1.98625 7.97762 1.91904 7.92057 1.8369 7.92057H0.716737C0.634592 7.92057 0.567383 7.97762 0.567383 8.04735V11.1853C0.567383 11.4658 0.834354 11.6924 1.1648 11.6924H13.9346C14.2651 11.6924 14.532 11.4658 14.532 11.1853V8.04735C14.532 7.97762 14.4648 7.92057 14.3827 7.92057Z' fill='black' fill-opacity='0.46')
+            //            //span.closeBtn((click)="closeChip()") &times;
+            //        .chip.ml-2.mt-2.brownBackground.myanchor(#parentElement, *ngIf='promoter.panUploaded')
+            //            a.mt-2(style='font-size: 8px; color: #001AFF', target='_blank',
+            //                [href]='apiStartUrl + "/uploads/kyc/" + promoter.panFront') PAN.png
+            //            span.closeBtn((click)="dismissPanModal(promoter)", *ngIf='!notDeletable') &times;
+            //    p.scrollBoxesPanText.mr-2.ml-2 Aadhar
+            //    ng-template(#uploadAadharFrontImage)
+            //        sbpro-document-upload-modal((uploadData)='uploadAadharFrontData($event,promoter)',
+            //            (dismissModal)= 'dismissAadharFrontModal(promoter)', [imgSrc] = 'imgSrc',
+            //            (closeModal)='closeAadharFrontModal($event,promoter)', [documentType] = '"Aadhar Front"')
+            //    ng-template(#uploadAadharBackImage)
+            //        sbpro-document-upload-modal((uploadData)='uploadAadharBackData($event,promoter)',
+            //            (dismissModal)= 'dismissAadharBackModal(promoter)', [imgSrc] = 'imgSrc',
+            //            (closeModal)='closeAadharBackModal(promoter)')
+            //    div.d-flex
+            //        .chip.mt-2.mr-2.whiteBackground.myanchor(#parentElement, *ngIf='!promoter.aadharFrontUploaded',
+            //            (click)='openModal(uploadAadharFrontImage,$event)')
+            //            p(style='font-size: 8px; color: rgba(62, 40, 8, 0.65)') Front
+            //            svg.mt-2.ml-2(width='15' height='12' viewbox='615*0 0 15 12' fill='none' xmlns='http://www.w3.org/2000/svg')
+            //                path(d='M5.45874 3.03455H6.83841V8.39601C6.83841 8.46575 6.90561 8.5228 6.98776 8.5228H8.10792C8.19006 8.5228 8.25727 8.46575 8.25727 8.39601V3.03455H9.64067C9.76575 3.03455 9.83483 2.91252 9.75829 2.83011L7.66732 0.582826C7.65335 0.567672 7.6355 0.555417 7.61512 0.546988C7.59475 0.53856 7.57237 0.53418 7.54971 0.53418C7.52704 0.53418 7.50467 0.53856 7.48429 0.546988C7.46391 0.555417 7.44606 0.567672 7.43209 0.582826L5.34113 2.82852C5.26458 2.91252 5.33366 3.03455 5.45874 3.03455ZM14.3827 7.92057H13.2625C13.1804 7.92057 13.1132 7.97762 13.1132 8.04735V10.488H1.98625V8.04735C1.98625 7.97762 1.91904 7.92057 1.8369 7.92057H0.716737C0.634592 7.92057 0.567383 7.97762 0.567383 8.04735V11.1853C0.567383 11.4658 0.834354 11.6924 1.1648 11.6924H13.9346C14.2651 11.6924 14.532 11.4658 14.532 11.1853V8.04735C14.532 7.97762 14.4648 7.92057 14.3827 7.92057Z' fill='black' fill-opacity='0.46')
+            //        .chip.mt-2.mr-2.brownBackground(#parentElement, *ngIf='promoter.aadharFrontUploaded')
+            //            a.mt-2(style='font-size: 8px; color: #001AFF', target='_blank',
+            //            [href]='apiStartUrl + "/uploads/kyc/" + promoter.aadharFront') Ac_Front.png
+            //            span.closeBtn((click)="dismissAadharFrontModal(promoter)", *ngIf='!notDeletable') &times;
+            //        .chip.mt-2.whiteBackground.myanchor(#parentElement, *ngIf='!promoter.aadharBackUploaded',
+            //            (click)='openModal(uploadAadharBackImage,$event)')
+            //            p(style='font-size: 8px; color: rgba(62, 40, 8, 0.65)') Back
+            //            svg.mt-2.ml-2(width='15' height='12' viewbox='0 0 15 12' fill='none' xmlns='http://www.w3.org/2000/svg')
+            //                path(d='M5.45874 3.03455H6.83841V8.39601C6.83841 8.46575 6.90561 8.5228 6.98776 8.5228H8.10792C8.19006 8.5228 8.25727 8.46575 8.25727 8.39601V3.03455H9.64067C9.76575 3.03455 9.83483 2.91252 9.75829 2.83011L7.66732 0.582826C7.65335 0.567672 7.6355 0.555417 7.61512 0.546988C7.59475 0.53856 7.57237 0.53418 7.54971 0.53418C7.52704 0.53418 7.50467 0.53856 7.48429 0.546988C7.46391 0.555417 7.44606 0.567672 7.43209 0.582826L5.34113 2.82852C5.26458 2.91252 5.33366 3.03455 5.45874 3.03455ZM14.3827 7.92057H13.2625C13.1804 7.92057 13.1132 7.97762 13.1132 8.04735V10.488H1.98625V8.04735C1.98625 7.97762 1.91904 7.92057 1.8369 7.92057H0.716737C0.634592 7.92057 0.567383 7.97762 0.567383 8.04735V11.1853C0.567383 11.4658 0.834354 11.6924 1.1648 11.6924H13.9346C14.2651 11.6924 14.532 11.4658 14.532 11.1853V8.04735C14.532 7.97762 14.4648 7.92057 14.3827 7.92057Z' fill='black' fill-opacity='0.46')
+            //        .chip.mt-2.brownBackground(#parentElement, *ngIf='promoter.aadharBackUploaded')
+            //            a.mt-2(style='font-size: 8px; color: #001AFF', target='_blank',
+            //            [href]='apiStartUrl + "/uploads/kyc/" + promoter.aadharBack') Ac_Back.png
+            //            span.closeBtn((click)="dismissAadharBackModal(promoter)", *ngIf='!notDeletable') &times;
+            //    //div.d-flex.ml-2(*ngIf='promoter.aadharUploaded')
+            //    //    .chip.mt-2.brownBackground(#parentElement)
+            //    //        p(style='font-size: 8px; color: #001AFF') Ac_back.png
+            //    //        span.closeBtn((click)="closeChip()") &times;
+            //    //    .chip.ml-2.mt-2.brownBackground(#parentElement)
+            //    //        p(style='font-size: 8px; color: #001AFF') Ac_Front.png
+            //    //        span.closeBtn((click)="closeChip()") &times;
+            //div.flex-display
+            //    div(style='flex-grow: 1')
+            //        div.flex-display.greenBorder.mt-2.rounded.justify-content-around(*ngIf='promoter.panUploaded')
+            //            div(style='color: #201F1D') {{ promoter.pan }}
+            //            svg.mt-1(width='14', height='12', viewbox='0 0 14 12', fill='none', xmlns='http://www.w3.org/2000/svg')
+            //                path(d='M11.704 0.149902L5.83898 7.8824L2.37148 4.4174L0.771484 6.0174L6.10398 11.3499L13.5715 1.7499L11.704 0.149902Z' fill='#15AD1C')
+            //    div.flex-display.greenBorder.mt-2.rounded.justify-content-around(
+            //        *ngIf='(promoter.aadharBackUploaded && promoter.aadharFrontUploaded)')
+            //        div(style='color: #201F1D') {{ promoter.aadhar }}
+            //        svg.mt-1(width='14', height='12', viewbox='0 0 14 12', fill='none', xmlns='http://www.w3.org/2000/svg')
+            //            path(d='M11.704 0.149902L5.83898 7.8824L2.37148 4.4174L0.771484 6.0174L6.10398 11.3499L13.5715 1.7499L11.704 0.149902Z' fill='#15AD1C')
+    div.ml-3.mb-3.bottomLeft.myanchor((click)='moveBack()')
+        svg(width='76', height='77', viewbox='0 0 76 77', fill='none', xmlns='http://www.w3.org/2000/svg')
+            path(d='M37.7928 57.6809L41.1708 54.3904L27.9897 41.1455H56.6904V36.4211H27.9897L41.1708 23.2565L37.7928 19.8857L18.8952 38.7833L37.7928 57.6809Z' fill='black' fill-opacity='0.28')
+            path(d='M37.7944 5.71254C44.3352 5.71254 50.7291 7.65211 56.1676 11.286C61.606 14.9199 65.8448 20.0848 68.3479 26.1277C70.8509 32.1706 71.5058 38.8201 70.2298 45.2352C68.9537 51.6503 65.804 57.543 61.179 62.168C56.554 66.793 50.6613 69.9427 44.2462 71.2188C37.8311 72.4948 31.1816 71.8399 25.1387 69.3369C19.0958 66.8338 13.9308 62.595 10.297 57.1566C6.66309 51.7181 4.72353 45.3242 4.72353 38.7834C4.73353 30.0155 8.22098 21.6096 14.4208 15.4098C20.6206 9.21 29.0265 5.72254 37.7944 5.71254ZM37.7944 67.1298C43.4008 67.1298 48.8813 65.4673 53.5428 62.3526C58.2044 59.2378 61.8376 54.8107 63.9831 49.6311C66.1285 44.4515 66.6899 38.7519 65.5961 33.2533C64.5024 27.7546 61.8027 22.7038 57.8383 18.7394C53.874 14.7751 48.8232 12.0754 43.3245 10.9816C37.8258 9.88786 32.1263 10.4492 26.9467 12.5947C21.767 14.7402 17.3399 18.3734 14.2252 23.0349C11.1104 27.6965 9.44793 33.177 9.44793 38.7834C9.45668 46.2986 12.446 53.5036 17.7601 58.8177C23.0742 64.1318 30.2791 67.1211 37.7944 67.1298Z' fill='black' fill-opacity='0.28')
+    div.mr-3.mb-3.bottomRight.myanchor((click)='moveFront()')
+        svg([ngClass]='(allDocumentsUploaded && promotersData.length > 0) ? "arrowOrange" : "arrowBlack"', width='75', height='75', viewbox='0 0 70 70', fill='none', xmlns='http://www.w3.org/2000/svg')
+            path(d='M37.8195 19.8857L34.4416 23.1763L47.6226 36.4212H18.9219V41.1456H47.6226L34.4416 54.3101L37.8195 57.681L56.7171 38.7834L37.8195 19.8857Z')
+            path(d='M37.8189 71.8541C31.2781 71.8541 24.8842 69.9145 19.4457 66.2807C14.0073 62.6468 9.76848 57.4818 7.26543 51.4389C4.76238 45.396 4.10746 38.7466 5.38351 32.3315C6.65955 25.9163 9.80925 20.0237 14.4343 15.3986C19.0593 10.7736 24.952 7.62391 31.3671 6.34786C37.7822 5.07182 44.4317 5.72673 50.4746 8.22979C56.5175 10.7328 61.6824 14.9716 65.3163 20.4101C68.9502 25.8486 70.8898 32.2425 70.8898 38.7833C70.8798 47.5511 67.3923 55.957 61.1925 62.1568C54.9927 68.3567 46.5868 71.8441 37.8189 71.8541ZM37.8189 10.4368C32.2125 10.4368 26.732 12.0993 22.0705 15.2141C17.4089 18.3288 13.7757 22.7559 11.6302 27.9356C9.48474 33.1152 8.92338 38.8147 10.0171 44.3134C11.1109 49.812 13.8106 54.8629 17.7749 58.8272C21.7393 62.7915 26.7901 65.4913 32.2888 66.585C37.7875 67.6788 43.487 67.1174 48.6666 64.972C53.8463 62.8265 58.2734 59.1933 61.3881 54.5317C64.5029 49.8702 66.1653 44.3897 66.1653 38.7833C66.1566 31.268 63.1673 24.0631 57.8532 18.749C52.5391 13.4349 45.3342 10.4456 37.8189 10.4368Z')
+
+
+ng-template(#alert)
+    .flex-display-column.rounded(style='background: #FFFAF2;padding-left: 16px;padding-right:16px;border: none')
+        div.promotersText.mt-4.mb-3.d-flex.justify-content-center PROMOTER DETAILS
+        span.promoterBoxClose((click)="closeAddModal()") &times;
+        div.mt-3.flex-display
+            label.mr-5(for='name').labelTexts Name
+            input#name.form-control(
+                style='background: #E2E2E2; border: none; margin-left: 32px',
+                type='text',
+                [(ngModel)]= 'signatoryName',
+                placeholder='Full Name',
+                (keydown)='utilityService.onlyAlphaNumeric($event)'
+            )
+        div.mt-3.mb-3.flex-display(*ngIf='userKycData.businessType === "PartnerShip"')
+            label(for='designation', style='margin-right: 20px').labelTexts Designation
+            select#designation.form-control(
+                    [(ngModel)]='signatoryDes',
+                    style='background: #E2E2E2; border: none',
+                    (change)='setPages($event.target.value)'
+            )
+                option Partner
+                option Authorised Signatory
+        div.mt-3.mb-3.flex-display(*ngIf='userKycData.businessType === "Company"')
+            label.mr-5(for='din').labelTexts DIN
+            input#din.form-control(
+                style='background: #E2E2E2; border: none; margin-left: 53px',
+                type='text',
+                [(ngModel)]= 'signatoryDin',
+                placeholder='Din',
+            )
+        div.mb-4.flex-display.justify-content-end
+            input.continueBtn.rounded(
+                type='button',
+                (click)='closeModalOfAdd()',
+                value='Add',
+            )
+
+
+//ng-template(#uploadPanImage)
+//    sbpro-document-upload-modal((uploadData)='uploadPanData($event)', (dismissModal)= 'dismissModal()',
+//            [imgSrc] = 'imgSrc', (closeModal)='closeModal()')
+//
+//
+//ng-template(#uploadAadharFrontImage)
+//    sbpro-document-upload-modal((uploadData)='uploadAadharFrontData($event)', (dismissModal)= 'dismissModal()',
+//            [imgSrc] = 'imgSrc', (closeModal)='closeModal()')
+//
+//ng-template(#uploadAadharBackImage)
+//    sbpro-document-upload-modal((uploadData)='uploadAadharBackData($event)', (dismissModal)= 'dismissModal()',
+//            [imgSrc] = 'imgSrc', (closeModal)='closeModal()')

@@ -1,0 +1,143 @@
+.row
+  .col-xl-4.col-md-6.mb-4
+    .dashboard-card.pt-3.pb-3.pl-4.pr-4(*ngIf='loadingNumTransactions')
+      ngx-skeleton-loader(count='1', [theme]='{ height: "20px", width: "100px" }')
+      ngx-skeleton-loader(count='1', [theme]='{ height: "20px" }')
+    .card.border-top-0.border-bottom-0.border-right-0.border-left-lg.h-100(
+      style='border-left-color: #09B261',
+      *ngIf='!loadingNumTransactions'
+    )
+      .card-body(*ngIf = 'allBanks',style='background: #FFFBF4;')
+        .d-flex.align-items-center
+          .flex-grow-1
+            .small.font-weight-bold.mb-1(style='color: #09B261;font-size: 16px') {{connectedBanking ? "Total Number of Deposits" : "Total Number of Deposits" }}
+            .p(style='color: #09B261;font-weight: bold;font-size: 26px;') {{ numTransactions }}
+      .card-body(*ngIf = '!allBanks',style='background: #FFFBF4;')
+        .d-flex.align-items-center
+          .flex-grow-1
+            .small.font-weight-bold.mb-1(style='color: #09B261;font-size: 16px') {{connectedBanking ? "Number of Deposits" : "Number of Inward Deposits" }}
+            .p(style='color: #09B261;font-weight: bold;font-size: 26px;') {{ numTransactions }}
+
+  .col-xl-4.col-md-6.mb-4
+    .dashboard-card.pt-3.pb-3.pl-4.pr-4(*ngIf='loadingTransactionAmount')
+      ngx-skeleton-loader(count='1', [theme]='{ height: "20px", width: "100px" }')
+      ngx-skeleton-loader(count='1', [theme]='{ height: "20px" }')
+    .card.border-top-0.border-bottom-0.border-right-0.border-left-lg.h-100(
+      style='border-left-color: #09B261',
+      *ngIf='!loadingTransactionAmount'
+    )
+      .card-body(*ngIf = 'allBanks',style='background: #FFFBF4;')
+        .d-flex.align-items-center
+          .flex-grow-1
+            .small.font-weight-bold.mb-1(style='color: #09B261;font-size: 16px') {{connectedBanking ? "Total Amount of Deposits" :"Total Amount of Deposits"}}
+            .p(style='color: #09B261;font-weight: bold;font-size: 26px;') {{ transactionAmount }}
+      .card-body(*ngIf = '!allBanks',style='background: #FFFBF4;')
+        .d-flex.align-items-center
+          .flex-grow-1
+            .small.font-weight-bold.mb-1(style='color: #09B261;font-size: 16px') {{connectedBanking ? "Amount of Deposits" :"Amount of Inward Deposits"}}
+            .p(style='color: #09B261;font-weight: bold;font-size: 26px;') {{ transactionAmount }}
+  .col-xl-4.col-md-6.mb-4(*ngIf='isAdmin')
+    .dashboard-card.pt-3.pb-3.pl-4.pr-4(*ngIf='loadingTransactionAmount')
+      ngx-skeleton-loader(count='1', [theme]='{ height: "20px", width: "100px" }')
+      ngx-skeleton-loader(count='1', [theme]='{ height: "20px" }')
+    .card.border-top-0.border-bottom-0.border-right-0.border-left-lg.h-100(
+      style='border-left-color: #09B261',
+      *ngIf='!loadingTransactionAmount'
+    )
+      .card-body(style='background: #FFFBF4;')
+        .d-flex.align-items-center
+          .flex-grow-1
+            .small.font-weight-bold.mb-1(style='color: #09B261;font-size: 16px') Avg daily deposits
+            .p(style='color: #09B261;font-weight: bold;font-size: 26px;') {{ averageTransactionAmount }}
+
+  .col-xl-4.col-md-6.mb-4
+    .dashboard-card.pt-3.pb-3.pl-4.pr-4(*ngIf='loadingNumTransfers')
+      ngx-skeleton-loader(count='1', [theme]='{ height: "20px", width: "100px" }')
+      ngx-skeleton-loader(count='1', [theme]='{ height: "20px" }')
+    .card.border-top-0.border-bottom-0.border-right-0.border-left-lg.h-100(
+      style='border-left-color: #E41144',
+      *ngIf='!loadingNumTransfers'
+    )
+      .card-body(*ngIf = 'allBanks', style='background: #FFFBF4;')
+        .d-flex.align-items-center
+          .flex-grow-1
+            .small.font-weight-bold.mb-1(style='color: #FF5F6D;font-size: 16px') {{connectedBanking ? "Total Number of Transfers" : "Total Number of Transfers"}}
+            .p(style='color: #FF5F6D;font-weight: bold;font-size: 26px;') {{ numTransfers }}
+      .card-body(*ngIf = '!allBanks', style='background: #FFFBF4;')
+        .d-flex.align-items-center
+          .flex-grow-1
+            .small.font-weight-bold.mb-1(style='color: #FF5F6D;font-size: 16px') {{connectedBanking ? "Number of Transfers" : "Number of Outward Transfers"}}
+            .p(style='color: #FF5F6D;font-weight: bold;font-size: 26px;') {{ numTransfers }}
+  .col-xl-4.col-md-6.mb-4
+    .dashboard-card.pt-3.pb-3.pl-4.pr-4(*ngIf='loadingTransferAmount')
+      ngx-skeleton-loader(count='1', [theme]='{ height: "20px", width: "100px" }')
+      ngx-skeleton-loader(count='1', [theme]='{ height: "20px" }')
+    .card.border-top-0.border-bottom-0.border-right-0.border-left-lg.h-100(
+      style='border-left-color: #E41144',
+      *ngIf='!loadingTransferAmount'
+    )
+      .card-body(*ngIf = 'allBanks', style='background: #FFFBF4;')
+        .d-flex.align-items-center
+          .flex-grow-1
+            .small.font-weight-bold.mb-1(style='color: #FF5F6D;font-size: 16px') {{connectedBanking ? "Total Amount of Transfers" : "Total Amount of Transfers"}}
+            .p(style='color: #FF5F6D;font-weight: bold;font-size: 26px;') {{ transferAmount }}
+      .card-body(*ngIf = '!allBanks', style='background: #FFFBF4;')
+        .d-flex.align-items-center
+          .flex-grow-1
+            .small.font-weight-bold.mb-1(style='color: #FF5F6D;font-size: 16px') {{connectedBanking ? "Amount of Transfers" : "Amount of Outward Transfers"}}
+            .p(style='color: #FF5F6D;font-weight: bold;font-size: 26px;') {{ transferAmount }}
+  .col-xl-4.col-md-6.mb-4(*ngIf='isAdmin')
+    .dashboard-card.pt-3.pb-3.pl-4.pr-4(*ngIf='loadingAverageTransferAmount')
+      ngx-skeleton-loader(count='1', [theme]='{ height: "20px", width: "100px" }')
+      ngx-skeleton-loader(count='1', [theme]='{ height: "20px" }')
+    .card.border-top-0.border-bottom-0.border-right-0.border-left-lg.h-100(
+      style='border-left-color: #E41144',
+      *ngIf='!loadingAverageTransferAmount'
+    )
+      .card-body(style='background: #FFFBF4;')
+        .d-flex.align-items-center
+          .flex-grow-1
+            .small.font-weight-bold.mb-1(style='color: #FF5F6D;font-size: 16px') Avg daily transfers
+            .p(style='color: #FF5F6D;font-weight: bold;font-size: 26px;') {{ averageTransferAmount }}
+
+  .col-xl-4.col-md-6.mb-4(*ngIf='isAdmin')
+    .dashboard-card.pt-3.pb-3.pl-4.pr-4(*ngIf='loadingMerchantCount')
+      ngx-skeleton-loader(count='1', [theme]='{ height: "20px", width: "100px" }')
+      ngx-skeleton-loader(count='1', [theme]='{ height: "20px" }')
+    .card.border-top-0.border-bottom-0.border-right-0.border-left-lg.h-100(
+      style='border-left-color: #fa8602',
+      *ngIf='!loadingMerchantCount'
+    )
+      .card-body(style='background: #FFFBF4;')
+        .d-flex.align-items-center
+          .flex-grow-1
+            .small.font-weight-bold.mb-1(style='color: #fa8602;font-size: 16px') No. of Merchants onboarded
+            .p(style='color: #fa8602;font-weight: bold;font-size: 26px;') {{ merchantCount }}
+
+  .col-xl-4.col-md-6.mb-4(*ngIf='isAdmin')
+    .dashboard-card.pt-3.pb-3.pl-4.pr-4(*ngIf='loadingTotalBilledAmount')
+      ngx-skeleton-loader(count='1', [theme]='{ height: "20px", width: "100px" }')
+      ngx-skeleton-loader(count='1', [theme]='{ height: "20px" }')
+    .card.border-top-0.border-bottom-0.border-right-0.border-left-lg.h-100(
+      style='border-left-color: #fa8602',
+      *ngIf='!loadingTotalBilledAmount'
+    )
+      .card-body(style='background: #FFFBF4;')
+        .d-flex.align-items-center
+          .flex-grow-1
+            .small.font-weight-bold.mb-1(style='color: #fa8602;font-size: 16px') Total Billing Amount
+            .p(style='color: #fa8602;font-weight: bold;font-size: 26px;') {{ totalBilledAmount }}
+
+  .col-xl-4.col-md-6.mb-4(*ngIf='isAdmin')
+    .dashboard-card.pt-3.pb-3.pl-4.pr-4(*ngIf='loadingAverageDailyBalance')
+      ngx-skeleton-loader(count='1', [theme]='{ height: "20px", width: "100px" }')
+      ngx-skeleton-loader(count='1', [theme]='{ height: "20px" }')
+    .card.border-top-0.border-bottom-0.border-right-0.border-left-lg.h-100(
+      style='border-left-color: #fa8602',
+      *ngIf='!loadingAverageDailyBalance'
+    )
+      .card-body(style='background: #FFFBF4;')
+        .d-flex.align-items-center
+          .flex-grow-1
+            .small.font-weight-bold.mb-1(style='color: #fa8602;font-size: 16px') Avg Daily Balance
+            .p(style='color: #fa8602;font-weight: bold;font-size: 26px;') {{ averageDailyBalance }}

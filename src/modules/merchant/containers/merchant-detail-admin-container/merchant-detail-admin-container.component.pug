@@ -1,0 +1,96 @@
+.flex-container
+  sbpro-dashboard-head(
+    icon='book',
+    title='Merchant Details',
+    description='Merchant Details.'
+  )
+  .container-fluid.mt-n10.responsiveForm
+    sbpro-card-navigation(
+      sbproTocItem='Tabs',
+      [navNames]='getTabNames(roles)',
+      [templates]='isMerchantAuthorizer ? [basic, profile, doc, Escrows, bankAccounts, Payees, parties, Team, authorizer] : isTrustee ? [basic, profile, doc, Escrows, bankAccounts, Payees, parties, Team, authorizer] : isSuperAdminViewer ? [basic, profile, doc, Bank, Escrows, bankAccounts, Payees, parties, Team, fees, invoices, authorizer] : [basic, profile, doc, Bank, Escrows, bankAccounts, Payees, parties, Team, fees, invoices, authorizer, Settings]',
+      [headerButtons]='[4]',
+      (eventEmitterRefresh)='refresh($event)',
+      (eventEmitterToggle)='toggle($event)'
+    )
+      ng-template(#basic)
+        sbpro-merchant-basic-detail(
+          [merchantId]='merchantId',
+          [editMode]='false',
+          [readOnly]='readOnly',
+          (emitMerchantName)='setMerchantName($event)',
+          (emitMerchantId)='setMerchantId($event)'
+        )
+      ng-template(#profile)
+        sbpro-profile-basic-details(
+          [merchantId]='merchantId',
+          (emitBusinessType)='setBusinessType($event)',
+          [businessType]='businessType',
+          [editMode]='false',
+          [readOnly]='readOnly'
+        )
+      ng-template(#doc)
+        sbpro-profile-document(
+          [merchantId]='merchantId',
+          (emitAllDocumentsUploaded)='setAllDocumentsUploaded($event)',
+          [businessType]='businessType',
+          [readOnly]='readOnly'
+        )
+      ng-template(#Bank)
+        sbpro-profile-bank-details(
+          [merchantId]='merchantId',
+          [editMode]='false',
+          [readOnly]='readOnly'
+        )
+      ng-template(#Escrows)
+        sbpro-all-accounts.card-body.flex-container.align-self-stretch(
+          [merchantId]='merchantId',
+          [readOnly]='readOnly'
+        )
+      ng-template(#bankAccounts)
+        sbpro-bank-account(
+          [hideHeader] = 'true',
+          [merchantId]='merchantId',
+          [readOnly]='readOnly'
+        )
+      ng-template(#Payees)
+        sbpro-payee-list(
+          [pageSize]='5',
+          [merchantId]='merchantId',
+          [readOnly]='readOnly'
+        )
+      ng-template(#parties)
+        sbpro-parties-list(
+          [merchantId]='merchantId',
+          [editMode]='false',
+          [readOnly]='readOnly'
+        )
+      ng-template(#Team)
+        sbpro-manage-team(
+          [merchantId]='merchantId',
+          [isAdmin]='true',
+          [readOnly]='readOnly'
+        )
+
+      ng-template(#invoices)
+        sbpro-list(
+          [merchantId]='merchantId',
+          [editMode]='true',
+          [readOnly]='readOnly'
+        )
+
+      ng-template(#fees)
+        sbpro-merchant-invioce-details(
+          [merchantId]='merchantId',
+          [editMode]='true',
+          [readOnly]='readOnly'
+        )
+      ng-template(#authorizer)
+        sbpro-authorizers([merchantId]='merchantId', [readOnly]='readOnly')
+      ng-template(#Settings)
+        sbpro-merchant-settings(
+          [merchantId]='merchantId',
+          [merchantEmail]='merchantEmail',
+          [merchantName]='merchantName',
+          [readOnly]='readOnly'
+        )

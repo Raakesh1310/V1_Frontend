@@ -1,0 +1,18 @@
+.page-header.page-header-dark.bg-gradient-primary-to-secondary(
+    [ngClass]='{"pb-10":!simplified, "page-header-dark": !light, "page-header-light bg-white shadow": light}',
+    style="background: #417505"
+)
+    .container-fluid
+        .page-header-content
+            h1.page-header-title.mr-5
+                .page-header-icon
+                    i-feather(
+                        *ngIf='icon',
+                        [name]='icon'
+                    )
+                span {{title}}
+            .page-header-subtitle
+                | {{description}}
+               
+
+            sb-breadcrumbs(*ngIf='breadcrumbs')

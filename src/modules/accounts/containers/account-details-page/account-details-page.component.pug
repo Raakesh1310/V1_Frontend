@@ -1,0 +1,61 @@
+.flex-container
+  sbpro-dashboard-head(
+    icon='book',
+    title='Escrow Details',
+    description='Escrow Details.'
+  )
+  .container-fluid.mt-n10.responsiveForm
+    sbpro-card-navigation(
+      sbproTocItem='Tabs',
+      [navNames]='navNames',
+      [templates]=' !isTesting && isSAValid(selectedBank) && sourceAccountValidation? [account, payee, document, statements,sourceaccount] : !isTesting? [account, payee, document, statements] : isTesting && isSAValid(selectedBank) && sourceAccountValidation? [account, payee, document, statements, deposit,sourceaccount] : [account, payee, document, statements, deposit]'
+    )
+      ng-template(#account)
+        sbpro-account-detail(
+          [accountId]='accountId',
+          [merchantId]='merchantId'
+          [draftPayees]='draftPayees',
+          [draftShareUnit]='draftShareUnit',
+          [isAutoTransfer]='isAutoTransfer',
+          (emitShareUnit)='setDraftShareUnit($event)',
+          (emitDraftPayee)='setdraftPayees($event)',
+          (emitUndraftPayee)='unsetdraftPayees($event)',
+          (emitRetention)='setRetention($event)',
+          (emitRetentionAmount)='setRetentionAmount($event)',
+          (emitAutoTransfer)='toggleAutoTransfer($event)',
+          (emitAutoTransferType)='setAutoTransferType($event)',
+          (emitScheduledAt)='setScheduledAt($event)',
+          (emitSelectedBank)='setSelectedBank($event)'
+        )
+      ng-template(#payee)
+        sbpro-account-payee-form(
+          [accountId]='accountId',
+          [viewMode]='true',
+          [readOnly]='readOnly',
+          [selectedBank]='selectedBank',
+          [draftPayees]='draftPayees',
+          [draftShareUnit]='draftShareUnit',
+          (emitDraftPayee)='setdraftPayees($event)',
+          (emitUndraftPayee)='unsetdraftPayees($event)',
+          (emitRetention)='setRetention($event)',
+          (emitRetentionAmount)='setRetentionAmount($event)',
+          [isRetentionChecked]='retention',
+          [retentionAmount]='retentionAmount',
+          [merchantId]='merchantId',
+          [isAutoTransfer]='isAutoTransfer',
+          [autoTransferType]='autoTransferType',
+          [autoScheduledAt]='autoScheduledAt',
+          (emitAutoTransfer)='toggleAutoTransfer($event)',
+        )
+      ng-template(#document)
+        sbpro-account-document-form(
+          [accountId]='accountId',
+          [readOnly]='readOnly',
+          [viewMode]='true'
+        )
+      ng-template(#statements)
+        sbpro-statement-list([accountId]='accountId')
+      ng-template(#deposit)
+        sbpro-account-deposit([accountId]='accountId')
+      ng-template(#sourceaccount)
+        sbpro-account-source-validation([accountId] = 'accountId',[selectedBank]='selectedBank',)

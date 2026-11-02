@@ -1,0 +1,22 @@
+div(*ngIf='errors.length > 0')
+  sbpro-alert(classes='alert-danger', [dismissable]='true')
+    | {{ errors[0] }}
+form([formGroup]='helpForm')
+  .form-group
+    label(for='exampleSolidFormControlSelect1') Nature of your Request
+    select#exampleSolidFormControlSelect1.form-control.form-control-solid(
+      formControlName='nature'
+    )
+      option(*ngFor='let n of natures; let i = index') {{ n }}
+  .form-group
+    label(for='exampleSolidFormControlTextarea1') Message
+    textarea#exampleSolidFormControlTextarea1.form-control.form-control-solid(
+      formControlName='message',
+      rows='3'
+    )
+
+  .form-group
+    sbpro-file-upload((fileChanged)='fileChangedHandler($event)')
+
+  .form-group
+    button.btn.btn-primary((click)='onSubmit()') Submit

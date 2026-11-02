@@ -1,0 +1,149 @@
+sbpro-card([headerActions]='true')
+  .card-body
+    div(*ngIf='errors.length > 0')
+      sbpro-alert(classes='alert-danger', [dismissable]='true')
+        | {{ errors[0] }}
+
+    // //////////////////////////////
+    // PAGE 1 (Mandatory detail page)
+    // //////////////////////////////
+
+    form(*ngIf='currentPage === 1')
+      h2 Escrow Detail
+      hr
+
+      .form-group
+        label(for='label') Page Title
+        span.text-danger *
+        input#title.form-control.form-control-sm(
+          type='text',
+          placeholder='Enter your page title',
+          [(ngModel)]='pageTitle',
+          (change)='detectTitleChange($event)',
+          [ngModelOptions]='{ standalone: true }'
+        )
+
+      //- .form-group
+      //-   label(for='frm-cntrl-amount') Escrow
+      //-   span.text-danger *
+      //-   ng-select(
+      //-     [items]='accounts',
+      //-     bindLabel='name',
+      //-     [(ngModel)]='selectedEscrow',
+      //-     loadingText='Loading...',
+      //-     placeholder='Select Escrow',
+      //-     (change)='detectChanges()',
+      //-     [disabled]='submitted',
+      //-     name='account',
+      //-     (search)='fetchEscrow($event)'
+      //-   )
+      //-     ng-template(ng-label-tmp='', let-item='item')
+      //-       span(*ngIf='selectedEscrow') {{ utilityService.firstCapitalize(item.name) }} &nbsp;
+      //-         span.fader - {{ item.accountId }}
+      //-     ng-template(
+      //-       ng-option-tmp='',
+      //-       let-item='item',
+      //-       let-search='searchTerm',
+      //-       let-index='index'
+      //-     )
+      //-       span.sup-option {{ utilityService.firstCapitalize(item.name) }}
+      //-       br
+      //-       span.sub-option {{ item.accountId }}
+      .form-group
+        label.small.mb-1(for='accounts') Escrows
+        span.text-danger *
+        angular2-multiselect#accounts(
+          [data]='dropdownList',
+          [(ngModel)]='selectedItems',
+          [settings]='dropdownSettings',
+          name='something'
+        )
+      .table-responsive.pp-table-container
+        br
+        br
+        table.table
+          thead
+            tr
+              th(scope='col')
+                span Escrow Name
+              th(scope='col')
+                span Escrow ID
+              th(scope='col')
+                span Escrow IFSC
+              th(scope='col')
+
+          tbody
+            //- tr
+              //- td
+              //-   span(*ngIf='selectedEscrow') {{ businessName }}
+              //-   span(*ngIf='!selectedEscrow') --
+              //- td
+              //-   span(*ngIf='selectedEscrow') {{ selectedEscrow.accountId }}
+              //-   span(*ngIf='!selectedEscrow') --
+              //- td
+              //-   span(*ngIf='selectedEscrow') {{ selectedEscrow.ifsc }}
+              //-   span(*ngIf='!selectedEscrow') --
+            tr(*ngFor='let account of selectedItems')
+              th(scope='col')
+                span {{ account.name }}
+              th(scope='col')
+                span {{ account.bankAccount }}
+              th(scope='col')
+                span {{ account.ifsc }}
+              th(scope='col')
+
+      sbpro-app-button(
+        (click)='submitAccount()',
+        [loading]='submitting',
+        text='Next',
+        loadingText='Generating Template',
+        [btnClass]='{ "btn-block": false, "btn-primary": true, "float-right": true }'
+      )
+
+    // ////////////////////////////
+    // PAGE 2 (Product detail page)
+    // ////////////////////////////
+
+    form(*ngIf='currentPage === 2')
+      // escrow page field template container
+      ng-template(#viewContainer)
+      br
+      // buttons
+      .form-group
+        button.btn.castlerButtonColor((click)='previousView()', type='button') Back
+        sbpro-app-button(
+          (click)='submitPage(1)',
+          [loading]='submitting',
+          text='Next',
+          loadingText='Generating Form',
+          [btnClass]='{ "btn-block": false, "btn-primary": true, "float-right": true }'
+        )
+
+    // /////////////////////////////
+    // PAGE 3 (Customer detail page)
+    // /////////////////////////////
+
+    form(*ngIf='currentPage === 3')
+      // escrow page field template container
+      ng-template(#viewContainer)
+      br
+      // buttons
+      .form-group
+        button.btn.castlerButtonColor((click)='previousView()') Back
+        sbpro-app-button(
+          (click)='submitLastPage(2)',
+          [loading]='submitting',
+          text='Preview',
+          loadingText='Generating Preview',
+          [btnClass]='{ "btn-block": false, "btn-primary": true, "float-right": true }'
+        )
+
+ng-template(#infoMessage)
+  .card-header.modal-header.logoColor Information Message
+  .card-body
+    | Please mail us at info@castler.com to enable payments via escrow pages.
+  .card-footer
+    button.btn.float-right(
+      (click)='closeModal()',
+      style='border-color: #bc8e32;color: #417505; border-width: 2px'
+    ) Exit

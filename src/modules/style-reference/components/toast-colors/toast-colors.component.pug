@@ -1,0 +1,178 @@
+sbpro-card
+    .card-header Toast Colors
+    .card-body
+        h6.small.text-muted.font-weight-500 Text Color Modification:
+        .sbp-preview.mb-4
+            .sbp-preview-content
+
+                sbpro-toast(
+                    [header]='toastTextPrimary',
+                    body='This toast uses the primary text utility on the toast header.',
+                    headerClasses='text-primary'
+                )
+                sbpro-toast(
+                    [header]='toastTextSecondary',
+                    body='This toast uses the secondary text utility on the toast header.',
+                    headerClasses='text-secondary'
+                )
+                sbpro-toast(
+                    [header]='toastTextSuccess',
+                    body='This toast uses the success text utility on the toast header.',
+                    headerClasses='text-success'
+                )
+                sbpro-toast(
+                    [header]='toastTextInfo',
+                    body='This toast uses the info text utility on the toast header.',
+                    headerClasses='text-info'
+                )
+                sbpro-toast(
+                    [header]='toastTextWarning',
+                    body='This toast uses the warning text utility on the toast header.',
+                    headerClasses='text-warning'
+                )
+                sbpro-toast(
+                    [header]='toastTextDanger',
+                    body='This toast uses the danger text utility on the toast header.',
+                    headerClasses='text-danger'
+                )
+
+            .sbp-preview-code
+                sbpro-code-sample(
+                    [codeSamples]='codeSamples',
+                )
+
+            .sbp-preview-text.
+                The above examples use a different text color utility class on the toast header to add another level of
+                context and emphasis to toast notifications.
+                You can use any of the text color utilities available with Bootstrap or with the SB Admin Pro theme!
+                    
+        h6.small.text-muted.font-weight-500 Background Color Modification:
+        .sbp-preview.mb-4
+            .sbp-preview-content
+
+                sbpro-toast(
+                    [header]='toastTextPrimaryWhite',
+                    body='This toast uses the primary text utility on the toast header.',
+                    headerClasses='bg-primary text-white'
+                )
+                sbpro-toast(
+                    [header]='toastTextSecondaryWhite',
+                    body='This toast uses the secondary text utility on the toast header.',
+                    headerClasses='bg-secondary text-white'
+                )
+                sbpro-toast(
+                    [header]='toastTextSuccessWhite',
+                    body='This toast uses the success text utility on the toast header.',
+                    headerClasses='bg-success text-white'
+                )
+                sbpro-toast(
+                    [header]='toastTextInfoWhite',
+                    body='This toast uses the info text utility on the toast header.',
+                    headerClasses='bg-info text-white'
+                )
+                sbpro-toast(
+                    [header]='toastTextWarningWhite',
+                    body='This toast uses the warning text utility on the toast header.',
+                    headerClasses='bg-warning text-white'
+                )
+                sbpro-toast(
+                    [header]='toastTextDangerWhite',
+                    body='This toast uses the danger text utility on the toast header.',
+                    headerClasses='bg-danger text-white'
+                )
+
+            .sbp-preview-code
+                sbpro-code-sample(
+                    [codeSamples]='codeSamplesBackground',
+                )
+
+            .sbp-preview-text.
+                The above examples use a combination of background color utilities and text color utilities on the toast header
+                to add another level of context and emphasis to toast notifications.
+                You can use any combination of the background color or text color utilities available with Bootstrap or with the SB Admin Pro theme!
+
+// Header Text Templates
+ng-template(#toastTextPrimary)
+    i(data-feather='alert-circle').mr-2
+    strong.mr-auto Primary Text Toast
+    small.text-muted.ml-2 just now
+    button.ml-2.mb-1.close(type='button', data-dismiss='toast', aria-label='Close')
+        span(aria-hidden='true') ×
+
+ng-template(#toastTextSecondary)
+    i(data-feather='alert-circle').mr-2
+    strong.mr-auto Secondary Text Toast
+    small.text-muted.ml-2 just now
+    button.ml-2.mb-1.close(type='button', data-dismiss='toast', aria-label='Close')
+        span(aria-hidden='true') ×
+
+ng-template(#toastTextSuccess)
+    i(data-feather='alert-circle').mr-2
+    strong.mr-auto Success Text Toast
+    small.text-muted.ml-2 just now
+    button.ml-2.mb-1.close(type='button', data-dismiss='toast', aria-label='Close')
+        span(aria-hidden='true') ×
+
+ng-template(#toastTextInfo)
+    i(data-feather='alert-circle').mr-2
+    strong.mr-auto Info Text Toast
+    small.text-muted.ml-2 just now
+    button.ml-2.mb-1.close(type='button', data-dismiss='toast', aria-label='Close')
+        span(aria-hidden='true') ×
+
+ng-template(#toastTextWarning)
+    i(data-feather='alert-circle').mr-2
+    strong.mr-auto Warning Text Toast
+    small.text-muted.ml-2 just now
+    button.ml-2.mb-1.close(type='button', data-dismiss='toast', aria-label='Close')
+        span(aria-hidden='true') ×
+
+ng-template(#toastTextDanger)
+    i(data-feather='alert-circle').mr-2
+    strong.mr-auto Danger Text Toast
+    small.text-muted.ml-2 just now
+    button.ml-2.mb-1.close(type='button', data-dismiss='toast', aria-label='Close')
+        span(aria-hidden='true') ×
+
+// Header Background Templates
+ng-template(#toastTextPrimaryWhite)
+    i(data-feather='alert-circle').mr-2.text-white-50
+    strong.mr-auto Primary Background Toast
+    small.text-muted.ml-2.text-white-50 just now
+    button.ml-2.mb-1.close.text-white(type='button', data-dismiss='toast', aria-label='Close')
+        span(aria-hidden='true') ×
+
+ng-template(#toastTextSecondaryWhite)
+    i(data-feather='alert-circle').mr-2.text-white-50
+    strong.mr-auto Secondary Background Toast
+    small.text-muted.ml-2.text-white-50 just now
+    button.ml-2.mb-1.close.text-white(type='button', data-dismiss='toast', aria-label='Close')
+        span(aria-hidden='true') ×
+
+ng-template(#toastTextSuccessWhite)
+    i(data-feather='alert-circle').mr-2.text-white-50
+    strong.mr-auto Success Background Toast
+    small.text-muted.ml-2.text-white-50 just now
+    button.ml-2.mb-1.close.text-white(type='button', data-dismiss='toast', aria-label='Close')
+        span(aria-hidden='true') ×
+
+ng-template(#toastTextInfoWhite)
+    i(data-feather='alert-circle').mr-2.text-white-50
+    strong.mr-auto Info Background Toast
+    small.text-muted.ml-2.text-white-50 just now
+    button.ml-2.mb-1.close.text-white(type='button', data-dismiss='toast', aria-label='Close')
+        span(aria-hidden='true') ×
+
+ng-template(#toastTextWarningWhite)
+    i(data-feather='alert-circle').mr-2.text-white-50
+    strong.mr-auto Warning Background Toast
+    small.text-muted.ml-2.text-white-50 just now
+    button.ml-2.mb-1.close.text-white(type='button', data-dismiss='toast', aria-label='Close')
+        span(aria-hidden='true') ×
+
+ng-template(#toastTextDangerWhite)
+    i(data-feather='alert-circle').mr-2.text-white-50
+    strong.mr-auto Danger Background Toast
+    small.text-muted.ml-2.text-white-50 just now
+    button.ml-2.mb-1.close.text-white(type='button', data-dismiss='toast', aria-label='Close')
+        span(aria-hidden='true') ×

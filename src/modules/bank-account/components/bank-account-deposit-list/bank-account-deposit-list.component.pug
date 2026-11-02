@@ -1,0 +1,178 @@
+sbpro-card([headerActions]="true")
+  .card-header.logoColor
+    | List of Deposits
+    div
+      span.mr-2
+        .spinner-border.spinner-border-sm.mr-1(
+          role="status",
+          aria-hidden="true",
+          *ngIf="loadingList$ | async"
+        )
+        button.btn.btn-icon.btn-xs.castlerButtonColor((click)="refreshData()")
+          i-feather(name="refresh-cw")
+
+        //- button.btn.btn-icon.btn-xs.mr-2.castlerButtonColor(
+        //-   (click)="toggleFilters()"
+        //- )
+        //-   i-feather(name="filter")
+
+  .card-body.flex-container.align-self-stretch
+    div
+      form.pb-2(*ngIf="filtersVisible")
+        .d-flex.mb-2
+          input#search-box.mt-1.form-control.w-100.mr-2(
+            placement="top",
+            ngbPopover="Search by Account Number, Description",
+            type="text",
+            name="s",
+            autocomplete="off",
+            placeholder="Search by Account Number, Description",
+            [(ngModel)]="bankaccountdepositService.searchTerm"
+          )
+
+          select#statusList.mt-1.form-control.w-25.mr-2(
+              name='Bank',
+              [(ngModel)]='bankaccountdepositService.bank'
+          )
+              option(value='') Select Bank
+              option(*ngFor='let st of banks', [ngValue]='st') {{ st }}
+
+          input#start-date.mt-1.form-control.w-25.mr-2(
+            type="text",
+            name="sd",
+            placeholder="Start Date",
+            autocomplete="off",
+            ngbDatepicker,
+            outsideDays="hidden",
+            #sd="ngbDatepicker",
+            (click)="sd.toggle()",
+            [(ngModel)]="bankaccountdepositService.dateFrom",
+            [minDate]="bankaccountdepositService.dateFromMin",
+            [maxDate]="bankaccountdepositService.dateFromMax"
+          )
+          input#end-date.mt-1.form-control.w-25.mr-2(
+            type="text",
+            name="ed",
+            placeholder="End Date",
+            autocomplete="off",
+            ngbDatepicker,
+            outsideDays="hidden",
+            #ed="ngbDatepicker",
+            (click)="ed.toggle()",
+            [(ngModel)]="bankaccountdepositService.dateTo",
+            [minDate]="bankaccountdepositService.dateToMin",
+            [maxDate]="bankaccountdepositService.dateToMax"
+          )
+          button.btn.mr-2.ws-wrap.mt-1.mb-1.castlerButtonColor(
+            type="submit",
+            (click)="submitSearchForm()"
+          )
+            fa-icon.d-flex.flex-row.align-items-center(
+              [icon]="['fas', 'search']"
+            )
+          button.btn.btn-link.mr-2.logoColor(
+            type="button",
+            (click)="clearSearchForm()"
+          ) Clear
+        //-   .justify-content-end 
+        //-     a.btn.btn-success.mt-1.mb-1.mr-2.ws-nowrap.btn-icon(
+        //-       type="button",
+        //-       target="_blank",
+        //-       [href]="transactionService.reportDownloadLink$ | async"
+        //-     )
+        //-       fa-icon.d-flex.flex-row.align-items-center(
+        //-         [icon]="['fas', 'arrow-down']"
+        //-       )
+        .d-flex(*ngIf="(deposits$ | async)?.length > 0") 
+          .flex-row
+            small.mb-2.mt-2 Showing {{ (bankaccountdepositService.page - 1) * 10 + 1 }} to {{ (bankaccountdepositService.page - 1) * 10 + (deposits$ | async)?.length }} of {{ total$ | async }}
+    .table-responsive.pp-table-container.align-self-stretch.flex-grow-1.flex-stretch-1.table-striped(
+      *ngIf="(deposits$ | async)?.length > 0 && !(loadingList$ | async)"
+    )
+      table.table
+        thead
+          tr
+            th.th-sticky-top(
+              *ngIf="isSuperAdmin",
+              scope="col",
+              sbSortable="event",
+              (sort)="onSort($event)"
+            )
+              span.ws-nowrap Merchant Name
+            th.th-sticky-top(
+              scope="col",
+              sbSortable="event",
+              (sort)="onSort($event)"
+            )
+              span.ws-nowrap Date
+            th.th-sticky-top(
+              scope="col",
+              sbSortable="event",
+              (sort)="onSort($event)"
+            )
+              span.ws-nowrap Account Number
+            th.th-sticky-top(
+              scope="col",
+              sbSortable="event",
+              (sort)="onSort($event)"
+            )
+              span.ws-nowrap Bank
+            th.th-sticky-top(scope="col", sbSortable="time", (sort)="onSort($event)")
+              span Description
+            th.th-sticky-top(scope="col", sbSortable="time", (sort)="onSort($event)")
+              span Amount
+        tbody
+          tr(*ngFor="let transaction of deposits$ | async")
+            td(*ngIf="isSuperAdmin")
+              a.nav-link.p-0.tableClickEntryColor(
+                href="javascript:void(0);",
+                (click)="openDetails(transaction.merchantId)"
+              )
+                ngb-highlight(
+                  [result]="transaction.merchantName",
+                  [term]="bankaccountdepositService.searchTerm"
+                )
+            td
+              ngb-highlight(
+                [result]="getParsedDate(transaction.depositDate)",
+                [term]="bankaccountdepositService.searchTerm"
+              )
+            td
+              ngb-highlight(
+                [result]="transaction.bankAccountNo",
+                [term]="bankaccountdepositService.searchTerm"
+              )
+            td
+              ngb-highlight(
+                [result]="capitalizeBankName(transaction.bankName)",
+                [term]="bankaccountdepositService.searchTerm"
+              )
+            td
+              ngb-highlight(
+                [result]="transaction.description",
+                [term]="bankaccountdepositService.searchTerm"
+              )
+            td
+              ngb-highlight(
+                [result]="toINR(transaction.amount)",
+                [term]="bankaccountdepositService.searchTerm"
+              )
+    .flex-container.flex-row(
+      *ngIf="(deposits$ | async)?.length <= 0 && !(loadingList$ | async)"
+    )
+      .align-self-center No Data available
+    .flex-container.flex-row(*ngIf="loadingList$ | async")
+      .align-self-center Please wait...
+    .d-flex.justify-content-between.pt-2.align-self-end(
+      *ngIf="(deposits$ | async)?.length > 0 && !(loadingList$ | async)"
+    )
+      ngb-pagination(
+        [collectionSize]="total$ | async",
+        [(page)]="bankaccountdepositService.page",
+        [maxSize]="5",
+        [rotate]="true",
+        [ellipses]="false",
+        [boundaryLinks]="true"
+      )
+ngx-spinner
+  p(style="font-size: 20px; color: white") Processing. Please wait...

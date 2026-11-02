@@ -1,0 +1,34 @@
+sbpro-dashboard-head(
+  icon='send',
+  title='Transfer',
+  description='Create a new Transfer Entry'
+)
+.container-fluid.mt-n10.responsiveForm
+  .row
+    .col-lg-12
+      sbpro-card
+        .card-header(class='logoColor') Fund Transfer
+        .card-body
+          .row.mb-3.pb-1(*ngIf='merchantProfile?.upiPayoutEnabled')
+            .col-sm-4
+              label
+              input.mr-3(
+                type='radio',
+                (change) = 'updateSelection("toBankAccount")',
+                [(ngModel)]='transferNormal',
+                [value]='true'
+              )
+              | To Bank Account 
+            .col-sm-4
+              label 
+              input.mr-3(
+                type='radio',
+                (change) = 'updateSelection("upiTransfer")',
+                [(ngModel)]='transferNormal',
+                [value]='false'
+              )
+              | To UPI ID 
+          ng-container(*ngIf='transferNormal')
+            sbpro-transfer-new-request(sbproTocItem='Default Form Controls',[connectedBanking]= 'true')
+          ng-container(*ngIf='!transferNormal')
+            sbpro-upi-transfer(sbproTocItem='Default Form Controls', [connectedBanking]='true')

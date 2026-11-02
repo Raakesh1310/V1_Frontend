@@ -1,0 +1,112 @@
+sbpro-card#selected([headerActions]='true')
+  .card-header(class='logoColor')
+    | Challan List
+    div
+      span.mr-2
+        .spinner-border.spinner-border-sm.text-primary.mr-1(
+          role='status',
+          aria-hidden='true',
+          *ngIf='loadingList$ | async'
+        )
+        button.btn.btn-icon.btn-xs.mr-2(
+          *ngIf='!(loadingList$ | async)',
+          (click)='loadData()',
+          class='castlerButtonColor',
+        )
+          i-feather(name='refresh-cw')
+        a.btn.btn-sm.mr-2.ws-nowrap.float-right(
+          type='button',
+          target='_blank',
+          [href]='',
+          style='display:none',
+          class='castlerButtonColor',
+        )
+          fa-icon.d-flex.flex-row.align-items-center(
+            [icon]='["fas", "arrow-down"]'
+          )
+      //button.btn.btn-blue.btn-icon.btn-xs((click)='toggleFilters()')
+      //  i-feather(name='filter')
+  .card-body.flex-container.align-self-stretch
+    form.pb-2 
+      .d-flex.mb-2
+        input#search-box.mt-1.form-control.w-100.mr-2(
+          type='text',
+          name='s',
+          autocomplete='off',
+          placement='top',
+          ngbPopover='{{placeholder}}',
+          placeholder='{{placeholder}}',
+          [(ngModel)]='challanService.searchTerm'
+        )
+
+        button.btn.mr-2.ws-nowrap.mt-1(
+          type='submit',
+          class='castlerButtonColor',
+          (click)='loadData()',
+        )
+          fa-icon.d-flex.flex-row.align-items-center(
+            [icon]='["fas", "search"]'
+          )
+        button.btn.btn-link.mr-2(
+          type='button',
+          (click)='clearSearchForm()',
+          class='logoColor'
+        ) Clear
+      .d-flex(*ngIf='(challans$ | async)?.length > 0')
+          .flex-row
+            small.mb-2.mt-2 Showing {{  (page - 1)  * 10 + 1 }} to {{ (page - 1)  * 10 +  (challans$ | async)?.length  }} of {{total$ | async}}
+        
+    .table-responsive.pp-table-container.align-self-stretch.flex-grow-1.flex-stretch-1.table-striped
+      table.table
+        thead
+          tr
+            th.th-sticky-top(*ngIf='isSuperAdmin')
+              span.ws-nowrap Merchant Name
+            th.th-sticky-top
+              span.ws-nowrap URN
+            th.th-sticky-top
+              span.ws-nowrap Escrow ID
+            th.th-sticky-top
+              span.ws-nowrap Creation Date
+            th.th-sticky-top
+              span.ws-nowrap Payer Name
+            th.th-sticky-top
+              span.ws-nowrap Contact 1
+            th.th-sticky-top
+              span.ws-nowrap Amount
+            th.th-sticky-top
+              span.ws-nowrap Status
+            th.th-sticky-top
+              span.ws-nowrap Challan
+        tbody( *ngIf='(challans$ | async)?.length > 0 && !(loadingList$ | async)')
+          tr(*ngFor='let challan of challans$ | async')
+            td(*ngIf='isSuperAdmin') {{ challan?.merchantName || "--" }}
+            td
+              a((click)='showDetail($event, challan)', href='#', class='tableClickEntryColor') {{ challan?.challanId }}
+            td {{ challan?.accountId || "--" }}
+            td {{ challan?.createdAt | date: "d MMM yyyy"  || "--" }}
+            td {{ challan?.payerName || "--" }}
+            td {{ challan?.contact1 || "--" }}
+            td {{ toINR(convertToNumber(challan?.amount)) || "--" }}
+            td {{ challan?.status || "in process" }}
+            td 
+              a.btn.btn-sm.mr-2.ws-nowrap(
+                (click)='generateChallan(challan)',
+                class='castlerButtonColor',
+                href='javascript:void(0);'
+              ) View/Print
+    .flex-container.flex-row(
+      *ngIf='(challans$ | async)?.length <= 0 && !(loadingList$ | async)'
+    )
+      .align-self-center No Data available
+    .flex-container.flex-row(*ngIf='loadingList$ | async')
+      .align-self-center Please wait...
+    .d-flex.p-2
+      ngb-pagination(
+        [collectionSize]='total$ | async',
+        [(page)]='challanService.page',
+        [maxSize]='5',
+        [rotate]='true',
+        [ellipses]='false',
+        [boundaryLinks]='true'
+      )

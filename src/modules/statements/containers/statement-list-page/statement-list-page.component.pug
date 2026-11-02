@@ -1,0 +1,30 @@
+.flex-container
+  sbpro-dashboard-head(
+    icon='send',
+    title='All Statements',
+    description='View all statements'
+  )
+  .container-fluid.mt-n10.responsiveForm.flex-grow-1
+    .row.h-100
+      .col-lg-12.h-100
+        sbpro-card([headerActions]='true')
+          .card-header(class='logoColor')
+            | All Statements
+            div
+              span.mr-2
+                .spinner-border.spinner-border-sm.mr-1(
+                  role='status',
+                  aria-hidden='true',
+                  *ngIf='loadingList$ | async'
+                )
+                button.btn.btn-icon.btn-xs(
+                  class='castlerButtonColor',
+                  *ngIf='!(loadingList$ | async)',
+                  (click)='loadData()'
+                )
+                  i-feather(name='refresh-cw')
+              button.btn.btn-icon.btn-xs.mr-2((click)='toggleFilters()', class='castlerButtonColor')
+                i-feather(name='filter')
+
+          .card-body
+            sbpro-statement-list

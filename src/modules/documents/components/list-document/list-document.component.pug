@@ -1,0 +1,183 @@
+
+form
+  .d-flex.mb-2
+    input#search-box.mt-1.form-control.w-100.mr-2(
+      type='text',
+      name='s',
+      placement='top',
+      ngbPopover='Search by Agreement name, Order ID',
+      autocomplete='off',
+      placeholder='Search by Agreement name, Order ID',
+      [(ngModel)]='documentService.searchTerm'
+    )
+
+    input#start-date.mt-1.form-control.w-25.mr-2(
+      type='text',
+      name='sd',
+      placeholder='Start Date',
+      autocomplete='off',
+      ngbDatepicker,
+      outsideDays='hidden',
+      autoClose='outside',
+      #sd='ngbDatepicker',
+      (click)='sd.toggle()',
+      [(ngModel)]='documentService.dateFrom',
+      [minDate]='documentService.dateFromMin',
+      [maxDate]='documentService.dateFromMax'
+    )
+
+    input#end-date.mt-1.form-control.w-25.mr-2(
+      type='text',
+      name='ed',
+      placeholder='End Date',
+      autocomplete='off',
+      ngbDatepicker,
+      outsideDays='hidden',
+      #ed='ngbDatepicker',
+      (click)='ed.toggle()',
+      [(ngModel)]='documentService.dateTo',
+      [minDate]='documentService.dateToMin',
+      [maxDate]='documentService.dateToMax'
+    )
+
+    select#statusList.mt-1.form-control.w-25.mr-2(
+      name='status',
+      [(ngModel)]='documentService.status'
+    )
+      option(value='') Select Status
+      option(*ngFor='let st of statusList', [ngValue]='st') {{ st }}
+
+    button.btn.ws-nowrap.mt-1(
+      class='castlerButtonColor',
+      type='button',
+      (click)='submitSearchForm()'
+    )
+      fa-icon.d-flex.flex-row.align-items-center([icon]='["fas", "search"]')
+
+    button.btn.btn-link.mt-1(type='button', (click)='clearSearchForm()', class='logoColor') Clear
+
+    //button.btn.btn-icon.btn-xs(
+    //
+    //  (click)='refresh()',
+    //  class='castlerButtonColor'
+    //)
+    //  i-feather(name='refresh-cw')
+
+    .align-self-end
+      sbpro-app-button.mt-1(
+        text='Refresh',
+        loadingText='Refresh',
+        [loading]='loading',
+        (click)='refresh()',
+        [btnClass]='{ "btn-block": false, "btn-primary": true }'
+      )
+
+    .justify-content-end
+      a.btn.ml-2.mt-2.ws-nowrap.btn-icon(
+        type='button',
+        class='castlerButtonColor',
+        target='_blank',
+        [href]='documentService.reportDownloadLink$ | async',
+      )
+        fa-icon.d-flex.flex-row.align-items-center(
+          [icon]='["fas", "arrow-down"]'
+        )
+
+  .d-flex.mb-2(*ngIf='(orders$ | async)?.length > 0') 
+    .flex-row
+      small.mb-2.mt-2 Showing {{ (documentService.page - 1) * 10 + 1 }} to {{ (documentService.page - 1) * 10 + (orders$ | async)?.length }} of {{ total$ | async }}
+  .table-responsive.pp-table-container.table-responsive-sm
+    table.table
+      thead
+        tr
+          th(scope='col', sbSortable='date', (sort)='onSort($event)')
+            span.ws-nowrap Agreement Name
+            sb-sort-icon(
+              *ngIf='sortedColumn === "date"',
+              [direction]='sortedDirection'
+            ) 
+          th(scope='col', sbSortable='date', (sort)='onSort($event)')
+            span.ws-nowrap Order ID
+            sb-sort-icon(
+              *ngIf='sortedColumn === "date"',
+              [direction]='sortedDirection'
+            )
+          th(scope='col', sbSortable='date', (sort)='onSort($event)')
+            span.ws-nowrap Creation Date
+            sb-sort-icon(
+              *ngIf='sortedColumn === "date"',
+              [direction]='sortedDirection'
+            )
+          th(scope='col', sbSortable='date', (sort)='onSort($event)')
+            span.ws-nowrap Created By
+            sb-sort-icon(
+              *ngIf='sortedColumn === "date"',
+              [direction]='sortedDirection'
+            )
+          th(scope='col', sbSortable='date', (sort)='onSort($event)')
+            span.ws-nowrap E-sign/E-stamp
+            sb-sort-icon(
+              *ngIf='sortedColumn === "date"',
+              [direction]='sortedDirection'
+            )
+          th(scope='col', sbSortable='event', (sort)='onSort($event)')
+            span.ws-nowrap Status
+            sb-sort-icon(
+              *ngIf='sortedColumn === "event"',
+              [direction]='sortedDirection'
+            )
+
+      tbody(*ngIf='(orders$ | async)?.length == 0')
+        tr
+          td(
+            *ngIf='!(documentService.loading$ | async) && (orders$ | async)?.length == 0'
+          ) No Entries Found
+          td.spinner(*ngIf='documentService.loading$ | async')
+            .spinner-border.text-primary(role='status')
+              span.sr-only Loading...
+
+      tbody(*ngIf='(orders$ | async)?.length > 0')
+        tr(*ngFor='let order of orders$ | async')
+          td
+            span(*ngIf='order.orderName') {{ order.orderName }}
+            span(*ngIf='!order.orderName') {{ order.documentId }}
+          td
+            a.nav-link.p-0(href='javascript:void(0);', (click)='viewOrder(order)', style='color: #417505;font-weight:bold')
+              ngb-highlight(
+                [result]='order.documentId',
+                [term]='documentService.searchTerm'
+              )
+          td
+            ngb-highlight(
+              [result]='order.createdAt | date: "d MMM yyyy" || "--"'
+            )
+          td
+            ngb-highlight(*ngIf='order.createdBy', [result]='order.createdBy')
+            span(*ngIf='!order.createdBy') --
+          td
+            ngb-highlight(
+             [result] ='order.estamp'
+            )
+            //ngb-highlight(
+            //  *ngIf='order.estamp && order.estamp.is_required',
+            //  result='E-Sign,E-Stamp'
+            //)
+            //ngb-highlight(
+            //  *ngIf='!order.estamp || !order.estamp.is_required',
+            //  result='E-Sign'
+            //)
+
+          td
+            ngb-highlight(
+              [result]='order.status',
+              [term]='documentService.searchTerm'
+            )
+  .d-flex.justify-content-between.p-2
+    ngb-pagination(
+      [collectionSize]='total$ | async',
+      [(page)]='documentService.page',
+      [maxSize]='5',
+      [rotate]='true',
+      [ellipses]='false',
+      [boundaryLinks]='true'
+    )

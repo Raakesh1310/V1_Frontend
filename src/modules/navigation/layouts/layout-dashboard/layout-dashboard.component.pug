@@ -1,0 +1,254 @@
+ng-container(*ngIf='!rtl')
+  span.d-flex.flex-column(style='height: 100vh;')
+    sb-top-nav.flex-grow-0
+    #layoutSidenav.flex-grow-1.position-relative
+      #layoutSidenav_nav
+        sb-side-nav(
+          [sidenavStyle]='sidenavStyle',
+          [sideNavItems]='sideNavItems',
+          [sideNavSections]='sideNavSections'
+        )
+      #layoutSidenav_content.d-flex.flex-column.position-absolute(
+        style='overflow-y: scroll; top: 0; bottom: 0; right: 0;left: 0;',
+        [ngClass]='{ scrollable: !static }',
+        (click)='closeSideNavIfOpen()'
+      )
+        main.flex-grow-1
+          ng-container.d-flex(*ngTemplateOutlet='defaultContent')
+        sb-footer.align-self-end.w-100
+
+ng-container(*ngIf='rtl')
+  span.layout-rtl([ngClass]='{ "nav-fixed": !static }')
+    sb-top-nav([rtl]='true')
+    #layoutSidenav
+      #layoutSidenav_content(
+        [ngClass]='{ scrollable: !static }',
+        (click)='closeSideNavIfOpen()'
+      )
+        main
+          ng-container(*ngTemplateOutlet='defaultContent')
+        sb-footer
+      #layoutSidenav_nav
+        sb-side-nav(
+          [sidenavStyle]='sidenavStyle',
+          [sideNavItems]='sideNavItems',
+          [sideNavSections]='sideNavSections'
+        )
+
+ng-template(#defaultContent)
+  .flex.flex-grow-1.overflow-auto.h-100
+    ng-content
+
+ng-template(#tAndCAccept)
+  .card
+    .card-header.modal-header.logoColor.card-title.pl-3 Terms And Conditions 
+    .card-body(style="max-height:400px;overflow:auto")
+      span.overflow-scroll.contentFont
+        p 
+          |   The websites 
+          a(href="www.castler.com") www.castler.com
+          | &nbsp; and &nbsp;
+          a(href="www.ncome.in") www.ncome.in, &nbsp;
+          | (hereinafter referred to as “Castler”) including any subdomains thereof, and any other websites through which its services are made available is owned, hosted and operated by Ncome Tech Solutions Pvt Ltd (hereinafter referred to as NCOME), a company incorporated in India under the Companies Act, 1956 and having its registered office E-3, 2nd Floor DDA Local Shopping Centre J Block, Saket, New Delhi, Delhi, India – 110017.
+        p These terms and conditions regulating use of these Services constitute a legally binding agreement between NCOME and the User (the “Agreement”).
+        ol.list-group.list-group-numbered
+          li.list-group-item.d-flex.justify-content-between.align-items-start
+            .ms-2.me-auto
+              p.font-weight-bold Definitions: 
+              span The term Customer/User/Visitor will mean and include a person who utilizes any of the Services offered by Castler, with and without the need or a requirement to create an account i.e. visits non-restricted portions of Castler. &nbsp;
+              span The use and access to Castler shall be subject to these terms and conditions. For the purposes of this Agreement, any person who does not have a legal or a contractual right to access the Services, but does so, will fall within the definition of an ‘unauthorised user’ and will nevertheless be subject to the terms and conditions regulating the usage of Castler, and expressly so with respect to respecting the intellectual property rights of the NCOME, and abiding by terms and conditions below mentioned.  &nbsp;
+              span Master Escrow Account shall mean the escrow account(s) of NCOME opened with RBI Licensed bank(s)  &nbsp;
+              span Digital Escrow Account shall mean the escrow account opened and being maintained by NCOME for its Customer on Castler  &nbsp;
+              span RBI Licensed bank(s) and Trusteeship Company(ies) are hereinafter collectively referred to as Partners.  &nbsp;
+          li.list-group-item.d-flex.justify-content-between.align-items-start
+            .ms-2.me-auto
+              p.font-weight-bold Terms and Conditions:
+              span Castler and/or any other website(s) linked to this website is an online digital escrow solution provider, subject to your compliance with the terms and conditions set forth below.  &nbsp;
+              span.font-weight-bold PLEASE READ THIS DOCUMENT CAREFULLY. BY ACCESSING OR USING Castler, YOU AGREE TO BE BOUND BY THE TERMS AND CONDITIONS SET FORTH BELOW. IF YOU DO NOT AGREE WITH ANY OF THESE TERMS AND CONDITIONS, YOU SHOULD NOT ACCESS OR USE Castler.  &nbsp;
+              span NCOME may amend/modify these terms and conditions at any time, and such modifications shall be effective immediately upon posting of the modified terms and conditions on Castler. You may review the modified terms and conditions periodically to be aware of such modifications and your continued access or use of Castler, shall be deemed conclusive proof of your acceptance of these terms and conditions, as amended/modified from time to time. NCOME may also suspend the operation of Castler for support or technical upgradation, maintenance work, in order to update the content or for any other reason.  &nbsp;
+              span If you utilize Castler in a manner inconsistent with these terms and conditions, NCOME may terminate your access, block your future access and/or seek such additional relief as the circumstances of your misuse may be deemed to be fit and proper.  &nbsp;
+              ol
+                li Once a User has accepted these Terms and Conditions, he/ she may avail the Services.  
+                li These Terms of Using the Castler Platform operated by Ncome Tech Solutions Pvt Ltd (“Terms of Using the Castler Platform” or “Agreement”) shall serve as an agreement that sets forth the terms and conditions which will govern your use and participation in the transaction management and digital escrow services provided on and through Castler (the “Services”). By selecting to utilize the Services you shall have also indicated your acceptance of these Terms of Using the Castler Platform and your intent and agreement to be bound by them. If you are unwilling to agree to these Terms of Using the Castler Platform, you shall discontinue further use of the Services. 
+                li NCOME is a digital escrow solutions provider in association with various RBI Licensed banks and Trusteeship companies.
+                li NCOME, The RBI Licensed bank(s) and Trusteeship Company(ies) have got into Master Escrow Agreement(s) to open, hold and operate the Master Escrow Account(s)
+                li The RBI Licensed bank(s) hold the escrow monies in their custody under the Master Escrow Account(s) belonging to NCOME with Trusteeship company (only) having the withdrawal rights on that Master Escrow Account.
+                li NCOME facilitates the escrow account transactions for its customers from the Master Escrow Account(s) through Castler
+                li The User will be required to login his/ her own User ID and Password, given by NCOME to register and/ or use the Services provided on Castler. By accepting these Terms and Conditions the User agrees that his/ her User ID and Password are very important pieces of information and it shall be the User’s own responsibility to keep them secure and confidential. In furtherance hereof, the User agrees to;
+                li Choose a new password, whenever required for security reasons.
+                li Keep his/ her User ID & Password strictly confidential.
+                li Be responsible for any transactions made by User under such User ID and Password.
+                li If you agree to these Terms of Using the Castler Platform, you will be bound as follows:
+                li Customer understands and agrees that for processing financial transactions which includes but not limited to RTGS, NEFT, IMPS and UPI each instruction shall be supported from Castler portal login of authorized user(s).
+                li For account maintenance related activities, each instruction shall be supported with email communication from registered email ID and(or) using electronic/ physical signatures.
+                li Customer shall sign documents/ instructions using electronic/physical signatures. The Customer shall always affix the electronic/physical signatures by logging in through the email address of the Customer last registered in NCOME’s records. Usage of any other email address for affixing electronic signatures, without first registering the same with Castler would, in NCOME’s sole discretion lead to rejection of the document sent or instructions of the Customer. Castler shall share the instructions for affixing electronic signatures, with the Customer, on the Customer’s last registered email address. It is hereby clarified that NCOME may, without being obliged to do so, at its sole discretion rely and act on the documents/instructions affixed with electronic signatures using an e-mail address of the Customer, which is not registered with NCOME.
+                li The Customer hereby requests and authorizes NCOME to rely upon and act or omit to act, at its absolute discretion, in accordance with any instructions submitted to NCOME for processing electronic transactions using electronic signatures. The documents/instructions for any transactions as approved by the NCOME at its sole discretion may be submitted through and affixed with electronic signatures by use of a third party platform. Customer understands that documents received in electronic form online (or electronically signed) are equivalent to physical documents with wet signatures.
+                li Customer understands and agrees that requests with electronic signatures raised to NCOME shall not be separately sent later via any other medium (physical/email) to avoid duplication and NCOME shall not be responsible for any such duplicate request processed by it.
+                li The Customer declares and confirms that the Customer has for the Customer’s convenience and after being fully aware of, and having duly considered, the risks involved (which risks shall be borne fully by the Customer) requested and authorized NCOME to act on instructions signed electronically.
+                li The services of sending electronically signed information/documents/instructions require engagement of third parties and uploading of the documents on their platforms for the purpose of obtaining electronic signatures of the Customer on those documents. The Customer understands that those third parties may indefinitely keep any and all the data relating to the instructions, execution of document for their internal purposes or audit purposes and / or for meeting their regulatory requirements. NCOME may use the electronically signed documents/instructions, take print outs, make copies and use those for any purposes for its records, protection or enforcement of its rights including as an evidence of Customer having electronically signed the document/instruction. The Customer shall not be entitled to challenge the veracity, genuineness or authenticity of the electronically signed document/instruction for any reason whatsoever. The Customer confirms that electronically signed documents constitute valid, legal, effective and enforceable obligation on the Customer to NCOME.
+                li NCOME shall be entitled to fully rely on the authority of the persons electronically signing the documents/instructions on behalf of the Customer, without being required to check the validity of internal authorization provided by the Customer. It shall be sole responsibility of the Customer to ensure that the person/s electronically signing the documents is/are validly authorized in respect of the documents electronically signed by them on behalf of the Customer and the NCOME shall be fully entitled to treat such documents as validly executed by the Customer.
+                li Customer understands and agrees that NCOME shall under no circumstances be held for any direct or indirect damages or loss of any kind whatsoever caused due to any act or omissions as a result of using the third party platform or any such contents or for any failure of performance, error, omission, interruption, deletion, defect, delay in operation or transmission, computer virus, communications line failure, theft or destruction or unauthorized access to, alteration of, or use of information contained on the third party’s platform. No representations, warranties or guarantees whatsoever are made by NCOME as to the accuracy, adequacy, reliability, completeness, suitability or applicability of the services provided by any third party.
+                li Customer confirms and agrees that once Customer has given an instruction using electronic signatures, the Customer will not be able to reverse it. The NCOME and its Partners are under no obligation to reverse any instruction once received and processed by NCOME; or to accept an instruction that is conditional or reversible or which requires NCOME to pay a third party sooner than it would been able to pay following normal practices. NCOME may at its discretion as and when informed by the Customer and on a best effort basis, try to engage relevant partner Bank requesting reverse entry to the extent that is possible under the rules and practices of the Banking system at a cost to the Customer and NCOME and its Partners shall have no liability, of any kind, arising due to non-reversal of such instruction.
+                li The Customer agrees that Castler has every right to reject the processing of any instruction, if there is any erroneous, incomplete, garbled, self- contradictory, unclear or misleading information provided by the customer or for any other similar reason whatsoever with/without assigning any reason. The Customer confirms that the Customer shall not hold NCOME responsible or liable for any loss on any grounds whatsoever incurred by the Customer pursuant to the Castler not being able to act on the basis of an instruction transmitted through any mode including the third party platform or for any reason whatsoever.
+                li The Customer hereby acknowledges and expressly agrees that all data/information related to the Customer or any other individuals associated with the Customer held by the NCOME may be disclosed to any statutory or regulatory or supervisory authority/ies upon request or where such disclosure is required under the laws or regulations applicable to the NCOME.
+                li The Customer approves the collection, storage, use and dissemination of data governed under the Aadhaar (Sharing of Information) Regulations 2016 and rules and regulation made thereunder (“Aadhar Regulations”). NCOME will undertake necessary steps to encrypt or anonymise such data / information to ensure compliance with the Aadhar Regulations.
+                li Customer understands that the financial information available by means of the service through the third party platform or any other mode is for reference purposes only and NCOME shall not be liable for any loss incurred or damage suffered by the Customer or third party by reason of having access to or disclosure of any such financial information.
+                li Customer confirms and agrees that NCOME shall endeavour to effect fund transfer, and(or) any instruction related to account maintenance or modification etc.  received through electronically signed documents/instructions by the Customer, provided that, there are sufficient funds available in Customer’s Account(s). NCOME shall not be liable for any omission or refusal to make any of these payments or for late payments on account of insufficient funds or due to any other circumstances beyond the reasonable control of the NCOME.
+                li NCOME shall execute instruction received using electronic signatures via registered email of the Customer post due-diligence to validate the Customer’s request. However, the NCOME shall not be liable for any loss to the Customer if the same accrues inspite of the NCOME have done the due-diligence or for reasons of the Customer not having maintained the confidentiality of the information (including in respect of electronic transactions) or for any other reason attributable to the Customer whatsoever.
+                li Customer is aware and confirms that sending information/instructions/documents signed electronically on a third party platform is not a secure means of sending information/instruction/document; and the Customer is aware of and acknowledges the risk that such electronically signed instructions may be fraudulently written or sent or not be received in whole or in part by the intended recipient or may be read or be known to an unauthorized person in which case the NCOME shall not be responsible in any manner whatsoever including but not limited to breach of confidentiality.
+                li The Customer declares and agrees that the Customer has, for the Customer’s convenience and after being fully aware of, and having duly considered, the risks involved (which risks shall be borne fully by the Customer) requested and authorized the NCOME to rely upon and act on instructions signed electronically for the Customer’s convenience and benefit.  The Customer further declares and confirms that the Customer is aware that the NCOME is agreeing to act on the basis of such electronically signed instructions only by reason of, and relying upon, the Customer accepting and agreeing, confirming, declaring and indemnifying the NCOME as done by accepting terms and conditions and the NCOME would not have done so in the absence thereof.
+                li Notwithstanding anything contained herein or elsewhere, the NCOME shall not be bound to act in accordance with the whole or any part of the electronically signed instructions and may in its sole discretion and exclusive determination, and without being required to give any notice or assign reason, decline or omit to act pursuant to any electronically signed instruction, or defer acting in accordance with any such electronically signed instruction, and the same shall be at the Customer’s risk and the NCOME shall not be liable for the consequences of any such refusal or omission to act or deferment of action. The Customer confirms that the Customer shall not hold the NCOME responsible or liable for any loss on any grounds whatsoever incurred by the Customer pursuant to the NCOME not being able to act on the basis of an electronically signed instruction transmitted.
+                li The Customer shall immediately indemnify and hold harmless the NCOME (and its Partners) its directors and officers (each an “Indemnified Party”) against all losses, proceedings, claims, costs and liabilities howsoever arising in consequence of or in any way related to the NCOME having acted or omitted to act in accordance with or pursuant to any electronically signed instruction/form/document or the terms hereof.
+                li The Castler may at any time without assigning any reason and without any notice withdraw the facility of accepting electronically signed documents/instructions.  However, any such termination shall not affect anything done or any rights or liability accrued or incurred prior to the termination and all the above indemnities given by the Customer to the NCOME hereunder shall survive any such termination.
+                li Customer declares and confirms that the NCOME shall be entitled to rely on all/any electronically signed communication, information or instruction and all such communications, information and details shall be valid, final and binding on the Customer.
+                li Customer understands and confirms that the NCOME and its Partners has every right to close or debit freeze the account, if the details provided by him/her are found to be inaccurate, incorrect or false by the NCOME or/and its Partners or for any other reason whatsoever without assigning any reason thereof.
+                li The Customer agrees that NCOME does not have any obligation to validate the data in the fund transfer request sent by Customer via Net Banking/ Host to Host or any other electronic channel instructions. The Customer agree that all the instructions received by NCOME through API/Net Banking/ Host to Host or any other electronic channel shall be treated as valid and genuine and that NCOME and its Partners shall not be held responsible for any losses or damages incurred by the Customer from any actions/proceedings arising out of such instructions in any manner whatsoever. The Customer acknowledge and accepts that such an unsecured method involves the risks of possible unauthorized alteration of data and/or unauthorized usage thereof for whatever purposes. The Customer agree to exempt NCOME and its Partners from any and all responsibility of such misuse and receipt of information, and holds NCOME and its Partners harmless for any costs or losses, the Customer may incur due to any errors, delays or problems in transmission or otherwise caused by using the API/ Net Banking/ Host to Host or any other electronic channel instructions as a means for fund transfer from Digital Escrow Account.
+                li The Customer hereby agrees and undertakes to send all or any reports, communications or information to Castler via e-mail as required. The Customer acknowledges and accepts that such a transmission method involves the risks of possible unauthorized alteration of data and/or unauthorized usage thereof for whatever purposes. The Customer agrees to exempt NCOME and its Partners from any and all responsibility of such misuse and receipt of information, and holds NCOME and its Partners harmless for any costs or losses, the Customer may incur due to any errors, delays or problems in transmission or otherwise caused by using the internet as a means of transmission. Further, the Customer hereby undertakes to indemnify NCOME and its Partners for all losses, damages, costs, expenses (including reasonable legal expenses), incurred or suffered by NCOME and its Partners and against any actions, suits, claims or proceedings that are or may be initiated against NCOME and its Partners by them agreeing to accept any reports, information or communication or arising from them acting or relying on such reports, information or communication received from the Customer by email.
+                li Upon transfer of the Escrow Amounts as per the instructions from the customer, NCOME and its Partners shall be free from all its obligations and liabilities under the Escrow Agreement signed mutually between them as the case may be.
+                li The Customer shall be responsible for source of deposit of monies in to Digital Escrow Account along with the reconciliation of transactions. NCOME does not have any responsibilities of reconciling the funds in the Digital Escrow Account.
+                li It is further clarified that the final withdrawal rights from the digital escrow account(s) are with Trusteeship Company acting as per the terms of escrow agreement, except recovery of fee(s) and/or any other charges due to NCOME by the Customer for availing its Services
+                li The Customer further holds NCOME harmless against all losses, proceedings, claims, costs and liabilities howsoever arising in consequence of or in any way related to the NCOME ‘s Partner(s) having acted or omitted to act in accordance with or pursuant to any electronically signed instruction/form/document or the terms hereof.
+                li In case the RBI Licensed Partner Bank goes under the legal proceedings of liquidation/cancellation of bank’s license or the date on which the scheme of amalgamation/merger/reconstruction comes into force, the deposits kept under Master Escrow Account of NCOME being maintained with the said bank will be covered under the then prevailing deposit insurance and credit guarantee corporation (DICGC) scheme and NCOME will be the beneficiary of such amount which in turn will distribute the same to all its Digital Escrow Account holders of such bank in Pro-rata basis.
+                li Customer confirms and agrees that the NCOME reserves the right to make any changes, alterations, cancellations, in the above rules at any time without notice. Any person opting for this facility shall be bound by the above terms as modified from time to time including but not limited to standard terms applicable to account.
+
+          li.list-group-item.d-flex.justify-content-between.align-items-start
+            .ms-2.me-auto
+              p.font-weight-bold Terms of using Castler’s Portal: 
+              span A person or entity offering goods or services for sale or offering property for rent and desiring to use the Escrow service of Castler in order to close such a sale shall hereinafter be referred to as “Seller” A person or entity desiring to purchase goods or services from a seller or desiring to rent the property by use of Escrow service of Castler for completing the purchase shall hereinafter be referred to as “Buyer” Seller and Buyer shall hereinafter jointly be referred to as Users/Parties and individually be referred to as User/Party Portal shall refer to portal.castler.com where the Users will transact Trustee shall mean a certified Trusteeship Company based in India which Castler engages from time to time for escrow agent services Length of time agreed upon by both parties in which Buyer may examine the goods or Services upon receipt shall hereinafter be referred to as “Inspection Period” General  &nbsp;
+              ol
+                li In order to initiate and commence an Escrow Transaction, all Users to a Transaction must register at the Portal and agree to all terms & conditions.
+                li Once the User has agreed to terms for a specific underlying Transaction, and has agreed to the General Escrow Instructions by selecting the “I Agree to Castler Terms & Conditions” checkbox at the bottom of the Create Order Screens, these instructions shall constitute a binding agreement between the respective Users.
+                li Users should log onto Portal daily and regularly to update, confirm the status of the Transaction, shipping and tracking and/or for Closing.
+                li Users agree that Castler will do their eKYC verification
+                li Users agree to notify Castler as soon as possible once any Trigger Event is met, or there is a dispute in respect of any order. Castler is not liable for any damages suffered by any User due the failure of a User to notify Castler or the Parties on the Platform.
+          li.list-group-item.d-flex.justify-content-between.align-items-start
+            .ms-2.me-auto
+              p.font-weight-bold Confirmation of receipt of Goods & Services:
+              ol 
+                li Upon receipt of Depositor’s funds, Castler will notify the Users and request Seller to deliver the goods/services. This request to the Seller shall be sent via email which will require the Seller to log on to the Portal to confirm secured funds, unless all parties lawfully agree to a different method of notification. Upon Seller’s verification, Seller agrees to deliver the goods/services. Buyer and Seller agree to choose a shipping (if any) method that utilizes online tracking information. Seller shall deliver the goods/services to the Buyer based upon information provided in Buyer’s profile. Seller will be responsible for shipping (if any) damage if insurance is not purchased. Seller agrees to complete and update the shipping (if any) information on Portal, on the same day on which the goods are placed in the possession of the company responsible for shipping. Confirmation of same will be sent via email to all parties, unless all parties lawfully agree to a different method of notification.
+                li In the event the Seller does not ship the goods within ten days of notification by Castler (through its email or posted on Castler portal) of Buyer’s deposit of immediately available funds, Buyer may request a return of funds, less the escrow fee, and Castler will do so after notifying both parties.
+          li.list-group-item.d-flex.justify-content-between.align-items-start
+            .ms-2.me-auto
+              p.font-weight-bold Disbursement of Funds:
+              span During the Buyer Inspection Period, Buyer shall either: (1) select the “Release Payment” button on the Portal to complete acceptance of the goods/services; or (2) select the “Cancel Order” button and follow any further instructions to complete the rejection of the goods/services. Should the Buyer fail to select either the ” Release Payment ” or “Cancel Order” buttons, and/or follow all further instructions, then Buyer shall be deemed to be satisfied with the quality of the goods/services, and to have accepted the goods/services.  &nbsp;
+              span Castler shall disburse the funds as per following conditions &nbsp;
+              ul
+                li If Buyer Accepts the Goods or Service by selecting the “Release payment” button, then funds will be released to the Seller after deducting the Escrow charges.
+                li If Buyer fails to “Release Payment” or “Cancel” the acceptance of goods or Services within Seven days after end of inspection period, then funds will be released to the Seller after deducting the Escrow charges.
+                li If Seller cancels the Escrow transaction at any moment, then funds will be released to the Buyer after deducting the Escrow charges.
+                li In the event the Seller has not shipped the goods within ten days of notification by Castler (through its email or posting on the Castler Portal) of Buyer’s deposit of immediately available funds, Buyer may request a return of funds, less the escrow fee, and Castler will do so after notifying both parties.
+                li All Payments from Castler Escrow to respective parties will take 3 – 4 business days to process.
+                li All Payments shall be processed after Trustee Approval.
+          li.list-group-item.d-flex.justify-content-between.align-items-start
+            .ms-2.me-auto
+              p.font-weight-bold Dispute:
+              ol
+                li Buyers may initiate a dispute on the Portal should the goods or services they receive be materially different to what was set forth in the order. Any dispute between the Users in relation to a transaction is between the Users. Castler will not get involved beyond its obligations under the Trade. Castler may offer assistance or facilitate the resolution of a dispute between Users if a dispute between Users arises but is under no obligation to do so. The Parties hereby agree to use their best efforts to negotiate in good faith during the dispute to reach a resolution which is satisfactory for all parties.
+                li In case of dispute, Castler will hold the funds in the Escrow Account
+                  ol 
+                    li Till parties resolve the dispute and confirms to Castler, Confirmation of both buyer and seller is required for final release of the funds or
+                    li It receives an order from an arbitrator or
+                    li It receives an order from an appropriate court of law or similar legal body.
+                li Confirmation of both buyer and seller is required for final release of the funds
+                li Castler will disburse the funds as per confirmation by both the parties
+          li.list-group-item.d-flex.justify-content-between.align-items-start
+            .ms-2.me-auto
+              p.font-weight-bold Rejection Process:
+              ul
+                li The buyer is responsible for 100% of the escrow fee in the event the transaction is cancelled, or the merchandise is returned. During the Buyer Inspection Period, Buyer may reject for any reason by selecting the “Cancel” button on Castler portal and following all other instructions to properly reject the merchandise. Upon such rejection, Castler will send Seller an email stating Buyer’s decision to reject and return the goods; and Buyer agrees to promptly ship goods to Seller within ten (10) calendar days of formal rejection and insure, at Buyer’s expense, the item(s) to the place designated by the Seller in the Seller’s profile. Buyer is aware that merchandise must be rejected in the manner described in order to obtain a refund of the purchase price.
+                li Buyer is aware that regardless of the reason for rejection, Escrowed Product must be returned to the Seller in order for funds to be returned to the Buyer. Shipping costs for returned Escrowed Product must be arranged and completed within ten (10) days of Buyer’s rejection. Failure of Buyer to return the Escrowed Product within the specified time period will cause Castler to automatically pay the Seller the purchase price.
+          li.list-group-item.d-flex.justify-content-between.align-items-start
+            .ms-2.me-auto
+              p.font-weight-bold Compliance with anti-bribery and anti-corruption laws:
+              ol
+                li  User agrees and unconditionally undertakes to comply with all applicable commercial and public anti-bribery and anti-corruption laws (including but not limited to the provisions of Prevention of Corruption Act, 1988, Prevention of Money Laundering Act, 2002, Foreign Contribution (Regulation) Act, 2010, and any amendments thereto) which prohibit the User, its/ his/ her officials, representatives, agents or any other person associated with or acting on behalf of such User from giving, offering, promising to offer, receiving/ accepting or acting in any other manner so as to induce a payment, gift, hospitality or anything of value (either directly or indirectly) whether from within the country or from abroad to government officials, publics servants, regulatory bodies, judicial authorities, persons in positions of authority, elected or contesting electoral candidates, political parties or office bearers thereof or any other third party or person in order to obtain an improper commercial/business advantage of any kind. Government Officials include any government employee, candidate for public office, an employee of government – owned or government — controlled companies, public international organization and political parties. User also agrees not to give, offer, pay, promise or authorized to give or pay, directly or through any other person, anything of value to anybody for the purpose of inducing or rewarding any favorable action or influencing a decision in favour of the User. The User also unconditionally agrees and undertakes that it is compliant with and shall do/ undertake all acts necessary to continue to be compliant with the provisions of ‘The Know Your Customer (KYC) / Anti-Money Laundering (AML) / Combating Financing of Terrorism (CFT) guidelines issued by the Department of Regulation’, RBI, as amended from time to time.
+          //- li.list-group-item.d-flex.justify-content-between.align-items-start
+          //-   .ms-2.me-auto
+          //-     p.font-weight-bold Compliance with mandates of the OFAC:
+          //-     span User undertakes that it shall, during the use of the Services, be in compliance with the mandates of OFAC and acknowledges that the User has not directly or indirectly lent, contributed or otherwise made available funds to any of its affiliates, joint venture partners or any other person or entity for the purpose of financing the activities of any person currently subject to the OFAC Specially Designated Nationals List (SDN), Consolidated Sanctions List and the Additional OFAC Sanctions List, as amended from time to time. For the purpose of this paragraph 7, OFAC means the Office of Foreign Assets Control constituted under the laws of the United States of America.
+          li.list-group-item.d-flex.justify-content-between.align-items-start
+            .ms-2.me-auto
+              p.font-weight-bold Prohibited Services:
+              span You agree that you will not accept payments in connection with businesses, business activities or business practices, including but limited to the following:  &nbsp;
+              ol
+                li Adult goods and services which include pornography and other sexually suggestive materials (including literature, imagery and other media), escort or prostitution services, website access and/or website memberships of pornography or illegal sites;
+                li Alcohol which includes alcohol or alcoholic beverages such as beer, liquor, wine, or champagne etc.;
+                li Body parts which include organs or other body parts;
+                li Bulk marketing tools which include email lists, software, or other products enabling unsolicited email messages (spam);
+                li Cable unscrambles and black boxes which include devices intended to obtain cable and satellite signals for free;
+                li Child pornography which includes pornographic materials involving minors;
+                li Copyright unlocking devices which include mod chips or other devices designed to circumvent copyright protection;
+                li Copyrighted media which includes unauthorized copies of books, music, movies, and other licensed or protected materials;
+                li Copyrighted software which includes unauthorized copies of software, video games and other licensed or protected materials, including OEM or bundled software;
+                li Counterfeit and unauthorized goods which include replicas or imitations of designer goods, items without a celebrity endorsement that would normally require such an association, fake autographs, counterfeit stamps, and other potentially unauthorized goods;
+                li Drugs and drug paraphernalia which include illegal drugs and drug accessories, including herbal drugs like marijuana, salvia and magic mushrooms etc.;
+                li Drug test circumvention aids which include drug cleansing shakes, urine test additives, and related items;
+                li Endangered species which include plants, animals or other organisms (including product derivatives) in danger of extinction;
+                li Gaming/ gambling which include lottery tickets, sports bets, memberships/ enrolment in online gambling sites, and related content;
+                li Government IDs or documents which include fake IDs, passports, diplomas, and noble titles;
+                li Hacking and cracking materials which include manuals, how-to guides, information, or equipment enabling illegal access to software, servers, website, or other protected property;
+                liIllegal goods which include materials, products, or information promoting illegal goods or enabling illegal acts;
+                li Miracle cures which include unsubstantiated cures, remedies or other items marketed as quick health fixes;
+                li Offensive goods which include literature, products or other materials that inter alia :
+                li Defame or slander any person or groups of people based on race, ethnicity, national origin, religion, sex, or other factors;
+                li Encourage or incite violent acts; or
+                li Promote intolerance or hatred.
+                li Offensive goods which include crime scene photos or items, such as personal belongings, associated with criminals;
+                li Pyrotechnic devices, combustibles, corrosives and hazardous materials which include explosives and related goods, toxic, flammable, and radioactive materials and substances;
+                li Regulated goods which include air bags, batteries containing mercury, freon or similar substances/ refrigerants, chemical/ industrial solvents, government uniforms, car titles, license plates, police badges and law enforcement equipment, lock-picking devices, pesticides, postage meters, recalled items, slot machines, surveillance equipment, goods regulated by government or other agency specifications;
+                li Securities which include government and/ or public sector unit bonds, stocks, debentures or related financial products;
+                li Tobacco and cigarettes which include cigarettes, cigars, chewing tobacco, and related products;
+                li Traffic devices which include radar detectors/ jammers, license plate covers, traffic signal changers, and related products;
+                li Weapons which include firearms, ammunition, knives, brass knuckles, gun parts, gun powder or explosive mixtures and other armaments;
+                li Wholesale currency which includes discounted currencies or currency exchanges;
+                li Live animals or hides/ skins/ teeth, nails and other parts etc. of animals;
+                li Multi-level marketing collection fees;
+                li Matrix sites or sites using a matrix scheme approach;
+                li Work-at-home approach and/ or work-at-home information;
+                li Drop-shipped merchandise;
+                li Any product or service which is not in compliance with all applicable laws and regulations whether federal, state, local or international, including the laws of India;
+                li The User providing services that have the potential of casting NCOME in a poor light and/ or that may be prone to buy and deny attitude of the cardholders when billed (e.g. adult material/ mature content/ escort services/ friend finders) and thus leading to chargeback and fraud losses;
+                li Businesses or website that operate within the scope of laws which are not absolutely clear or are ambiguous in nature (e.g. web-based telephony, website supplying medicines or controlled substances, website that promise online match-making);
+                li Businesses out rightly banned by law (e.g. betting & gambling/ publications or content that is likely to be interpreted by the authorities as leading to moral turpitude or decadence or incite caste/ communal tensions, lotteries/ sweepstakes & games of chance;
+                li Businesses dealing in intangible goods/ services (e.g. software download/ health/ beauty Products), and involved in pyramid marketing schemes or get-rich-quick schemes;
+                li Any other product or service, which in the sole opinion of NCOME is detrimental to its image and interest.
+                li Mailing lists;
+                li Virtual currency, cryptocurrency, prohibited investments for commercial gain or credits that can be monetized, re-sold or converted to physical or digital goods or services or otherwise exit the virtual world;
+                li Money laundering services;
+                li Database providers (for tele-callers);
+                li Bidding/ auction houses;
+                li Activities prohibited by the Telecom Regulatory Authority of India; and
+                li Any other activities prohibited by applicable law.
+              span The above list is subject to additions/ amendments (basis changes/ amendments to applicable laws) by NCOME without prior intimation to User.  &nbsp;
+
+          li.list-group-item.d-flex.justify-content-between.align-items-start
+            .ms-2.me-auto
+              p.font-weight-bold Indemnification:
+              span You agree to indemnify and hold harmless Castler, its affiliates,its officers, directors, shareholders and employees, from any claim, demand, expense or damage, including reasonable attorneys’ fees and court costs, arising from or relating to your use of the Services or any violation of this Agreement, the rules contained on the Site or the Escrow Instructions, including, payment of Castler fees.  &nbsp;
+          li.list-group-item.d-flex.justify-content-between.align-items-start
+            .ms-2.me-auto
+              p.font-weight-bold Modifications:
+              span Castler reserves the right to change this Agreement, or any portion of it, at any time, without prior notice, provided that no such change will apply to a order once the Users to such Order have agreed to the Escrow Terms & conditions. You understand that the most recent version of this Agreement will be located on the Site.  &nbsp;
+          li.list-group-item.d-flex.justify-content-between.align-items-start
+            .ms-2.me-auto
+              p.font-weight-bold Notices:
+              span Notices from Castler to you will be given by e-mail, SMS or by general posting on the Site. You may contact Castler by filling out the customer support form or such other email address as Castler posts as its address for notice on the Site in the most recent version of the Terms of Using the Escrow Platform  &nbsp;
+          li.list-group-item.d-flex.justify-content-between.align-items-start
+            .ms-2.me-auto
+              p.font-weight-bold Refund Policy:
+              span In the event of a cancelled transaction or a partial refund to the Paying Party, the Paying Party’s funds will be refunded back to the Paying party’s bank account. Castler Registration fee and Portal usage fee is non-refundable.  &nbsp;
+          li.list-group-item.d-flex.justify-content-between.align-items-start
+            .ms-2.me-auto
+              p.font-weight-bold Disclaimer:
+              span NCOME owns all the right, title and interest including the copyright in respect of all the Content including various logos, trademarks, service marks etc., unless indicated otherwise. You may use/download the Content only for non-commercial and personal use, provided you retain all copyright and other proprietary notices contained therein. You shall not, however, reproduce, distribute, redistribute, modify, transmit, reuse, report, or use the Content for public or commercial purposes without NCOME’ written permission. You shall not use the Content for illegal purpose.  &nbsp;
+              span You or any third party accessing the Website irrevocably agrees to the exclusive jurisdiction of the courts at Delhi in relation any matter connected or related to use or access of Castler and waives any objection to any proceedings on grounds of venue or on the grounds that the proceedings have been brought in an inconvenient forum. The governing law in such legal proceedings referred to above shall be the laws of the Republic of India.  &nbsp;
+    .card-footer
+      button.btn.float-right.castlerButtonColor.mr-2(
+        (click)='acceptTAndC()',
+        style='box-shadow: none'
+      ) Accept
+      span.float-right &nbsp;&nbsp;&nbsp;&nbsp;
+      button.btn.float-right(
+        (click)='declineTAndC()',
+        style='border-color: #bc8e32;color: #417505; border-width: 0px'
+      ) Decline

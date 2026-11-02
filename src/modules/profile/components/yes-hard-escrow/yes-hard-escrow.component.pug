@@ -1,0 +1,148 @@
+sbpro-card([headerActions]='true')
+  .card-header
+    | Form
+    button.btn.btn-icon.btn-link.btn-xl((click)='closeModal()')
+      i-feather(name='x-circle')
+  .card-body
+    div(*ngIf='errors && errors.length > 0')
+      sbpro-alert(classes='alert-danger')
+        | {{ errors[0] }}
+    form([formGroup]='hardEscrowForm')
+      .d-flex
+        .form-group.w-50.mr-2
+          .row
+            .col-sm-12.col-md-9.col-lg-9
+              label(for='frm-cntrl-cb') Enable Hgih TPS
+              |
+              i-feather.ml-1(
+                name="info",
+                ngbTooltip="When high TPS is enabled, transfer will bypass trustee and admin approval flow and will directly go to bank for processing",
+                container="body"
+              )
+            .col-sm-12.col-md-3.col-lg-3
+              input#frm-cntrl-cb.form-control.form-control-sm.float-left(
+                type='checkbox',
+                #checkbox,
+                name='enableHighTPS',
+                formControlName='enableHighTPS',
+                (change)='highTPS($event)'
+              )
+      .d-flex
+        .form-group.w-100.mr-2
+          label(for='frm-cntrl-accountNo') Account No
+          input#frm-cntrl-accountNo.form-control.form-control-sm(
+            type='string',
+            [readonly]="isEdit",
+            formControlName='accountNo',
+            placeholder='Account No'
+          )
+        .form-group.w-100
+          label(for='frm-cntrl-accountName') Account Name
+          input#frm-cntrl-accountName.form-control.form-control-sm(
+            type='string',
+            formControlName='accountName',
+            placeholder='Account Name'
+          )
+      .d-flex
+        .form-group.w-100.mr-2
+          label(for='frm-cntrl-appId') App Id
+          input#frm-cntrl-appId.form-control.form-control-sm(
+            type='string',
+            formControlName='appId',
+            placeholder='App ID',
+          )
+        .form-group.w-100.mr-2
+          label(for='frm-cntrl-secondId') Secondary Id
+          input#frm-cntrl-secondId.form-control.form-control-sm(
+            type='string',
+            formControlName='secondId',
+            placeholder='Secondary ID',
+          )
+      .d-flex
+        .form-group.w-100.mr-2
+          label(for='frm-cntrl-clientId') Client Id
+          input#frm-cntrl-clientId.form-control.form-control-sm(
+            type='string',
+            formControlName='clientId',
+            placeholder='Client ID',
+          )
+        .form-group.w-100.mr-2
+          label(for='frm-cntrl-clientSecret') Client Secret
+          input#frm-cntrl-.form-control.form-control-sm(
+            type='password',
+            formControlName='clientSecret',
+            placeholder='Client Secret',
+            autocomplete='new-password'
+          )
+      .d-flex
+        .form-group.w-50.mr-2
+          label(for='frm-cntrl-trusteeMsil') Trustee Email
+          input#frm-cntrl-trusteeMsil.form-control.form-control-sm(
+            type='string',
+            formControlName='trusteeMail',
+            placeholder='Trustee Email',
+            [readOnly]='hardEscrowForm.get("enableHighTPS").value'
+          )
+        .form-group.w-50.mr-2
+          label(for='frm-cntrl-ifsc') IFSC (Optional)
+          input#frm-cntrl-ifsc.form-control.form-control-sm(
+            type='string',
+            formControlName='ifsc',
+            placeholder='IFSC'
+          ) 
+      .d-flex
+        .form-group.w-50.mr-2
+          .row
+            .col-sm-12.col-md-9.col-lg-9
+              label(for='frm-cntrl-cb') Enable Connected Banking
+            .col-sm-12.col-md-3.col-lg-3
+              input#frm-cntrl-cb.form-control.form-control-sm.float-left(
+                type='checkbox',
+                #checkbox,
+                name='enableConnectedBanking',
+                formControlName='enableConnectedBanking',
+                [disabled]='hide'
+              )
+      .d-flex 
+        .form-group.w-100.mr-2(*ngIf="hardEscrowForm.get('enableConnectedBanking').value")
+          .row
+            .col-sm-4
+              label(for='frm-cntrl-cb') With Digital Escrow
+              input.ml-2(
+                type='radio',
+                name='enableConnectedBankingWithVA',
+                formControlName='enableConnectedBankingWithVA',
+                [value]="true",
+                (change)="updateEnableConnectedBanking(true)"
+              )
+            .col-sm-4
+              label(for='frm-cntrl-cb') Without Digital Escrow
+              input.ml-2(
+                type='radio',
+                name='enableConnectedBankingWithVA',
+                formControlName='enableConnectedBankingWithVA',
+                [value]="false",
+                (change)="updateEnableConnectedBanking(false)"
+              )
+      .d-flex(*ngIf="hardEscrowForm.get('enableConnectedBanking').value")
+        .form-group.w-100.mr-2
+          label(for='frm-cntrl-accountType') Account Type
+          select#frm-cntrl-accountType.form-control.form-control-sm(
+            formControlName='accountType'
+          )
+            option(value='Escrow Account') Escrow Account
+            option(value='Current Account') Current Account
+    sbpro-app-button.float-right(
+      *ngIf='!isEdit',
+      (click)='onSubmit()',
+      [loading]='submitting',
+      text='Submit',
+      loadingText='Submitting'
+    )
+    sbpro-app-button.float-right(
+      *ngIf='isEdit',
+      (click)='onSubmit()',
+      [loading]='submitting',
+      text='Update',
+      loadingText='Submitting'
+    )

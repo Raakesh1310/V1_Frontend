@@ -1,0 +1,29 @@
+.background {
+  background-color: #FFFAF2;
+  width: 100%;
+  height: 100vh;
+  padding-left: 10%;
+  padding-right: 10%;
+}
+
+@media screen and (max-width: 1200px) {
+  .background {
+    background-color: #FFFAF2;
+    width: 100%;
+    height: auto;
+    padding-left: 10%;
+    padding-right: 10%;
+  }
+}
+
+
+.flex-display {
+  display: flex;
+  justify-content: center;
+}
+
+p {
+  margin-top: -10px;
+  margin-left: 50px;
+  font-size: 10px;
+}

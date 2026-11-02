@@ -1,0 +1,50 @@
+sbpro-card 
+  .card-header(class='logoColor') Send Mail
+  .card-body 
+    form
+      .form-group 
+        ng-multiselect-dropdown(
+          name='email',
+          [placeholder]='"Select Email"',
+          [settings]='dropdownSettings',
+          [data]='merchants',
+          [(ngModel)]='dropDownMails',
+          [disabled]='disabled'
+        )
+      .form-group
+        .custom-control.custom-checkbox
+          input#customCheck1.custom-control-input(
+            type='checkbox',
+            [(ngModel)]='showCustomMail',
+            [ngModelOptions]='{ standalone: true }'
+          )
+          label.custom-control-label(for='customCheck1') Add custom Mail
+
+      .input-group.input-group-joined.mb-4(*ngIf='showCustomMail')
+        input.form-control(
+          type='text',
+          [(ngModel)]='customMails',
+          [ngModelOptions]='{ standalone: true }'
+        )
+
+      .form-group 
+        label(for='subject') Subject
+        input#subject.form-control(
+          type='text',
+          name='subject',
+          placeholder='Add a subject',
+          [(ngModel)]='subject'
+        )
+
+      .form-group
+        label(for='body') Body
+        textarea#body.form-control(name='body', rows='6', [(ngModel)]='body')
+
+      .form-group 
+        sbpro-app-button(
+          text='Send',
+          loadingText='Sending',
+          [loading]='loading$ | async',
+          [btnClass]='{ "btn-block": false, "btn-primary": true }',
+          (click)='onSubmit()'
+        )

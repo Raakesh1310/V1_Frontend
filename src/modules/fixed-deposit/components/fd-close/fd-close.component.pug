@@ -1,0 +1,63 @@
+sbpro-card([headerActions]='true')
+  .card-header
+    | Close FD  
+    | ({{fd.fdAccountNo}}: Rs. {{fd.amount}})
+    button.btn.btn-icon.btn-link.btn-xl((click)='closeModal()')
+      i-feather(name='x-circle')
+  .card-body 
+    .form-group
+      //- .row 
+      //-   .col-sm-6
+      //-     label Fixed Deposit ID: {{fd.accountId}}
+      //-   .col-sm-6
+      //-     label Amount: {{fd.amount}}
+      .row
+        .col-sm-12.col-md-3.col-lg-3
+          label(for='third-pary-transfer')
+            | Select Closure
+            span.text-danger *
+        .col-sm-4
+          .custom-control.custom-radio.custom-control-solid
+            input#customSolidRadio.custom-control-input(
+              type='radio',
+              name='thirdParyTransfer',
+              value='false',
+              (change)='onItemChange($event.target.value)',
+              "checked"
+            )
+            label.custom-control-label(for='customSolidRadio') Full Closure 
+        .col-sm-4
+          .custom-control.custom-radio.custom-control-solid
+            input#customSolidRadio1.custom-control-input(
+              type='radio',
+              name='thirdParyTransfer',
+              value='true',
+              (change)='onItemChange($event.target.value)',
+            )
+            label.custom-control-label(for='customSolidRadio1') Partial Closure
+      .get_partial_data(*ngIf="partialSelected")
+        .form-group 
+          label Partial Amount
+          input#partial.form-control(
+            type='number',
+            [(ngModel)]='partialClosureAmount',
+            placeholder="Please Enter Amount Less than {{fd?.amount}}"
+          )
+
+      sbpro-alert(classes='alert-danger', *ngIf='error')
+        span {{ error }}
+      .form-group 
+        label Interest Amount
+        input#interest.form-control(
+          type='number',
+          [(ngModel)]='interest',
+          placeholder='Interest Amount'
+        )
+
+  .card-footer 
+    sbpro-app-button.float-right(
+      (click)='update()',
+      [loading]='updating',
+      text='Release Funds',
+      loadingText='Updating'
+    )

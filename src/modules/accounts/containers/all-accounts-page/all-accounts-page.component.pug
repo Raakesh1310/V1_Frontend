@@ -1,0 +1,31 @@
+.flex-container
+  sbpro-dashboard-head(
+    icon='book',
+    title='All Escrow',
+    description='View all escrows'
+  )
+  .container-fluid.mt-n10.responsiveForm.flex-grow-1
+    sbpro-card([headerActions]='true')
+      .card-header(class='logoColor')
+        | Escrows List
+        div
+          span.mr-2
+            .spinner-border.spinner-border-sm.mr-1(
+              role='status',
+              aria-hidden='true',
+              class='castlerButtonColor',
+              *ngIf='loadingList$ | async'
+            )
+            button.btn.btn-icon.btn-xs(
+              class='castlerButtonColor',
+              *ngIf='!(loadingList$ | async)',
+              (click)='refresh()'
+            )
+              i-feather(name='refresh-cw')
+          button.btn.btn-icon.btn-xs.mr-2(
+            class='castlerButtonColor',
+            (click)='toggleFiltersParent()'
+          )
+            i-feather(name='filter')
+
+      sbpro-all-accounts.card-body.flex-container.align-self-stretch

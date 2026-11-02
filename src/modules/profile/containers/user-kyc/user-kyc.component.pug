@@ -1,0 +1,12 @@
+sbpro-dashboard-head(
+  icon='kyc',
+  title='All User KYC',
+  description='View all user KYCs'
+)
+.container-fluid.mt-n10.responsiveForm
+  .row
+    .col-lg-12
+      sbpro-card
+        .card-header User KYC
+        .card-body
+          sbpro-user-kyc([pageSize]='10')

@@ -1,0 +1,16 @@
+sbpro-dashboard-head(
+    icon='sunset',
+    title='Shadows',
+    description='Shadow utilities add depth and elevation to your content'
+)
+.container-fluid.mt-n10
+    .row
+        .col-lg-9
+            sbpro-shadows-default(
+                sbproTocItem='Default'
+            )
+            sbpro-shadows-extended(
+                sbproTocItem='Extended'
+            )
+        .col-lg-3
+            sbpro-toc-nav([tocIndex]='tocIndex')

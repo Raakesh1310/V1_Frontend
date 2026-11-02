@@ -1,0 +1,204 @@
+sbpro-card
+  .card
+  .card-header Details
+  .card-body
+    table.table
+      tr
+        td Business Name
+        td {{ profile.businessName }}
+      tr
+        td Email
+        td {{ profile.email }}
+      tr
+        td GST Number
+        td {{ profile.businessGst }}
+      tr
+        td Company PAN
+        td {{ profile.businessPan }}
+      tr
+        td Authorised person Name
+        td {{ profile.authorizedPersonName }}
+      tr
+        td Authorised person PAN
+        td {{ profile.authorizedPersonPan }}
+    .row
+      .col
+        h4.display-6 Documents
+
+    .sb-preview
+      .sbp-preview-content
+        form
+          .form-group
+            div(*ngIf='errors.length > 0')
+              sbpro-alert(classes='alert-danger', [dismissable]='true')
+                | {{ errors[0] }}
+
+          .form-group(*ngIf='gstFile')
+            label Company GST
+            br
+            .row
+              .col.col-md-10
+                #dummy.form-control
+                  p
+                    a(href='{{ downloadGst() }}', target='_blank') {{ gstFile }}
+                    span.linker((click)='removeGst()') &nbsp;&nbsp;&nbsp;&nbsp;
+                      img(
+                        src='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAChUlEQVRIS9WVT2jUQBTG35uktaJSdyfgnx48iYIHe9GLItVNIoqg4sGKIm2yXRARRERoL/YgCkJV0EOhTcSKUEFBBG3ZbKR4EOypgicFEaGINklLRalrZ57siiC1O20OBZ3b8OZ9v/nevJlBWOKBS6wP/wbAsDsOEMm7ALC66ljKhIAdT0JveKEKLMpB1nSfIwOPlZc9rAiSPnNMErQmoZ9LDTDMfIsAcU1KXK4x+PpLgDYIidHvuZCwQgfkxOhDNQpyJZP4DZl2Lir1j/wJ/csB33OyCbT6Q0DyJmlaKxBJ5S4RGUo5CIBnQJQfxc8GxpWASjBjFhoZiqmy/GF8CQdiFWBVS8GorxMTpM80JkP3pueurXUGyK32Mkp9SxT2vTFst1WTNCo11lQRYEKOC4bbo6I3yO3CZhDiVRx6DdVqzRk1Dzljux8R2JGk2Pcim3PHUINuIGip5iOMkIDuJPSaM6azExDvTwZeFb5oALfaXyNgVxT4j1UAbjmHEaE7KvpbUwLyI4Q0kBQ9XwUwTKdD1bI1S8Rt9wEQjMaBd1XpwHY7kbA5CvqPpnKQtdp7gbTppNR/QenAcnuIoCEueadTAbjtXgKi9XHgO2oH+TtI9D4KvIupAFnTOUuIuycD76AKkLXcJ0gwFJe8W6kA3MqfAJCn4sDfoe6itpeI2vXKnUgFyNjOPiK4MRX4m7jtdmpIT2eJbayI6CjfCsL9cdG7YuTa3hGyQlzyS6kAPNexDWB2OA5vc9VTkTHdaR3ZromgbywVwNhbWEdSjAOiKYE+z5fMJK0FxEDHujWfir3zrlH+B9xyuoDgvCSsnxcA8jsw7IkD/3Itl4v6cJTP9QLB/x/wE1zHRCjF83WXAAAAAElFTkSuQmCC'
+                      )
+              .col.col-md-2
+                .custom-control.custom-checkbox
+                  input#docBusinessGst.custom-control-input(
+                    type='checkbox',
+                    (change)='verifyDoc($event)',
+                    name='docBusinessGstVerified',
+                    [(ngModel)]='profile.docBusinessGstVerified'
+                  )
+                  label.custom-control-label(for='docBusinessGst') Verified
+          .form-group(*ngIf='!gstFile')
+            label(for='gstupload') Company GST
+              span.text-danger 
+                | *
+            .custom-file.mb-lg-3
+              input#docBusinessGst.form-control.custom-file-input(
+                type='file',
+                (change)='handleFileInput($event)',
+                enctype='multipart/form-data',
+                [disabled]='docBusinessGst'
+              )
+              label.custom-file-label(for='gstupload') Upload File (Max size 5 MB)
+
+          .form-group(*ngIf='panFile')
+            label Company PAN
+            br
+            .row
+              .col.col-md-10
+                #dummy.form-control
+                  p
+                    a(href='{{ downloadPan() }}', target='_blank') {{ panFile }}
+                    span.linker((click)='removePan()') &nbsp;&nbsp;&nbsp;&nbsp;
+                      img(
+                        src='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAChUlEQVRIS9WVT2jUQBTG35uktaJSdyfgnx48iYIHe9GLItVNIoqg4sGKIm2yXRARRERoL/YgCkJV0EOhTcSKUEFBBG3ZbKR4EOypgicFEaGINklLRalrZ57siiC1O20OBZ3b8OZ9v/nevJlBWOKBS6wP/wbAsDsOEMm7ALC66ljKhIAdT0JveKEKLMpB1nSfIwOPlZc9rAiSPnNMErQmoZ9LDTDMfIsAcU1KXK4x+PpLgDYIidHvuZCwQgfkxOhDNQpyJZP4DZl2Lir1j/wJ/csB33OyCbT6Q0DyJmlaKxBJ5S4RGUo5CIBnQJQfxc8GxpWASjBjFhoZiqmy/GF8CQdiFWBVS8GorxMTpM80JkP3pueurXUGyK32Mkp9SxT2vTFst1WTNCo11lQRYEKOC4bbo6I3yO3CZhDiVRx6DdVqzRk1Dzljux8R2JGk2Pcim3PHUINuIGip5iOMkIDuJPSaM6azExDvTwZeFb5oALfaXyNgVxT4j1UAbjmHEaE7KvpbUwLyI4Q0kBQ9XwUwTKdD1bI1S8Rt9wEQjMaBd1XpwHY7kbA5CvqPpnKQtdp7gbTppNR/QenAcnuIoCEueadTAbjtXgKi9XHgO2oH+TtI9D4KvIupAFnTOUuIuycD76AKkLXcJ0gwFJe8W6kA3MqfAJCn4sDfoe6itpeI2vXKnUgFyNjOPiK4MRX4m7jtdmpIT2eJbayI6CjfCsL9cdG7YuTa3hGyQlzyS6kAPNexDWB2OA5vc9VTkTHdaR3ZromgbywVwNhbWEdSjAOiKYE+z5fMJK0FxEDHujWfir3zrlH+B9xyuoDgvCSsnxcA8jsw7IkD/3Itl4v6cJTP9QLB/x/wE1zHRCjF83WXAAAAAElFTkSuQmCC'
+                      )
+              .col.col-md-2
+                .custom-control.custom-checkbox
+                  input#docBusinessPan.custom-control-input(
+                    type='checkbox',
+                    (change)='verifyDoc($event)',
+                    name='docBusinessPanVerified',
+                    [(ngModel)]='profile.docBusinessPanVerified'
+                  )
+                  label.custom-control-label(for='docBusinessPan') Verified
+          .form-group(*ngIf='!panFile')
+            label(for='panupload') Company PAN
+              span.text-danger 
+                | *
+            .custom-file.mb-lg-3
+              input#docBusinessPan.form-control.custom-file-input(
+                type='file',
+                (change)='handleFileInput($event)',
+                enctype='multipart/form-data',
+                [disabled]='docBusinessPan'
+              )
+              label.custom-file-label(for='panupload') Upload File(Max size 5 MB)
+
+          .form-group(*ngIf='cheqFile')
+            label Cancelled Cheque
+            br
+            .row
+              .col.col-md-10
+                #dummy.form-control
+                  p
+                    a(href='{{ downloadCheq() }}', target='_blank') {{ cheqFile }}
+                    span.linker((click)='removeCheq()') &nbsp;&nbsp;&nbsp;&nbsp;
+                      img(
+                        src='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAChUlEQVRIS9WVT2jUQBTG35uktaJSdyfgnx48iYIHe9GLItVNIoqg4sGKIm2yXRARRERoL/YgCkJV0EOhTcSKUEFBBG3ZbKR4EOypgicFEaGINklLRalrZ57siiC1O20OBZ3b8OZ9v/nevJlBWOKBS6wP/wbAsDsOEMm7ALC66ljKhIAdT0JveKEKLMpB1nSfIwOPlZc9rAiSPnNMErQmoZ9LDTDMfIsAcU1KXK4x+PpLgDYIidHvuZCwQgfkxOhDNQpyJZP4DZl2Lir1j/wJ/csB33OyCbT6Q0DyJmlaKxBJ5S4RGUo5CIBnQJQfxc8GxpWASjBjFhoZiqmy/GF8CQdiFWBVS8GorxMTpM80JkP3pueurXUGyK32Mkp9SxT2vTFst1WTNCo11lQRYEKOC4bbo6I3yO3CZhDiVRx6DdVqzRk1Dzljux8R2JGk2Pcim3PHUINuIGip5iOMkIDuJPSaM6azExDvTwZeFb5oALfaXyNgVxT4j1UAbjmHEaE7KvpbUwLyI4Q0kBQ9XwUwTKdD1bI1S8Rt9wEQjMaBd1XpwHY7kbA5CvqPpnKQtdp7gbTppNR/QenAcnuIoCEueadTAbjtXgKi9XHgO2oH+TtI9D4KvIupAFnTOUuIuycD76AKkLXcJ0gwFJe8W6kA3MqfAJCn4sDfoe6itpeI2vXKnUgFyNjOPiK4MRX4m7jtdmpIT2eJbayI6CjfCsL9cdG7YuTa3hGyQlzyS6kAPNexDWB2OA5vc9VTkTHdaR3ZromgbywVwNhbWEdSjAOiKYE+z5fMJK0FxEDHujWfir3zrlH+B9xyuoDgvCSsnxcA8jsw7IkD/3Itl4v6cJTP9QLB/x/wE1zHRCjF83WXAAAAAElFTkSuQmCC'
+                      )
+              .col.col-md-2
+                .custom-control.custom-checkbox
+                  input#docCancelledCheque.custom-control-input(
+                    type='checkbox',
+                    (change)='verifyDoc($event)',
+                    name='docCancelledChequeVerified',
+                    [(ngModel)]='profile.docCancelledChequeVerified'
+                  )
+                  label.custom-control-label(for='docCancelledCheque') Verified
+          .form-group(*ngIf='!cheqFile')
+            label(for='chequpload') Cancelled Cheque
+              span.text-danger 
+                | *
+            .custom-file.mb-lg-3
+              input#docCancelledCheque.form-control.custom-file-input(
+                type='file',
+                (change)='handleFileInput($event)',
+                enctype='multipart/form-data',
+                [disabled]='docCancelledCheque'
+              )
+              label.custom-file-label(for='chequpload') Upload File(Max size 5 MB)
+
+          .form-group(*ngIf='logoFile')
+            label Company Logo
+            br
+            .row
+              .col.col-md-10
+                #dummy.form-control
+                  p
+                    a(href='{{ downloadLogo() }}', target='_blank') {{ logoFile }}
+                    span.linker((click)='removeLogo()') &nbsp;&nbsp;&nbsp;&nbsp;
+                      img(
+                        src='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAChUlEQVRIS9WVT2jUQBTG35uktaJSdyfgnx48iYIHe9GLItVNIoqg4sGKIm2yXRARRERoL/YgCkJV0EOhTcSKUEFBBG3ZbKR4EOypgicFEaGINklLRalrZ57siiC1O20OBZ3b8OZ9v/nevJlBWOKBS6wP/wbAsDsOEMm7ALC66ljKhIAdT0JveKEKLMpB1nSfIwOPlZc9rAiSPnNMErQmoZ9LDTDMfIsAcU1KXK4x+PpLgDYIidHvuZCwQgfkxOhDNQpyJZP4DZl2Lir1j/wJ/csB33OyCbT6Q0DyJmlaKxBJ5S4RGUo5CIBnQJQfxc8GxpWASjBjFhoZiqmy/GF8CQdiFWBVS8GorxMTpM80JkP3pueurXUGyK32Mkp9SxT2vTFst1WTNCo11lQRYEKOC4bbo6I3yO3CZhDiVRx6DdVqzRk1Dzljux8R2JGk2Pcim3PHUINuIGip5iOMkIDuJPSaM6azExDvTwZeFb5oALfaXyNgVxT4j1UAbjmHEaE7KvpbUwLyI4Q0kBQ9XwUwTKdD1bI1S8Rt9wEQjMaBd1XpwHY7kbA5CvqPpnKQtdp7gbTppNR/QenAcnuIoCEueadTAbjtXgKi9XHgO2oH+TtI9D4KvIupAFnTOUuIuycD76AKkLXcJ0gwFJe8W6kA3MqfAJCn4sDfoe6itpeI2vXKnUgFyNjOPiK4MRX4m7jtdmpIT2eJbayI6CjfCsL9cdG7YuTa3hGyQlzyS6kAPNexDWB2OA5vc9VTkTHdaR3ZromgbywVwNhbWEdSjAOiKYE+z5fMJK0FxEDHujWfir3zrlH+B9xyuoDgvCSsnxcA8jsw7IkD/3Itl4v6cJTP9QLB/x/wE1zHRCjF83WXAAAAAElFTkSuQmCC'
+                      )
+              .col.col-md-2
+                .custom-control.custom-checkbox
+                  input#docBusinessLogo.custom-control-input(
+                    type='checkbox',
+                    (change)='verifyDoc($event)',
+                    name='docBusinessLogoVerified',
+                    [(ngModel)]='profile.docBusinessLogoVerified'
+                  )
+                  label.custom-control-label(for='docBusinessLogo') Verified
+          .form-group(*ngIf='!logoFile')
+            label(for='logoupload') Company Logo
+              span.text-danger 
+                | *
+            .custom-file.mb-lg-3
+              input#docBusinessLogo.form-control.custom-file-input(
+                type='file',
+                (change)='handleFileInput($event)',
+                enctype='multipart/form-data',
+                [disabled]='docBusinessLogo'
+              )
+              label.custom-file-label(for='logoupload') Upload Image File (Max. Resolution: 512 x 512)
+
+          .form-group(*ngIf='authpanFile')
+            label Authorized Person PAN
+            br
+            .row
+              .col.col-md-10
+                #dummy.form-control
+                  p
+                    a(href='{{ downloadAuthPan() }}', target='_blank') {{ authpanFile }}
+                    span.linker((click)='removeAuthpan()') &nbsp;&nbsp;&nbsp;&nbsp;
+                      img(
+                        src='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAChUlEQVRIS9WVT2jUQBTG35uktaJSdyfgnx48iYIHe9GLItVNIoqg4sGKIm2yXRARRERoL/YgCkJV0EOhTcSKUEFBBG3ZbKR4EOypgicFEaGINklLRalrZ57siiC1O20OBZ3b8OZ9v/nevJlBWOKBS6wP/wbAsDsOEMm7ALC66ljKhIAdT0JveKEKLMpB1nSfIwOPlZc9rAiSPnNMErQmoZ9LDTDMfIsAcU1KXK4x+PpLgDYIidHvuZCwQgfkxOhDNQpyJZP4DZl2Lir1j/wJ/csB33OyCbT6Q0DyJmlaKxBJ5S4RGUo5CIBnQJQfxc8GxpWASjBjFhoZiqmy/GF8CQdiFWBVS8GorxMTpM80JkP3pueurXUGyK32Mkp9SxT2vTFst1WTNCo11lQRYEKOC4bbo6I3yO3CZhDiVRx6DdVqzRk1Dzljux8R2JGk2Pcim3PHUINuIGip5iOMkIDuJPSaM6azExDvTwZeFb5oALfaXyNgVxT4j1UAbjmHEaE7KvpbUwLyI4Q0kBQ9XwUwTKdD1bI1S8Rt9wEQjMaBd1XpwHY7kbA5CvqPpnKQtdp7gbTppNR/QenAcnuIoCEueadTAbjtXgKi9XHgO2oH+TtI9D4KvIupAFnTOUuIuycD76AKkLXcJ0gwFJe8W6kA3MqfAJCn4sDfoe6itpeI2vXKnUgFyNjOPiK4MRX4m7jtdmpIT2eJbayI6CjfCsL9cdG7YuTa3hGyQlzyS6kAPNexDWB2OA5vc9VTkTHdaR3ZromgbywVwNhbWEdSjAOiKYE+z5fMJK0FxEDHujWfir3zrlH+B9xyuoDgvCSsnxcA8jsw7IkD/3Itl4v6cJTP9QLB/x/wE1zHRCjF83WXAAAAAElFTkSuQmCC'
+                      )
+              .col.col-md-2
+                .custom-control.custom-checkbox
+                  input#docAuthorizedPersonPan.custom-control-input(
+                    type='checkbox',
+                    (change)='verifyDoc($event)',
+                    name='docAuthorizedPersonPanVerified',
+                    [(ngModel)]='profile.docAuthorizedPersonPanVerified'
+                  )
+                  label.custom-control-label(for='docAuthorizedPersonPan') Verified
+          .form-group(*ngIf='!authpanFile')
+            label(for='authpersonpanupload') Authorized Person PAN
+              span.text-danger 
+                | *
+            .custom-file.mb-lg-3
+              input#docAuthorizedPersonPan.form-control.custom-file-input(
+                type='file',
+                (change)='handleFileInput($event)',
+                enctype='multipart/form-data',
+                [disabled]='docAuthorizedPersonPan'
+              )
+              label.custom-file-label(for='authpersonpanupload') Upload File(Max size 5 MB)

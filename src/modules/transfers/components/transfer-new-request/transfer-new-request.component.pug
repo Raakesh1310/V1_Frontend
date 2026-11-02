@@ -1,0 +1,469 @@
+div(*ngIf='errors !== null && errors.length > 0')
+	.alert.alert-danger.alert-dismissible.fade.show(
+		role='alert',
+		*ngIf='errors.length > 0'
+	)
+		| {{ errors[0] }}
+		button.close(
+			type='button',
+			(click)='errors = []',
+			data-dismiss='alert',
+			aria-label='Close'
+		)
+			span(aria-hidden='true') ×
+form(autocomplete='off', ngNativeValidate, [formGroup]='transferForm')
+	.form-group(*ngIf='isAdmin')
+		label(for='payee') Merchant
+		span.text-danger *
+		br
+		ng-select(
+			[items]='merchants',
+			bindLabel='title',
+			[(ngModel)]='selectedMerchant',
+			[ngModelOptions]='{ standalone: true }',
+			loadingText='Loading...',
+			placeholder='Select Merchant',
+			(search)='getMerchants($event.term)',
+			name='merchant'
+		)
+			ng-template(ng-label-tmp='' let-item='item')
+				span(*ngIf='selectedMerchant') {{ item.title }}
+			ng-template(
+				ng-option-tmp='',
+				let-item='item',
+				let-search='searchTerm',
+				let-index='index'
+			)
+				span.sup-option {{ item.title }}
+				br
+				span.sub-option {{ item.merchantId }} | {{ item.email }}
+	.form-group
+		label(for ='bank') Bank 
+		span.text-danger *
+		br
+		ng-select(
+			name='bank',
+			placeholder = 'Select a Bank',
+			[(ngModel)]='selectedBank',
+			[ngModelOptions]='{ standalone: true }',
+			(change)='updateMerchant()',
+		)
+			ng-option(*ngFor='let st of banks', [value]='st') {{ st }}
+
+	.form-group(*ngIf='!connectedBanking')
+		label(for='account') Escrow
+		span.text-danger *
+		ng-select(
+			[items]='accounts',
+			bindLabel='name',
+			[(ngModel)]='selectedAccount',
+			formControlName='account',
+			loadingText='Loading...',
+			placeholder='Enter Escrow Name',
+			(change)='updateAccount($event)',
+			[disabled]='submitted',
+			name='account',
+			(search)='fetchAccount($event)'
+		)
+			ng-template(ng-label-tmp='' let-item='item')
+				span(*ngIf='selectedAccount') {{ utilService.firstCapitalize(item.name) }} &nbsp;
+					span.fader - {{ item.accountId }}
+			ng-template(
+				ng-option-tmp='',
+				let-item='item',
+				let-search='searchTerm',
+				let-index='index'
+			)
+				span.sup-option {{ utilService.firstCapitalize(item.name) }}
+				br
+				span.sub-option {{ item.accountId }}
+
+		div(*ngIf='selectedAccount')
+			.subTextAmount(*ngIf='selectedAccount.balance >= 0')
+				p Available Balance:
+					b &nbsp; Rs. {{ selectedAccount.balance.toFixed(2) }} /-
+	.form-group(*ngIf='connectedBanking')
+		label(for='bankAccount') Bank Account
+		span.text-danger *
+		ng-select(
+			[items]='bankAccounts',
+			bindLabel='accountName',
+			[(ngModel)]='selectedBankAccount',
+			formControlName='bankAccount',
+			loadingText='Loading...',
+			placeholder='Select Account',
+			(change)='updateBankAccount($event)',
+			[disabled]='submitted',
+			name='bankAccount',
+
+		)
+			ng-template(ng-label-tmp='' let-item='item')
+				span(*ngIf='selectedBankAccount') {{ utilService.firstCapitalize(item.accountName) }} &nbsp;
+					span.fader - {{ item.bankAccountNo }}
+			ng-template(
+				ng-option-tmp='',
+				let-item='item',
+				let-search='searchTerm',
+				let-index='index'
+			)
+				span.sup-option {{ utilService.firstCapitalize(item.accountName) }}
+				br
+				span.sub-option {{ item.bankAccountNo }}
+
+		div(*ngIf='selectedBankAccount')
+			.subTextAmount(*ngIf='selectedBankAccount.balance >= 0')
+				p Available Balance:
+					b &nbsp; Rs. {{activeBalance?.toFixed(2) }} /-
+
+	.form-group(*ngIf='!connectedBanking')
+		label(for='payee') Payee
+		span.text-danger *
+		ng-select#payee(
+			[items]='accountPayeeService.payees$ | async',
+			bindLabel='accountHolder',
+			formControlName='payee',
+			[(ngModel)]='selectedPayee',
+			(change)='updatePayee($event)',
+			loadingText='Loading...',
+			placeholder='Enter Payee Name',
+			[disabled]='submitted',
+			name='payee'
+		)
+			ng-template(ng-label-tmp='' let-item='item')
+				span(*ngIf='selectedPayee') {{ utilService.firstCapitalize(item?.accountHolder) }} &nbsp;
+					span.fader - {{ item?.accountNumber }} - {{ item?.ifscCode?.toUpperCase() }}
+			ng-template(
+				ng-option-tmp='',
+				let-item='item',
+				let-search='searchTerm',
+				let-index='index',
+				*ngIf='(accountPayeeService.payees$ | async).length > 0'
+			)
+				span.sup-option {{ utilService.firstCapitalize(item?.accountHolder) }}
+				br
+				span.sub-option {{ item?.accountNumber }} | {{ item?.ifsc?.toUpperCase() }}
+
+		.subTextAmount(*ngIf='selectedPayee && !isRetention')
+			p Maximum Transfer Limit:
+				b &nbsp; Rs. {{ selectedPayee?.balance.toFixed(2) }} /-
+		
+	.form-group(*ngIf='connectedBanking')
+		label(for='payee') Payee
+		span.text-danger *
+		ng-select#payee(
+			[items]='payeeService.payees$ | async',
+			bindLabel='accountHolder',
+			formControlName='payee',
+			[(ngModel)]='selectedPayee',
+			(change)='updatePayee($event)',
+			loadingText='Loading...',
+			placeholder='Enter Payee Name',
+			[disabled]='submitted',
+			name='payee'
+		)
+			ng-template(ng-label-tmp='' let-item='item')
+				span(*ngIf='selectedPayee') {{ utilService.firstCapitalize(item?.accountHolder) }} &nbsp;
+					span.fader - {{ item?.accountNumber }} - {{ item?.ifscCode?.toUpperCase() }}
+			ng-template(
+				ng-option-tmp='',
+				let-item='item',
+				let-search='searchTerm',
+				let-index='index',
+				*ngIf='(payeeService.payees$ | async).length > 0'
+			)
+				span.sup-option {{ utilService.firstCapitalize(item?.accountHolder) }}
+				br
+				span.sub-option {{ item?.accountNumber }} | {{ item?.ifsc?.toUpperCase() }}
+
+		.subTextAmount(*ngIf='selectedPayee && bankAccounts.length === 0 && !isRetention')
+			p Maximum Transfer Limit:
+				b &nbsp; Rs. {{ selectedPayee?.balance.toFixed(2) }} /-
+
+	//- .form-group(*ngIf='selectedAccount')
+	//- .form-group(*ngIf='selectedAccount && (selectedAccount.bank === "yes_bank" || selectedAccount.bank === "ibl" || selectedAccount.bank === "hdfc" || selectedAccount.bank === "icici" || selectedAccount.bank === "rbl")')
+	.form-group(*ngIf='selectedBankAccount || (selectedAccount && ( selectedAccount.bank !== "icici"))')
+		label Transfer Type
+		sbpro-transfer-type-radio(
+			[isImpsAllowed]='isIMPS',
+			[isFTAllowed]='isFTAllowed',
+			formControlName='transferType'
+		)
+
+	.form-group
+		label(for='amountcontrol') Amount
+		span.text-danger *
+		input#amountcontrol.form-control.form-control-sm(
+			type='text',
+			placeholder='Enter Amount',
+			formControlName='amount',
+			appTwoDigitDecimalNumber,
+			name='amount',
+			(change)='amountChanged($event)',
+			[disabled]='submitted'
+		)
+		span(*ngIf='amount.invalid && (amount.dirty || amount.touched)')
+			span.text-danger(*ngIf='transferForm.controls.amount.errors.rtgs') &nbsp; In case of RTGS, transfer amount should be greater than or equal to Rs 2 Lacs.
+			span.text-danger(*ngIf='transferForm.controls.amount.errors.imps') &nbsp; In case of IMPS, transfer amount should be lesser than or equal to Rs 5 Lacs.
+	.form-group
+		label(for='purpose') Purpose (optional)
+		input#purpose.form-control.form-control-sm(
+			type='text',
+			placeholder='Purpose of the transfer',
+			formControlName='purpose',
+			name='purpose'
+		)
+	.form-group
+		div(formArrayName='notes')
+			label(for='purpose') 
+				b Notes &nbsp;
+				small (Optional - Max {{ maxNotesAllowed }} Key-Value) &nbsp;
+			button.btn.btn-light.btn-sm((click)='addNote()')
+				mat-icon.add-course-btn + Add New
+				br
+			.mt-2(*ngIf='notes.controls.length > 0')
+				div(*ngFor='let noteFrom of notes.controls; let i = index')
+					.row.mt-1([formGroupName]='i')
+						.col
+							input#purpose.form-control.form-control-sm(
+								type='text',
+								placeholder='Title (Key)',
+								formControlName='key',
+								name='key',
+								maxlength=256,
+								alphaNumericInput
+							)
+							div(
+								*ngIf='getNoteKey(i).invalid && (getNoteKey(i).dirty || getNoteKey(i).touched)' 
+							)
+								span.text-danger Key Error
+						.col
+							input#purpose.form-control.form-control-sm(
+								type='text',
+								placeholder='Description (Value)',
+								formControlName='value',
+								name='value',
+								maxlength=256
+							)
+							div(
+								*ngIf='getNoteValue(i).invalid && (getNoteValue(i).dirty || getNoteValue(i).touched)' 
+							)
+								span.text-danger Value Error
+						.col
+							button.btn.ws-nowrap(
+								(click)='deleteNote(i)',
+								type='button',
+								style='color:red'
+							)
+								i-feather(name='trash-2')
+
+	//- .row
+	.row.mt-4
+		.col
+			input(
+				type='checkbox',
+				#checkbox,
+				(click)='checkboxSupportingDocuments(checkbox)'
+			) 
+			| &nbsp;
+			label Add Supporting Documents
+			.div(style='color: light-gray; font-size:15px') (Acceptable file formats - .png, .jpg, .pdf, .xlsx, .xls, .csv, .doc, .docx Max size - 5 MB, Multiple files can be uploaded)
+		.col(*ngIf='addSupportingDocuments' style='text-align: left;')
+			.form-group
+				input#uploadDocs(
+					#myInput,
+					type='file',
+					enctype='multipart/form-data',
+					(change)='onfileChange($event)',
+					multiple,
+					accept='.png, .jpg, .pdf, .xlsx, .xls, .csv, .doc, .docx'
+				)
+				sbpro-app-button(
+					(click)='docUp()',
+					text='Upload',
+					loadingText='Uploading...',
+					[buttonStyle]='417505',
+					[loading]='uploading',
+					[btnClass]='{ "btn-block": false, "btn-primary": true, "btn-sm": false }'
+				)
+	.row.mt-3.ml-2.mr-3(*ngIf='addSupportingDocuments')
+		.col-6
+			.table-responsive.pp-table-container
+				table.table
+					thead
+						tr
+							th(scope='col' style='width: 10%')
+								span S.No.
+							th(scope='col' style='width: 80%')
+								span Document
+							th(scope='col' style='width: 10%')
+								span Action
+					tbody(*ngIf='uploadedDocuments.length <= 0 && !uploadedDocuments')
+						tr
+							td
+								span No document linked yet
+					//- tbody(*ngIf='loadingList$ | async')
+					//-   tr
+					//-     td Please wait...
+					tbody(*ngIf='uploadedDocuments.length > 0')
+						tr(*ngFor='let doc of uploadedDocuments; let i = index')
+							td
+								| {{ i + 1 }}
+							td
+								a(
+									href="#", (click)='downloadFile($event, doc.hash, doc?.name)',
+									*ngIf='doc.hash'
+								) {{ doc.name }}
+							td
+								sbpro-app-button(
+									(click)='deleteDoc(doc.documentId)',
+									text='Delete',
+									type='button',
+									loadingText='Deleting...',
+									[loading]='deleting',
+									[btnClass]='{ "btn-block": false, "btn-light": true, "btn-sm": true }'
+								)
+
+	//- .row.mt-4
+	//-   .col
+	//-     div(formArrayName='notes')
+	//-       div(*ngfor='let noteFrom of notes.controls; let i = index')
+	//-         p Hello!
+	//-         .lesson-form-row([formGroup]='noteForm')
+	//-           mat-form-field(appearance='fill')
+	//-             input(matinput='' formControlName='key' placeholder='Key')
+	//-           mat-form-field(appearance='fill')
+	//-             input(matinput='' formControlName='value' placeholder='Value')
+	//-           mat-icon.delete-btn((click)='deleteNote(i)')
+	//-             | delete_forever
+	//-       label(for='purpose') 
+	//-         b Notes &nbsp;
+	//-         small (Optional - Max 5 Key-Value) &nbsp;
+	//-       br
+	//-       button.btn.btn-light.mr-3((click)='addNote()')
+	//-         mat-icon.add-course-btn + Add New
+
+	.row
+		.col-md-6(*ngIf='showMerchantAuthorizer')
+			//label Authorizers(s)
+			div {{ showAccountAuthorizer ? "Level 1 Authorizer" : "Authorizers" }}
+			angular2-multiselect(
+				[data]='dropdownListMerchantAuthorizers',
+				[(ngModel)]='selectedMerchantAuthorizers',
+				[settings]='dropdownSettings',
+				[ngModelOptions]='{ standalone: true }'
+			)
+		.col-md-6(*ngIf='showAccountAuthorizer')
+			//label Authorizers(s)
+			div {{ showMerchantAuthorizer ? "Level 2 Authorizer" : "Authorizers" }}
+			angular2-multiselect(
+				[data]='dropdownListAccountAuthorizers',
+				[(ngModel)]='selectedAccountAuthorizers',
+				[settings]='dropdownSettings',
+				[ngModelOptions]='{ standalone: true }'
+			)
+		//input#purpose.form-control.form-control-sm(
+		//  type='text',
+		//  placeholder='Purpose of the transfer',
+		//  formControlName ='purpose',
+		//  name='purpose'
+		//)
+
+	br
+	h5(*ngIf = '!connectedBanking') Additional Transfer Request
+	hr
+	.form-group(*ngIf = '!connectedBanking')
+		label &nbsp; Add Recurring Transfer
+		br
+		label.switch
+			input(
+				type='checkbox',
+				#checkbox,
+				[disabled]='isDetailPage',
+				[checked]='isRecurring',
+				(click)='checkboxAction($event)'
+			)
+			span.slider.round
+	.row
+		.col-xl-3.col-lg-3.col-md-3.col-sm-12
+			.form-group(*ngIf='isRecurring')
+				label(for='frm-cntrl-start-date') Start Date
+				input#frm-cntrl-start-date.aria-readonly.form-control.form-control-sm(
+					type='text',
+					placeholder='DD MM YYYY',
+					autocomplete='off',
+					[(ngModel)]='startDate',
+					name='startDate',
+					ngbDatepicker,
+					outsideDays='hidden',
+					#d='ngbDatepicker',
+					(click)='d.toggle()',
+					[minDate]='minDate1',
+					[ngModelOptions]='{ standalone: true }'
+				)
+		.col-xl-3.col-lg-3.col-md-3.col-sm-12
+			.form-group(*ngIf='isRecurring')
+				.form-check-label
+					| Frequency
+				select#frm-cntrl-account.selecter.aria-readonly.form-control.form-control-sm(
+					name='account',
+					[(ngModel)]='selectedFrequency',
+					[ngModelOptions]='{ standalone: true }'
+				)
+					option(value='') Please Select
+					option(*ngFor='let f of frequencies', [ngValue]='f') {{ f }}
+		.col-xl-3.col-lg-3.col-md-3.col-sm-12
+			.form-group(*ngIf='isRecurring && selectedFrequency')
+				label(for='recurrence') Repeat for
+				input#recurrence.form-control.form-control-sm(
+					type='text',
+					[(ngModel)]='repeat',
+					[ngModelOptions]='{ standalone: true }',
+					placeholder='Enter billing frequency',
+					name='repeat',
+					(keydown)='onlyTenNumbers($event)'
+				)
+		.col-xl-3.col-lg-3.col-md-3.col-sm-12
+			span.freq(*ngIf='selectedFrequency === "Daily"') Day
+			span.freq(*ngIf='selectedFrequency === "Weekly"') Week
+			span.freq(*ngIf='selectedFrequency === "Monthly"') Month
+			span.freq(*ngIf='selectedFrequency === "Quarterly"') Quarter
+	.row(*ngIf='!isAdmin')
+		.col-sm-12.customCheckBoxWidth
+			input(
+				type='checkbox',
+				#tcCheckbox,
+				name='tcCheckbox',
+				formControlName='tcCheckBox',
+				(click)='tcCheckboxAction(tcCheckbox)'
+			)
+		.col-sm-12.col-md-6.col-lg-6
+			label(for='tcCheckbox') 
+				| I agree to the
+				a.logoColor(
+					href='https://castler.com/domestic-tcs/',
+					target='_blank'
+				) Terms and Conditions
+
+	.row
+		.col
+			sbpro-app-button(
+				text='Request Transfer',
+				type='submit',
+				value='submit',
+				[loading]='loading$ | async',
+				loadingText='Submitting..',
+				[disabled]='addSupportingDocuments && (!uploadedDocuments || uploadedDocuments?.length <= 0)',
+				[btnClass]='{ "btn-block": false, "btn-primary": true }',
+				(click)='sendOTP()'
+			)
+		.col
+			.text-danger(*ngIf='submitted && createTransferError')
+				| {{ createTransferError }}
+		//- [disabled]='submitted'
+		//button.btn.btn-primary(type='submit', *ngIf='!submitted') Request Transfer
+		//button.btn.btn-primary(*ngIf='submitted', [disabled]='submitted')
+		//  span.spinner-border.spinner-border-sm(role='status' aria-hidden='true')
+		//  | &nbsp; Submitting...
+
+ngx-spinner
+	p(style='font-size: 20px; color: white') Initiating Transfer...

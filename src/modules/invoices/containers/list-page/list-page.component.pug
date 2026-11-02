@@ -1,0 +1,16 @@
+.flex-container
+  sbpro-dashboard-head(
+    icon='book',
+    title='All Invoices',
+    description='View all invoices'
+  )
+  .container-fluid.mt-n10.responsiveForm.flex-grow-1
+    sbpro-card-navigation(
+      sbproTocItem='Tabs',
+      [navNames]='["Invoice", "Billing"]',
+      [templates]='[invoice, billing]'
+    )
+      ng-template(#invoice)
+        sbpro-list
+      ng-template(#billing)
+        sbpro-merchant-billing-detail

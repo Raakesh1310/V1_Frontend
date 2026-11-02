@@ -1,0 +1,199 @@
+sbpro-card([headerActions]='true')
+  .card-header.logoColor
+    | All Deposits
+    div
+      span.mr-2
+        .spinner-border.spinner-border-sm.mr-1(
+          role='status',
+          aria-hidden='true',
+          *ngIf='loadingList$ | async'
+        )
+        button.btn.btn-icon.btn-xs.castlerButtonColor(
+          *ngIf='!(loadingList$ | async)',
+          (click)='refreshData()'
+        )
+          i-feather(name='refresh-cw')
+      button.btn.btn-icon.btn-xs.mr-2.castlerButtonColor(
+        (click)='toggleFilters()'
+      )
+        i-feather(name='filter')
+
+  .card-body.flex-container.align-self-stretch
+    div
+      form.pb-2(*ngIf='filtersVisible')
+        .d-flex.mb-2
+          input#search-box.mt-1.form-control.w-100.mr-2(
+            placement='top',
+            ngbPopover='Search by Business Name, Virtual ID, Transaction ID, Remitter name',
+            type='text',
+            name='s',
+            autocomplete='off',
+            placeholder='Search by Business Name, Virtual ID, Transaction ID, Remitter name',
+            [(ngModel)]='transactionService.searchTerm'
+          )
+
+          input#start-date.mt-1.form-control.w-25.mr-2(
+            type='text',
+            name='sd',
+            placeholder='Start Date',
+            autocomplete='off',
+            ngbDatepicker,
+            outsideDays='hidden',
+            #sd='ngbDatepicker',
+            (click)='sd.toggle()',
+            [(ngModel)]='transactionService.dateFrom',
+            [minDate]='transactionService.dateFromMin',
+            [maxDate]='transactionService.dateFromMax'
+          )
+          input#end-date.mt-1.form-control.w-25.mr-2(
+            type='text',
+            name='ed',
+            placeholder='End Date',
+            autocomplete='off',
+            ngbDatepicker,
+            outsideDays='hidden',
+            #ed='ngbDatepicker',
+            (click)='ed.toggle()',
+            [(ngModel)]='transactionService.dateTo',
+            [minDate]='transactionService.dateToMin',
+            [maxDate]='transactionService.dateToMax'
+          )
+          select.mt-1.form-control.w-25.mr-2(
+            *ngIf='!isTrustee',
+            name='bank',
+            [(ngModel)]='transactionService.bank'
+          )
+            option(value='') Select Bank
+            option(value='icici') ICICI
+            option(value='rbl') RBL
+            option(value='idfc') IDFC
+            option(value='yes_bank') YES BANK
+            option(value='ibl') IndusInd
+            option(value='hdfc') HDFC
+            option(value='dbs') DBS
+            option(value='axis') AXIS
+          button.btn.mr-2.ws-wrap.mt-1.mb-1.castlerButtonColor(
+            type='submit',
+            (click)='submitSearchForm()'
+          )
+            fa-icon.d-flex.flex-row.align-items-center(
+              [icon]='["fas", "search"]'
+            )
+          button.btn.btn-link.mr-2.logoColor(type='button', (click)='clearForm()') Clear
+          .justify-content-end 
+            a.btn.btn-success.mt-1.mb-1.mr-2.ws-nowrap.btn-icon(
+              type='button',
+              target='_blank',
+              [href]='transactionService.reportDownloadLink$ | async'
+            )
+              fa-icon.d-flex.flex-row.align-items-center(
+                [icon]='["fas", "arrow-down"]'
+              )
+        .d-flex(*ngIf='(transactions$ | async)?.length > 0') 
+          .flex-row
+            small.mb-2.mt-2 Showing {{ (transactionService.page - 1) * 10 + 1 }} to {{ (transactionService.page - 1) * 10 + (transactions$ | async)?.length }} of {{ total$ | async }}
+    .table-responsive.pp-table-container.align-self-stretch.flex-grow-1.flex-stretch-1.table-striped(
+      *ngIf='(transactions$ | async)?.length > 0 && !(loadingList$ | async)'
+    )
+      table.table
+        thead
+          tr
+            th.th-sticky-top(
+              scope='col',
+              sbSortable='event',
+              (sort)='onSort($event)'
+            )
+              span.ws-nowrap Transaction ID
+            th.th-sticky-top(
+              scope='col',
+              sbSortable='event',
+              (sort)='onSort($event)'
+            )
+              span.ws-nowrap Business name
+            th.th-sticky-top(
+              scope='col',
+              sbSortable='event',
+              (sort)='onSort($event)'
+            )
+              span.ws-nowrap Escrow ID
+            th.th-sticky-top(scope='col', sbSortable='time', (sort)='onSort($event)')
+              span UTR
+            th.th-sticky-top(scope='col', sbSortable='time', (sort)='onSort($event)')
+              span Amount
+            th.th-sticky-top(scope='col', sbSortable='time', (sort)='onSort($event)')
+              span.ws-nowrap Remitter Name
+            th.th-sticky-top(scope='col', sbSortable='time', (sort)='onSort($event)')
+              span.ws-nowrap Remitter Account Number/UPI ID
+            th.th-sticky-top(scope='col', sbSortable='time', (sort)='onSort($event)')
+              span.ws-nowrap Creation Date
+        tbody
+          tr(*ngFor='let transaction of transactions$ | async')
+            td
+              a.nav-link.p-0.tableClickEntryColor(
+                href='javascript:void(0);',
+                (click)='showTransactionDetails(transaction.transactionId)'
+              )
+                ngb-highlight(
+                  [result]='transaction.transactionId',
+                  [term]='transactionService.searchTerm'
+                )
+            td
+              a.nav-link.p-0.tableClickEntryColor(
+                href='javascript:void(0);',
+                (click)='openMerchantDetails(transaction.merchantId)'
+              )
+                ngb-highlight(
+                  [result]='transaction.merchantTitle',
+                  [term]='transactionService.searchTerm'
+                )
+            td
+              a.nav-link.p-0.tableClickEntryColor(
+                href='javascript:void(0);',
+                (click)='openAccountDetails(transaction.accountId)'
+              )
+                ngb-highlight(
+                  [result]='transaction.accountId',
+                  [term]='transactionService.searchTerm'
+                )
+            td
+              ngb-highlight(
+                [result]='transaction.utr',
+                [term]='transactionService.searchTerm'
+              )
+            td
+              ngb-highlight(
+                [result]='toINR(transaction.amount)',
+                [term]='transactionService.searchTerm'
+              )
+            td
+              ngb-highlight(
+                [result]='transaction.remitterName',
+                [term]='transactionService.searchTerm'
+              )
+            td
+              ngb-highlight(
+                [result]='transaction.remitterAccNumber',
+                [term]='transactionService.searchTerm'
+              )
+            td
+              ngb-highlight(
+                [result]='transaction.createdAt | date: "d MMM yyyy"',
+                [term]='transactionService.searchTerm'
+              )
+    .flex-container.flex-row(
+      *ngIf='(transactions$ | async)?.length <= 0 && !(loadingList$ | async)'
+    )
+      .align-self-center No Data available
+    .flex-container.flex-row(*ngIf='loadingList$ | async')
+      .align-self-center Please wait...
+    .d-flex.justify-content-between.pt-2.align-self-end(
+      *ngIf='(transactions$ | async)?.length > 0 && !(loadingList$ | async)'
+    )
+      ngb-pagination(
+        [collectionSize]='total$ | async',
+        [(page)]='transactionService.page',
+        [maxSize]='5',
+        [rotate]='true',
+        [ellipses]='false',
+        [boundaryLinks]='true'
+      )

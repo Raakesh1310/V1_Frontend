@@ -1,0 +1,89 @@
+div(*ngIf='errors && errors.length > 0')
+	sbpro-alert(classes='alert-danger', [dismissable]='true')
+		| {{ errors[0] }}
+form(*ngIf='!readOnly')
+	//- p.text-danger(*ngIf='(docs$ | async)?.length === 0') Please upload atleast 1 document.
+	.row
+		.col-sm-4
+			.form-group
+				select#frm-cntrl-email.form-control.form-control-sm(
+					name='docType',
+					[(ngModel)]='selectedDoc',
+					[ngModelOptions]='{ standalone: true }',
+					[disabled]='submitted'
+				)
+					option(value='', disabled) Select a type of document
+					option(value='Request letter for Escrow creation') Request letter for Escrow creation
+					option(value='Escrow agreement') Escrow agreement
+					option(value='Transaction parties agreement') Transaction parties agreement
+					option(value='Indemnity undertaking') Indemnity undertaking
+
+		.col
+			.form-group
+				input#ndocs(
+					#myInput,
+					type='file',
+					enctype='multipart/form-data',
+					(change)='onfileChange($event)',
+					multiple,
+					[disabled]='!selectedDoc',
+					accept='.png,.jpg,.pdf'
+				)
+				sbpro-app-button(
+					(click)='docUp()',
+					text='Upload',
+					loadingText='Uploading...',
+					[buttonStyle]='417505',
+					[loading]='uploading',
+					[disabled]='!selectedDoc',
+					[btnClass]='{ "btn-block": false, "btn-primary": true, "btn-sm": true }'
+				)
+br
+.row
+	.table-responsive.pp-table-container
+		table.table
+			thead
+				tr
+					th(scope='col')
+						span S.No.
+					th(scope='col')
+						span Document Type
+					th(scope='col')
+						span Document Uploaded
+					th(scope='col', *ngIf='!viewMode || !readOnly')
+						span Action
+
+			tbody(*ngIf='(docs$ | async)?.length <= 0 && !(loadingList$ | async)')
+				tr
+					td
+						span No document linked yet
+			tbody(*ngIf='loadingList$ | async')
+				tr
+					td Please wait...
+			tbody(*ngIf='(docs$ | async)?.length > 0 && !(loadingList$ | async)')
+				tr(*ngFor='let doc of docs$ | async; let i = index')
+					td
+						| {{ i + 1 }}
+					td
+						span {{ doc.docType }}
+					td
+						a(href="#", (click)='downloadFile($event, doc.hash, doc.name)', *ngIf='doc.hash') {{ doc.name }}
+					td
+						sbpro-app-button(
+							*ngIf='!viewMode',
+							(click)='deleteDoc(doc.documentId)',
+							text='Delete',
+							loadingText='Deleting...',
+							[loading]='deleting',
+							[btnClass]='{ "btn-block": false, "btn-light": true, "btn-sm": true }'
+						)
+
+sbpro-app-button(
+	*ngIf='currentTab && !viewMode',
+	(click)='activate()',
+	text='Activate',
+	loadingText='Activating...',
+	[loading]='activating',
+	[disabled]='(docs$ | async).length < 1',
+	[btnClass]='{ "btn-block": false, "btn-primary": true }'
+) 

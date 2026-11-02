@@ -1,0 +1,197 @@
+@import '~@ng-select/ng-select/themes/default.theme.css';
+
+@media screen and (min-width: 1024px) {
+  .responsiveForm {
+    width: 100%;
+  }
+}
+
+/* Chrome, Safari, Edge, Opera */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input[type='number'] {
+  -moz-appearance: textfield;
+}
+
+p {
+  margin-bottom: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.sub-option {
+  font-size: small;
+  color: gray;
+}
+
+.sup-option {
+  font-weight: 500;
+  font-size: large;
+}
+
+.errors {
+  ul {
+    list-style: none;
+  }
+  color: red;
+}
+
+.grecaptcha-badge {
+  visibility: hidden;
+}
+
+.logoImage {
+  width: 250px;
+}
+
+.alert {
+  ul {
+    margin-bottom: 0%;
+    list-style: none;
+  }
+}
+
+.ng-select .ng-select-container {
+  min-height: 30.5px;
+}
+
+.ng-select.ng-select-single .ng-select-container {
+  height: 30.5px;
+}
+
+.myanchor {
+  color: blue;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.details {
+  label {
+    font-weight: 600;
+    color: black;
+    margin-bottom: 0em;
+  }
+  p {
+    margin-top: 0em;
+  }
+}
+
+// SLIDER CSS
+
+/* The switch - the box around the slider */
+
+/* Hide default HTML checkbox */
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+/* The slider */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 50px;
+  height: 20px;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: -1px;
+  bottom: 0;
+  background-color: #ccc;
+  -webkit-transition: 0.4s;
+  transition: 0.4s;
+}
+
+.slider:before {
+  position: absolute;
+  content: '';
+  height: 20px;
+  width: 20px;
+  left: 1px;
+  bottom: 0px;
+  background-color: rgb(255, 255, 255);
+  -webkit-transition: 0.4s;
+  transition: 0.4s;
+}
+
+input:checked + .slider {
+  background-color: #2196f3;
+}
+
+input:focus + .slider {
+  box-shadow: 0 0 1px #2196f3;
+}
+
+input:checked + .slider:before {
+  -webkit-transform: translateX(30px);
+  -ms-transform: translateX(30px);
+  transform: translateX(30px);
+}
+/* Rounded sliders */
+.slider.round {
+  border-radius: 32px;
+}
+
+.slider.round:before {
+  border-radius: 50%;
+}
+
+.linker {
+  cursor: pointer;
+  color: #2196f3;
+  text-decoration: underline;
+}
+.linker:visited {
+  cursor: pointer;
+  color: #2196f3;
+  text-decoration: underline;
+}
+
+sbpro-escrow-page-widgets-input,
+sbpro-escrow-page-field-text,
+sbpro-escrow-page-field-aadhaar,
+sbpro-escrow-page-field-bank,
+sbpro-escrow-page-widgets-pan,
+sbpro-escrow-page-field-email,
+sbpro-escrow-page-field-mobile,
+sbpro-escrow-page-field-number {
+  width: 100%;
+}
+
+.no-border {
+  border: none;
+}
+
+.bold {
+  font-weight: bold;
+}
+
+.disabled {
+  pointer-events: none;
+  opacity: 0.5;
+}
+
+@media screen and (-webkit-min-device-pixel-ratio: 0) and (min-resolution: 0.001dpcm) {
+  .ng-select.ng-select-single .ng-select-container {
+    // height: 100%;
+    min-block-size: auto;
+    min-height: 10px;
+  }
+}
+
+.full-width {
+  width: 100%;
+}
+
+.nav-link {
+  cursor: pointer;
+}

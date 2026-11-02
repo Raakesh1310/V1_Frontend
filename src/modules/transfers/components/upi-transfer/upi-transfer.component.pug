@@ -1,0 +1,302 @@
+div(*ngIf='errors !== null && errors.length > 0')
+	.alert.alert-danger.alert-dismissible.fade.show(
+		role='alert',
+		*ngIf='errors.length > 0'
+	)
+		| {{ errors[0] }}
+		button.close(
+			type='button',
+			(click)='errors = []',
+			data-dismiss='alert',
+			aria-label='Close'
+		)
+			span(aria-hidden='true') ×
+form(autocomplete='off', ngNativeValidate, [formGroup]='transferForm')
+
+	.form-group
+		label(for ='bank') Bank 
+		span.text-danger *
+		br
+		ng-select(
+			name='bank',
+			placeholder = 'Select a Bank',
+			[(ngModel)]='selectedBank',
+			[ngModelOptions]='{ standalone: true }',
+			(change)='getAccounts()',
+		)
+			ng-option(*ngFor='let st of banks', [value]='st') {{ st }}
+
+	.form-group(*ngIf='!connectedBanking')
+		label(for='account') Escrow
+		span.text-danger *
+		ng-select(
+			[items]='accounts',
+			bindLabel='name',
+			[(ngModel)]='selectedAccount',
+			formControlName='account',
+			loadingText='Loading...',
+			placeholder='Enter Escrow Name',
+			(change)='updateAccount($event)',
+			[disabled]='submitted',
+			name='account',
+			(search)='fetchAccount($event)'
+		)
+			ng-template(ng-label-tmp='' let-item='item')
+				span(*ngIf='selectedAccount') {{ utilService.firstCapitalize(item.name) }} &nbsp;
+					span.fader - {{ item.accountId }}
+			ng-template(
+				ng-option-tmp='',
+				let-item='item',
+				let-search='searchTerm',
+				let-index='index'
+			)
+				span.sup-option {{ utilService.firstCapitalize(item.name) }}
+				br
+				span.sub-option {{ item.accountId }}
+
+		div(*ngIf='selectedAccount')
+			.subTextAmount(*ngIf='selectedAccount.balance >= 0')
+				p Available Balance:
+					b &nbsp; Rs. {{ selectedAccount.balance.toFixed(2) }} /-
+	.form-group(*ngIf='connectedBanking')
+		label(for='bankAccount') Bank Account
+		span.text-danger *
+		ng-select(
+			[items]='bankAccounts',
+			bindLabel='name',
+			[(ngModel)]='selectedBankAccount',
+			formControlName='bankAccount',
+			loadingText='Loading...',
+			placeholder='Select Account',
+			(change)='updateBankAccount($event)',
+			[disabled]='submitted',
+			name='bankAccount',
+
+		)
+			ng-template(ng-label-tmp='' let-item='item')
+				span(*ngIf='selectedBankAccount') {{ utilService.firstCapitalize(item.accountName) }} &nbsp;
+					span.fader - {{ item.bankAccountNo }}
+			ng-template(
+				ng-option-tmp='',
+				let-item='item',
+				let-search='searchTerm',
+				let-index='index'
+			)
+				span.sup-option {{ utilService.firstCapitalize(item.accountName) }}
+				br
+				span.sub-option {{ item.bankAccountNo }}
+
+		div(*ngIf='selectedBankAccount')
+			.subTextAmount(*ngIf='selectedBankAccount.balance >= 0')
+				p Available Balance:
+					b &nbsp; Rs. {{activeBalance?.toFixed(2) }} /-
+	.form-group(*ngIf='!connectedBanking')
+		label(for='payee') Payee 
+		span.text-danger *
+		.d-flex
+			.pr-1.w-50(style='height: fit-content !important;')
+				ng-select(
+					[items]='accountPayeeService.payees$ | async',
+					bindLabel='accountHolder',
+					formControlName='vpa',
+					[(ngModel)]='selectedPayee',
+					loadingText='Loading...',
+					placeholder='Enter Payee Name',
+					(change)='updatePayee($event)'
+				)
+					ng-template(ng-label-tmp='' let-item='item')
+						span(*ngIf='selectedPayee') {{ utilService.firstCapitalize(item?.accountHolder) }} &nbsp;
+							span.fader - {{ item.vpa }}
+					
+					ng-template(
+						ng-option-tmp='',
+						let-item='item',
+						let-search='searchTerm',
+						let-index='index',
+						*ngIf='(accountPayeeService.payees$ | async).length > 0 '
+					)
+						span.sup-option {{ utilService.firstCapitalize(item?.accountHolder) }}
+						br
+						span.sub-option {{item.vpa }}
+				.subTextAmount(*ngIf='selectedPayee && !isRetention')
+					p Maximum Transfer Limit:
+						b &nbsp; Rs. {{ selectedPayee?.balance.toFixed(2) }} /-
+
+			.pl-2.flex-shrink-1(*ngIf='!vpaHolderName' style='height: fit-content !important;')
+				sbpro-app-button(
+					(click)='verifyVPA()',
+					text='Verify',
+					[loading]='verifyingVPA$ | async',
+					loadingText='Verifying..',
+					[btnClass]='{ "btn-block": false, "btn-primary": true }',
+					[disabled]='!selectedBankAccount && !selectedAccount'
+				)
+		.row.mb-1
+			.col-lg-12
+				span.text-success(*ngIf='vpaHolderName') UPI ID is linked to {{ vpaHolderName }}
+				span.text-danger(*ngIf='!vpaHolderName && vpaHolderNameError') {{ vpaHolderNameError }}
+
+
+	.form-group(*ngIf='connectedBanking')
+		label(for='payee') Payee 
+		span.text-danger *
+		.d-flex
+			.pr-1.w-50(style='height: fit-content !important;')
+				ng-select(
+					*ngIf='connectedBanking',
+					[items]='payeeService.payees$ | async',
+					bindLabel='accountHolder',
+					formControlName='vpa',
+					[(ngModel)]='selectedPayee',
+					loadingText='Loading...',
+					placeholder='Enter Payee Name',
+					(change)='updatePayee($event)'
+				)
+					ng-template(ng-label-tmp='' let-item='item')
+						span(*ngIf='selectedPayee') {{ utilService.firstCapitalize(item?.accountHolder) }} &nbsp;
+							span.fader - {{ item.vpa }}
+					
+					ng-template(
+						ng-option-tmp='',
+						let-item='item',
+						let-search='searchTerm',
+						let-index='index',
+						*ngIf='(payeeService.payees$ | async).length > 0'
+					)
+						span.sup-option {{ utilService.firstCapitalize(item?.accountHolder) }}
+						br
+						span.sub-option {{item.vpa }}
+
+			.pl-2.flex-shrink-1(*ngIf='!vpaHolderName' style='height: fit-content !important;')
+				sbpro-app-button(
+					(click)='verifyVPA()',
+					text='Verify',
+					[loading]='verifyingVPA$ | async',
+					loadingText='Verifying..',
+					[btnClass]='{ "btn-block": false, "btn-primary": true }',
+					[disabled]='!selectedBankAccount && !selectedAccount'
+				)
+		.row.mb-1
+			.col-lg-12
+				span.text-success(*ngIf='vpaHolderName') UPI ID is linked to {{ vpaHolderName }}
+				span.text-danger(*ngIf='!vpaHolderName && vpaHolderNameError') {{ vpaHolderNameError }}
+
+	.form-group
+		label(for='amountcontrol') Amount
+		span.text-danger *
+		input#amountcontrol.form-control.form-control-sm(
+			type='text',
+			placeholder='Enter Amount',
+			formControlName='amount',
+			appTwoDigitDecimalNumber,
+			name='amount',
+			(change)='amountChanged($event)',
+			[disabled]='submitted'
+		)
+
+	.form-group
+		label(for='purpose') Purpose (optional)
+		input#purpose.form-control.form-control-sm(
+			type='text',
+			placeholder='Purpose of the transfer',
+			formControlName='purpose',
+			name='purpose'
+		)
+	.row.mt-4
+		.col
+			input(
+				type='checkbox',
+				#checkbox,
+				(click)='checkboxSupportingDocuments(checkbox)'
+			) 
+			| &nbsp;
+			label Add Supporting Documents
+			.div(style='color: light-gray; font-size:15px') (Acceptable file formats - .png, .jpg, .pdf, .xlsx, .xls, .csv, .doc, .docx Max size - 5 MB, Multiple files can be uploaded)
+		.col(*ngIf='addSupportingDocuments' style='text-align: left;')
+			.form-group
+				input#uploadDocs(
+					#myInput,
+					type='file',
+					enctype='multipart/form-data',
+					(change)='onfileChange($event)',
+					multiple,
+					accept='.png, .jpg, .pdf, .xlsx, .xls, .csv, .doc, .docx'
+				)
+				sbpro-app-button(
+					(click)='docUp()',
+					text='Upload',
+					loadingText='Uploading...',
+					[buttonStyle]='417505',
+					[loading]='uploading',
+					[btnClass]='{ "btn-block": false, "btn-primary": true, "btn-sm": false }'
+				)
+	.row.mt-3.ml-2.mr-3(*ngIf='addSupportingDocuments')
+		.col-6
+			.table-responsive.pp-table-container
+				table.table
+					thead
+						tr
+							th(scope='col' style='width: 10%')
+								span S.No.
+							th(scope='col' style='width: 80%')
+								span Document
+							th(scope='col' style='width: 10%')
+								span Action
+					tbody(*ngIf='uploadedDocuments.length <= 0 && !uploadedDocuments')
+						tr
+							td
+								span No document linked yet
+					tbody(*ngIf='uploadedDocuments.length > 0')
+						tr(*ngFor='let doc of uploadedDocuments; let i = index')
+							td
+								| {{ i + 1 }}
+							td
+								a(
+									href="#", (click)='downloadFile($event, doc.hash, doc?.name)',
+									*ngIf='doc.hash'
+								) {{ doc.name }}
+							td
+								sbpro-app-button(
+									(click)='deleteDoc(doc.documentId)',
+									text='Delete',
+									type='button',
+									loadingText='Deleting...',
+									[loading]='deleting',
+									[btnClass]='{ "btn-block": false, "btn-light": true, "btn-sm": true }'
+								)
+
+	.row.pt-3(*ngIf='!isAdmin')
+		.col-sm-12.customCheckBoxWidth
+			input(
+				type='checkbox',
+				#tcCheckbox,
+				name='tcCheckbox',
+				formControlName='tcCheckBox',
+				(click)='tcCheckboxAction(tcCheckbox)'
+			)
+		.col-sm-12.col-md-6.col-lg-6
+			label(for='tcCheckbox') 
+				| I agree to the 
+				a.logoColor(
+					href='https://castler.com/domestic-tcs/',
+					target='_blank'
+				) Terms and Conditions
+
+	.row
+		.col
+			sbpro-app-button(
+				text='Request Transfer',
+				type='submit',
+				value='submit',
+				[loading]='loading$ | async',
+				loadingText='Submitting..',
+				[disabled]='(addSupportingDocuments && (!uploadedDocuments || uploadedDocuments?.length <= 0))',
+				[btnClass]='{ "btn-block": false, "btn-primary": true }',
+				(click)='sendOTP()'
+			)
+		.col
+			.text-danger(*ngIf='submitted && createTransferError')
+				| {{ createTransferError }}
+
+ngx-spinner
+	p(style='font-size: 20px; color: white') Processing...Please wait.

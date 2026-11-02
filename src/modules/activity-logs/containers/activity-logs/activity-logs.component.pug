@@ -1,0 +1,15 @@
+sbpro-layout-dashboard([light]='true')
+    .flex-container
+      sbpro-dashboard-head(
+        icon='send',
+        title='All Logs',
+        description='View all activity logs'
+      )
+      .container-fluid.mt-n10.responsiveForm.flex-grow-1
+        .row.h-100
+          .col-lg-12.h-100
+            sbpro-card([headerActions]='true')
+              .card-header(class='logoColor')
+                | All Logs
+              .card-body
+                sbpro-logs

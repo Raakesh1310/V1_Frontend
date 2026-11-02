@@ -1,0 +1,161 @@
+div
+  div
+    div(*ngIf='errors.length > 0')
+      sbpro-alert(classes='alert-danger', [dismissable]='true')
+        | {{ errors[0] }}
+    form([formGroup]='accountForm', (ngSubmit)='onSubmit()')
+      .form-group(*ngIf='isAdmin')
+        label(for='payee') Merchant
+        span.text-danger *
+        br
+        ng-select(
+          [items]='merchants',
+          bindLabel='title',
+          [(ngModel)]='selectedMerchant',
+          (change)='updateMerchant()',
+          [ngModelOptions]='{ standalone: true }',
+          loadingText='Loading...',
+          placeholder='Select Merchant',
+          (search)='getMerchants($event.term)',
+          name='merchant'
+        )
+          ng-template(ng-label-tmp='', let-item='item')
+            span(*ngIf='selectedMerchant') {{ item.title }}
+          ng-template(
+            ng-option-tmp='',
+            let-item='item',
+            let-search='searchTerm',
+            let-index='index'
+          )
+            span.sup-option {{ item.title }}
+            br
+            span.sub-option {{ item.merchantId }} | {{ item.email }}
+      .form-group(*ngIf='banks.length > 1')
+        label(for='bank-account-selection')
+          | Select Bank
+          span.text-danger *
+        select.frm-cntrl-email.form-control.form-control-sm(
+          formControlName='bank',
+          placeholder='Select Bank you want to use.',
+          (change)='updateAccount($event)',
+          required
+        )
+          option(*ngFor='let item of banks', [value]='item')
+            p {{ resolveBankName(item) }}
+
+      .form-group(
+        *ngIf='this.accountForm.controls.bank.value && this.multiBanks.length > 1'
+      )
+        label(for='multi-account-selection')
+          | Select Bank Account
+          span.text-danger *
+        select.frm-cntrl-email.form-control.form-control-sm(
+          [(ngModel)]='selectedBankAccount',
+          [ngModelOptions]='{ standalone: true }',
+          placeholder='Select Bank Account you want to use.',
+          (change)='updateHardEscrow($event)',
+          name='account'
+          required
+        )
+          option([value]="''" disabled selected hidden) Select Bank Account you want to use.
+          option(*ngFor='let item of multiBanks')
+            p {{ item.accountName}} | {{item.accountNo}}
+      .form-group
+        label(for='frm-cntrl-purpose') Escrow Name
+        span.text-danger *
+        input#frm-cntrl-name.form-control.form-control-sm(
+          type='text',
+          placeholder='Enter the name of escrow',
+          formControlName='name',
+          name='name',
+          autocomplete='off',
+          (keydown)='utilityService.onlyAlphaNumeric($event)'
+        )
+        span(*ngIf='name.invalid && (name.dirty || name.touched)')
+          span.text-danger(*ngIf='name.errors.required') Escrow name is required.
+
+      .form-group
+        label(for='frm-cntrl-purpose') Purpose
+        span.text-danger *
+        input#frm-cntrl-purpose.form-control.form-control-sm(
+          type='text',
+          placeholder='Enter the purpose of escrow',
+          formControlName='purpose',
+          name='purpose',
+          autocomplete='off'
+        )
+        span(*ngIf='purpose.invalid && (purpose.dirty || purpose.touched)')
+          span.text-danger(*ngIf='purpose.errors.required') Purpose is required.
+
+      .form-group
+        label(for='frm-cntrl-email') Email
+        input#frm-cntrl-email.form-control.form-control-sm(
+          type='email',
+          placeholder='Enter email addresses that will receive email notifications regarding Deposits and Transfers in the escrow (You can enter multiple email addresses separated by a comma.)',
+          formControlName='email',
+          [class.is-valid]='emailControlValid',
+          [class.is-invalid]='emailControlInvalid',
+          autocomplete='off'
+        )
+        .invalid-feedback(*ngIf='emailControl.hasError("required")')
+          | Email is required.
+        .invalid-feedback(*ngIf='emailControl.hasError("emailValidationError")')
+          | Email {{ invalidEmails.join(", ") }} is not valid.
+      .form-group
+        label(for='frm-cntrl-validity') Validity
+        span.text-danger *
+        input#frm-cntrl-validity.form-control.form-control-sm(
+          type='number',
+          placeholder='Enter Validity of escrow (in days)',
+          formControlName='validity',
+          min='1',
+          autocomplete='off',
+          (keydown)='utilityService.onlyNumeric($event)'
+        )
+        span(*ngIf='validity.invalid && (validity.dirty || validity.touched)')
+          span.text-danger(*ngIf='validity.errors.required') Validity is required.
+      .form-group
+        label(for='frm-cntrl-start-date') Start Date
+        span.text-danger *
+        input#frm-cntrl-start-date.aria-readonly.form-control.form-control-sm(
+          type='text',
+          placeholder='DD MM YYYY',
+          style='background-color: white',
+          readonly,
+          autocomplete='off',
+          formControlName='startDate',
+          ngbDatepicker,
+          outsideDays='hidden',
+          #d='ngbDatepicker',
+          (click)='d.toggle()',
+          [minDate]='startDateMin'
+        )
+        span(*ngIf='startDate.invalid && (startDate.dirty || startDate.touched)')
+          span.text-danger(*ngIf='startDate.errors.required') Start Date is required.
+      .form-group
+        label(for='frm-cntrl-end-date') Expected Volume
+        input#frm-cntrl-end-date.form-control.form-control-sm(
+          type='text',
+          placeholder='Enter the amount in INR',
+          formControlName='expectedVolume',
+          min='1',
+          autocomplete='off',
+          appTwoDigitDecimalNumber
+        )
+      .form-group(*ngIf='currentTab === 0')
+        sbpro-app-button(
+          text='Next',
+          loadingText='Generating escrow',
+          [loading]='loading$ | async',
+          [disabled]='!valid',
+          [btnClass]='{ "btn-block": false, "btn-primary": true }'
+        ) 
+      .form-group(*ngIf='currentTab !== 0')
+        sbpro-app-button(
+          text='update',
+          loadingText='updating',
+          [buttonStyle]='417505',
+          [loading]='loading$ | async',
+          [disabled]='!valid',
+          [btnClass]='{ "btn-block": false, "btn-primary": true }'
+        )

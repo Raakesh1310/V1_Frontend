@@ -1,0 +1,60 @@
+.form-control::placeholder {
+  /* Chrome, Firefox, Opera, Safari 10.1+ */
+  color: #c5ccd6;
+  opacity: 1; /* Firefox */
+}
+
+.form-control:-ms-input-placeholder {
+  /* Internet Explorer 10-11 */
+  color: #c5ccd6;
+}
+
+.form-control::-ms-input-placeholder {
+  /* Microsoft Edge */
+  color: #c5ccd6;
+}
+
+.dashboard-card {
+  @extend .mb-3;
+  margin: 10px auto;
+  padding: 18px;
+  background-color: #fffbf4;
+}
+
+.ws-nowrap {
+  white-space: nowrap;
+}
+
+input {
+  transition: 0.5s;
+}
+
+input.non-editable {
+  @extend .p-0;
+  @extend .border-0;
+  outline: none;
+  background-color: transparent !important;
+  font-weight: bold;
+}
+
+input.non-editable[readonly] {
+  background-color: transparent !important;
+}
+
+input.non-editable:hover {
+  outline: none;
+  box-shadow: none;
+  border-color: none !important;
+}
+
+input.non-editable:focus {
+  outline: none;
+  box-shadow: none;
+  border-color: none !important;
+}
+
+@for $i from 1 through 4 {
+  .min-w-#{$i *50}px {
+    min-width: #{$i * 50}px;
+  }
+}

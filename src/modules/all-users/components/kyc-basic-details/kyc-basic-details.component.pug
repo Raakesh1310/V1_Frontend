@@ -1,0 +1,89 @@
+form.details
+  .container-fluid.border.rounded.w-75.float-left.shadow-lg.p-3.mb-5.bg-white.rounded
+    .row.pt-2.pl-2
+      .col 
+        h4 Basic Details
+        hr
+    .row.p-2
+      .col Registered As
+      .col 
+        label {{ businessType }}
+    .row.p-2(*ngIf='businessType != "Individual"')
+      .col Business Name
+      .col
+        input.non-editable.form-control(
+          type='text',
+          [(ngModel)]='businessName',
+          [readOnly]='!editOnly',
+          [ngModelOptions]="{standalone: true}",
+        )
+    .row.p-2
+      .col Full Name
+      .col
+        input.non-editable.form-control(
+          type='text',
+          [(ngModel)]='name',
+          [readOnly]='!editOnly',
+          [ngModelOptions]="{standalone: true}",
+          disabled
+        )
+    .row.p-2
+      .col Mobile
+      .col
+        input.non-editable.form-control(
+          type='text',
+          [(ngModel)]='mobile',
+          [readOnly]='!editOnly',
+          [ngModelOptions]="{standalone: true}",
+        )
+    .row.p-2
+      .col Email
+      .col
+        input.non-editable.form-control(
+          type='text',
+          [(ngModel)]='email',
+          [readOnly]='!editOnly',
+          [ngModelOptions]="{standalone: true}",
+        )
+    .row.p-2
+      .col Status
+      .col 
+        label {{ status }}
+    .row.p-2
+      .col Latitude
+      .col
+        label {{ latitude }}
+    .row.p-2
+      .col Longitude
+      .col
+        label {{ longitude }}
+    .row.p-2(*ngIf='businessType === "Individual"')
+      .col Selfie
+      .col
+        a(href='#', (click)='downloadSelfie($event)', target='_blank') User Selfie
+    .row.p-2(*ngIf='businessType != "Individual"')
+      .col
+        | Involved in import/export?
+      .col
+        select#inputIndustry.form-control(
+          *ngIf='editOnly',
+          [(ngModel)]='importExportText',
+          [ngModelOptions]="{standalone: true}",
+          (change)='setIndustryType($event.target.value)'
+        )
+          option Yes
+          option No
+        input.non-editable.form-control(
+          *ngIf='!editOnly',
+          type='text',
+          [(ngModel)]='importExportText',
+          [readOnly]='!editOnly',
+          [ngModelOptions]="{standalone: true}",
+        )
+      //  label No
+      //.col(*ngIf='importExport')
+      //  label Yes
+    //- .row.pl-3
+    //-   button.btn.btn-light.mr-3(type='button', *ngIf='editOnly', (click)='editOnly = false') Cancel
+    //-   button.btn((click)='updateData();editOnly = true', class='castlerButtonColor') {{ editOnly ? isLoading ? "Updating..." :"Update" : "Edit" }}
+

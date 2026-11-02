@@ -1,0 +1,289 @@
+div
+  h4 Authorization Workflow
+  span.text-center.text-danger(*ngIf='duplicateEmailError') Email already used for another authorizer
+  span.text-center.text-danger(*ngIf='!modalOpened && newLevelError') Please add atleast one authorizer at level {{ selectedLevel }}
+  span.text-center.text-danger(*ngIf='!modalOpened && validLevelError') Please select a valid level
+  span.text-center.text-danger(*ngIf='validEmailError') Please enter a valid email address
+  span.text-center.text-danger(*ngIf='!modalOpened && validNameError') Please enter a valid name
+  span.text-center.text-danger(*ngIf='!modalOpened && validMobileError') Please enter a valid mobile number
+  span.text-center.text-danger(*ngIf='merchantAuthError') Email already registered with merchant authorizer
+  span.text-center.text-danger(*ngIf='accountAuthError') Email already registered with account authorizer
+  span.text-center.text-danger(*ngIf='!modalOpened && incompleteFromError') Please fill the details
+  span.text-center.text-danger(*ngIf='accountStatusError') Authorizers can be updated only on Active accounts
+  span.text-center.text-danger(*ngIf='zeroMemberError') Cannot update level, since there is only one authorizer at this level
+  span.text-center.text-danger(*ngIf='lessMemberError') Number of members should be greater than or equal to minimum approvals requied
+  hr
+form.pl-5([formGroup]='authorizerForm', autocomplete='off', *ngIf='!readOnly')
+  .row
+    .col
+      .form-group 
+        label Name
+        span.text-danger *
+        input#authoriser-name.form-control.form-control-sm(
+          type='text',
+          placeholder='Name',
+          formControlName='name',
+          (focusout)='onNameChange($event)',
+          required
+        )
+    .col
+      .form-group
+        label Email
+        span.text-danger *
+        input#authoriser-email.form-control.form-control-sm(
+          type='email',
+          placeholder='Email',
+          formControlName='email',
+          (focusout)='onEmailChange($event)',
+          required
+        )
+    .col
+      .form-group
+        label Mobile
+        span.text-danger *
+        input#authoriser-mobile.form-control.form-control-sm(
+          type='text',
+          placeholder='Mobile',
+          formControlName='mobile',
+          (focusout)='onMobileChange($event)',
+          required
+        )
+    .col
+      .form-group
+        label Level
+        span.text-danger *
+        select#authoriser-mobile.form-control.form-control-sm(
+          formControlName='level',
+          required,
+          (change)='onLevelChange($event)',
+          [(ngModel)]='selectedLevel'
+        )
+          option(value='') Level
+          option(
+            *ngFor='let number of levels',
+            [ngValue]='number',
+            selected='number === selectedLevel'
+          ) Level {{ number }}
+          option(value='Add') Add level
+    .col-sm-12.col-md-2.col-lg-2.pt-4
+      .form-group
+        button.btn.btn-light.castlerButtonColor(
+          (click)='onAdd()',
+          [disabled]='disableAddButton === true ? true : null'
+        ) Add
+br
+.table-responsive.pp-table-container.align-self-stretch.flex-grow-1.flex-stretch-1.table-striped
+  table.table
+    thead
+      tr
+        th.th-sticky-top(scope='col', sbSortable='date', (sort)='onSort($event)')
+          span.ws-nowrap Updation Date
+          sb-sort-icon(
+            *ngIf='sortedColumn === "date"',
+            [direction]='sortedDirection'
+          )
+        th.th-sticky-top(scope='col', sbSortable='date', (sort)='onSort($event)')
+          span.ws-nowrap Authorization Name
+          sb-sort-icon(
+            *ngIf='sortedColumn === "date"',
+            [direction]='sortedDirection'
+          )
+        th.th-sticky-top(scope='col', sbSortable='event', (sort)='onSort($event)')
+          span.ws-nowrap Email
+          sb-sort-icon(
+            *ngIf='sortedColumn === "date"',
+            [direction]='sortedDirection'
+          )
+        th.th-sticky-top(scope='col', sbSortable='event', (sort)='onSort($event)')
+          span.ws-nowrap Mobile
+          sb-sort-icon(
+            *ngIf='sortedColumn === "event"',
+            [direction]='sortedDirection'
+          )
+        th.th-sticky-top(scope='col', sbSortable='time', (sort)='onSort($event)')
+          span.ws-nowrap Level
+          sb-sort-icon(
+            *ngIf='sortedColumn === "time"',
+            [direction]='sortedDirection'
+          )
+        th.th-sticky-top(scope='col', sbSortable='time', (sort)='onSort($event)')
+          span.ws-nowrap Status
+          sb-sort-icon(
+            *ngIf='sortedColumn === "time"',
+            [direction]='sortedDirection'
+          )
+        th.th-sticky-top(*ngIf='!readOnly', scope='col', sbSortable='time', (sort)='onSort($event)')
+          span.ws-nowrap Action
+          sb-sort-icon(
+            *ngIf='sortedColumn === "time"',
+            [direction]='sortedDirection'
+          )
+    tbody
+      tr(*ngFor='let authorizer of authorizers; let index')
+        td
+          ngb-highlight(
+            [result]='authorizer.updatedAt | date: "dd MMM yyyy" || "--"'
+          )
+        td
+          ngb-highlight([result]='authorizer.name || "--"')
+        td
+          ngb-highlight([result]='authorizer.email || "--"')
+        td
+          ngb-highlight([result]='authorizer.mobile || "--"')
+        td(*ngIf='authorizer.status !== "INACTIVE"')
+          a.nav-link.p-0.tableClickEntryColor(
+            href='javascript:void(0);',
+            (click)='showLevelDetails(detailsTemplate, authorizer.level, authorizer.approvalsRequired)'
+          )
+            ngb-highlight([result]='authorizer.level || "--"')
+        td(*ngIf='authorizer.status === "INACTIVE"')
+          ngb-highlight([result]='authorizer.level || "--"')
+        td
+          ngb-highlight([result]='authorizer.status || "--"')
+        td(*ngIf='authorizer.status !== "INACTIVE" && !readOnly')
+          button.btn.btn-blue.mr-2.btn-sm(
+            *ngIf='(!updatingEmail || (updatingEmail && updatingEmail === authorizer.email)) && !deletingAuthorizerEmail && authorizer.action !== "CREATED" && !newAuthorizer',
+            type='button',
+            (click)='openUpdateModal(UpdateAuthorizer, authorizer.name, authorizer.email, authorizer.mobile, authorizer.level, authorizer.authorizerId, authorizer)',
+            [ngClass]='authorizer.action === "UPDATED" ? "btn-transparent-blue" : "btn-transparent-dark"',
+            disable='authorizer.status === "ACTIVE"'
+          )
+            i-feather(name='edit-3')
+          button.btn.btn-red.mr-2.btn-sm(
+            *ngIf='authorizer.action === "CREATED" || (!updatingEmail && (!deletingAuthorizerEmail || (deletingAuthorizerEmail && deletingAuthorizerEmail === authorizer.email)) && !newAuthorizer)',
+            type='button',
+            (click)='deleteAuthorizer(authorizer.email, authorizer.level)',
+            [ngClass]='authorizer.action === "DELETED" ? "btn-transparent-red" : "btn-transparent-dark"'
+          )
+            i-feather(name='trash-2')
+        td(*ngIf='authorizer.status === "INACTIVE" && !readOnly')
+          ngb-highlight.pl-3([result]='"--"')
+br 
+.form-group(*ngIf='!readOnly')
+  button.btn.castlerButtonColor((click)='onSubmit()') Update
+
+ng-template(#detailsTemplate)
+  sbpro-card([headerActions]='true')
+    .card-header.logoColor(style='flex: display; justify-content: center')
+      | Level {{ selectedLevel }} Details
+    .card-body 
+      .row
+        .col.text-danger(*ngIf='approvalsRequiredError') Maximum approval cannot exceed total number of members for this level
+        .col.text-danger(*ngIf='validApprovalsRequiredError') Please select a valid number
+        .col.text-danger(*ngIf='wholeNumberError') Please enter a whole number
+      .row 
+        .col No of members
+        .col {{ levelMembers }}
+      br
+      .row
+        .col.col-auto No of approvals required
+        .col
+          span.pl-4(*ngIf='readOnly') {{ selectedApprovalRequired }}
+          input.form-control(
+            *ngIf='!readOnly',
+            type='number',
+            (keyup)='onKey($event)',
+            (focus)='onFocus()',
+            [(ngModel)]='selectedApprovalRequired',
+            min='1',
+            max='levelMembers',
+          )
+        .col
+          input#all(
+            *ngIf="!readOnly",
+            type='radio',
+            #all,
+            value='all',
+            name='all',
+            [checked]='allApprovalsRequired',
+            (change)='onApprovalRequiredChange($event)'
+          )
+          label(*ngIf="!readOnly", for='all') 
+            | All
+      br
+      span.small *by default, approval of all group members will be if none selected
+    .card-footer
+      button.btn.btn-sm.btn-light.float-right.mr-2(
+        type='button',
+        (click)='closeLevelUpdateModal()'
+      ) Cancel
+      button.btn.btn-sm.castlerButtonColor.float-right.mr-2(
+        *ngIf="!readOnly",
+        type='button',
+        (click)='onLevelDetailsUpdate()'
+      ) Update level
+    span.float-right &nbsp;&nbsp;
+
+ng-template(#UpdateAuthorizer)
+  .modal-header(style='flex: display; justify-content: center')
+    h4 Update Authorizer
+  .modal-body
+    span.ml-5.pl-5.text-center.text-danger(*ngIf='validLevelError') Please select a valid level
+    span.ml-5.pl-5.text-center.text-danger(*ngIf='validNameError') Please enter a valid name
+    span.ml-5.pl-5.text-center.text-danger(*ngIf='validMobileError') Please enter a valid mobile number
+    span.ml-5.pl-5.text-center.text-danger(*ngIf='newLevelError') Please add atleast one authorizer at level {{ selectedLevel }}
+
+    form.pt-3.pl-5([formGroup]='authorizerUpdateForm', autocomplete='off')
+      .row
+        .col-sm-6
+          .form-group
+            label Name
+        .col-sm-6
+          .form-group
+            input#authoriser-name.form-control.form-control-sm(
+              type='text',
+              placeholder='Name',
+              formControlName='name',
+              (focusout)='onNameChange($event)',
+              required
+            )
+      .row
+        .col
+          .form-group
+            label Email
+        .col
+          .form-group
+            input#authoriser-email.form-control.form-control-sm.non-editable(
+              type='email',
+              placeholder='Email',
+              formControlName='email',
+              readonly,
+              required
+            )
+      .row
+        .col
+          .form-group
+            label Mobile
+        .col 
+          .form-group
+            input#authoriser-mobile.form-control.form-control-sm(
+              type='text',
+              placeholder='Number',
+              formControlName='mobile',
+              (focusout)='onMobileChange($event)',
+              required
+            )
+      .row
+        .col
+          .form-group
+            label Level
+        .col 
+          .form-group
+            select#authoriser-mobile.form-control.form-control-sm(
+              formControlName='level',
+              required,
+              (change)='onLevelChange($event)'
+            )
+              option(value='') Level
+              option(
+                *ngFor='let number of levels',
+                [ngValue]='number',
+                selected='number === selectedLevel'
+              ) Level {{ number }}
+              option(value='Add') Add level
+  .modal-footer.flex-display(style='justify-content: center')
+    button.btn.btn-light.mr-5(type='button', (click)='onCancel()') Cancel
+    button.btn.castlerButtonColor((click)='updateAuthorizer()') Update Authorizer
+
+ngx-spinner
+  p(style='font-size: 20px; color: white') Processing...Please wait...

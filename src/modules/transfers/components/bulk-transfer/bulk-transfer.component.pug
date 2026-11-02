@@ -1,0 +1,567 @@
+div
+	.mb-4.mt-4.ml-1.flex-display
+		.flex-display-column.selectAccountWidth(
+			*ngIf='isAdmin',
+			style='margin-right:25px'
+		)
+			label(for='merchant') Merchant
+				span.text-danger *
+				br
+			ng-select(
+				[items]='merchants',
+				bindLabel='title',
+				[(ngModel)]='selectedMerchant',
+				(change)='updateMerchant()',
+				[ngModelOptions]='{ standalone: true }',
+				loadingText='Loading...',
+				placeholder='Select Merchant',
+				(search)='getMerchants($event.term)',
+				name='merchant'
+			)
+			ng-template(ng-label-tmp='' let-item='item')
+				span(*ngIf='selectedMerchant') {{ item.title }}
+			ng-template(
+				ng-option-tmp='',
+				let-item='item',
+				let-search='searchTerm',
+				let-index='index'
+			)
+				span.sup-option {{ item.title }}
+				br
+				span.sub-option {{ item.merchantId }} | {{ item.email }}
+
+		.flex-display-column.selectAccountWidth(*ngIf='!connectedBanking')
+			label Select Escrow ID
+			ng-select(
+				[items]='accounts',
+				bindLabel='name',
+				[(ngModel)]='selectedAccount',
+				loadingText='Loading...',
+				placeholder='Enter Escrow Name',
+				[disabled]='submitted',
+				name='account',
+				(change)='updateAccount($event)',
+				(search)='fetchAccount($event)'
+			)
+				ng-template(ng-label-tmp='' let-item='item')
+					span(*ngIf='selectedAccount') {{ utilService.firstCapitalize(item.name) }} &nbsp;
+						span.fader - {{ item.accountId }}
+				ng-template(
+					ng-option-tmp='',
+					let-item='item',
+					let-search='searchTerm',
+					let-index='index'
+				)
+					span.sup-option {{ utilService.firstCapitalize(item.name) }}
+					br
+					span.sub-option {{ item.accountId }}
+
+			div(*ngIf='selectedAccount')
+				.subTextAmount(*ngIf='selectedAccount.balance >= 0')
+					p Available Balance:
+						b &nbsp; {{ convertToIndianCurrency(selectedAccount.balance) }}
+		.flex-display-column.selectAccountWidth(*ngIf='connectedBanking')
+			label(for='bankAccount') Bank Account
+			ng-select(
+				[items]='bankAccounts',
+				bindLabel='accountName',
+				[(ngModel)]='selectedBankAccount',
+				loadingText='Loading...',
+				placeholder='Enter Bank Name',
+				(change)='updateBankAccount($event)',
+				[disabled]='submitted',
+				name='bankAccount',
+			)
+				ng-template(ng-label-tmp='' let-item='item')
+					span(*ngIf='selectedBankAccount') {{ utilService.firstCapitalize(item.accountName) }} &nbsp;
+						span.fader - {{ item.bankAccountNo }}
+				ng-template(
+					ng-option-tmp='',
+					let-item='item',
+					let-search='searchTerm',
+					let-index='index'
+				)
+					span.sup-option {{ utilService.firstCapitalize(item.accountName) }}
+					br
+					span.sub-option {{ item.bankAccountNo }}
+
+			div(*ngIf='selectedBankAccount')
+				.subTextAmount(*ngIf='selectedBankAccount.balance >= 0 && activeBalance >=0')
+					p Available Balance:
+						b &nbsp; {{ convertToIndianCurrency(activeBalance) }}
+		.fullWidth100
+			#batchWidth.flex-display-column
+				label Batch Name
+				input.form-control.form-control-sm(
+					[ngbPopover]='"Enter Batch Name"',
+					type='text',
+					autocomplete='off',
+					[placeholder]='"Batch Name"',
+					[(ngModel)]='batchName'
+				)
+		.flex-display.leftMargin(
+			*ngIf='!(bulkTransferStatus === states.upload || bulkTransferStatus === states.error)'
+		)
+			button.btn.mt-3.mr-3.w200.castlerButtonColor(
+				(click)='openUpload()',
+				*ngIf='!hideAllFailed'
+			) Upload
+				svg.bi.bi-file-earmark-arrow-up.ml-2(
+					xmlns='http://www.w3.org/2000/svg',
+					width='16',
+					height='16',
+					fill='currentColor',
+					viewbox='0 0 16 16'
+				)
+					path(
+						d='M8.5 11.5a.5.5 0 0 1-1 0V7.707L6.354 8.854a.5.5 0 1 1-.708-.708l2-2a.5.5 0 0 1 .708 0l2 2a.5.5 0 0 1-.708.708L8.5 7.707V11.5z'
+					)
+					path(
+						d='M14 14V4.5L9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2zM9.5 3A1.5 1.5 0 0 0 11 4.5h2V14a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h5.5v2z'
+					)
+				input(
+					type='file',
+					#inputFile,
+					accept='.xlsx, .xls, .csv',
+					(change)='uploadExcel($event)',
+					(click)='$event.target.value = null'
+				)
+			.flex-display(*ngIf='hideAllFailed')
+				//button.btn.mt-3.mr-3.w200(class="castlerButtonColor", (click)='openUpload()') Upload
+				//    svg.bi.bi-file-earmark-arrow-up.ml-2(xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='currentColor' viewbox='0 0 16 16')
+				//        path(d='M8.5 11.5a.5.5 0 0 1-1 0V7.707L6.354 8.854a.5.5 0 1 1-.708-.708l2-2a.5.5 0 0 1 .708 0l2 2a.5.5 0 0 1-.708.708L8.5 7.707V11.5z')
+				//        path(d='M14 14V4.5L9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2zM9.5 3A1.5 1.5 0 0 0 11 4.5h2V14a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h5.5v2z')
+				//    input(type='file', #inputFile, accept='.xlsx, .xls, .csv', (change)="uploadExcel($event)")
+				button.btn.mt-3.makeTransferButtonWidth.castlerButtonColor3(
+					(click)='makeTransfer()'
+				) Create Transfer
+					svg.bi.bi-chevron-right.ml-3(
+						xmlns='http://www.w3.org/2000/svg',
+						width='16',
+						height='16',
+						fill='currentColor',
+						viewbox='0 0 16 16'
+					)
+						path(
+							fill-rule='evenodd',
+							d='M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z'
+						)
+	div
+		button.btn.castlerButtonColor((click)='openModal(documentUploadModal)') {{ uploadedDocuments.length > 0 ? "View Documents " + "(" + uploadedDocuments.length + ")" : "Add Supporting Documents" }}
+
+	.alert.alert-danger.alert-dismissible.fade.show(
+		role='alert',
+		*ngIf='errors.length > 0'
+	)
+		| {{ errors[0] }}
+		button.close(
+			type='button',
+			(click)='errors = []',
+			data-dismiss='alert',
+			aria-label='Close'
+		)
+			span(aria-hidden='true') ×
+
+	.row.mt-3.mb-3
+		.col-md-6(*ngIf='showMerchantAuthorizer')
+			//label Authorizers(s)
+			div {{ showAccountAuthorizer ? "Level 1 Authorizer" : "Authorizers" }}
+			angular2-multiselect(
+				[data]='dropdownListMerchantAuthorizers',
+				[(ngModel)]='selectedMerchantAuthorizers',
+				[settings]='dropdownSettings',
+				[ngModelOptions]='{ standalone: true }'
+			)
+		.col-md-6(*ngIf='showAccountAuthorizer')
+			//label Authorizers(s)
+			div {{ showMerchantAuthorizer ? "Level 2 Authorizer" : "Authorizers" }}
+			angular2-multiselect(
+				[data]='dropdownListAccountAuthorizers',
+				[(ngModel)]='selectedAccountAuthorizers',
+				[settings]='dropdownSettings',
+				[ngModelOptions]='{ standalone: true }'
+			)
+
+	.mb-4.mt-4.ml-1.flex-display(*ngIf='bulkTransferStatus !== states.submit')
+		p.fullWidth Enter the required details in the template and upload (.xls, .xlsx, .csv)
+
+		.mt-2.myanchor(
+			*ngIf='!hasMultipleBanks()',
+			style='width:250px;padding:0;margin-right:2%'
+		)
+			a(
+				href='{{icici ? sampleFileUrlICICI : yes_bank || hdfc || ibl || rbl || dbs || idfc || axis ? sampleFileUrlTransferType : sampleFileUrl }}',
+				target='_self',
+				download='{{icici ? sampleFileUrlICICI.split("/")[6] : yes_bank || hdfc || ibl || rbl || dbs || idfc || axis ? sampleFileUrlTransferType.split("/")[6] : sampleFileUrl.split("/")[6] }}' 
+				style='color: #687281'
+			)
+				.float-left
+					| Download Template
+				.float-right
+				img.ml-1(src='/assets/img/excel.png' width='25' height='25')
+
+		.col
+			.row.text-danger(*ngIf='templateError') 
+				small Select Template
+			.row.mt-2.myanchor(
+				*ngIf='hasMultipleBanks()',
+				style='width:250px;margin-right:2%;display:flex;flex-wrap: wrap;'
+			)
+				select#inputIndustry.form-control.float-left(
+				*ngIf='hasMultipleBanks()',
+				name='bank',
+				[(ngModel)]='bank',
+				(change)='downloadTemplate($event)',
+				style='flex: 2;'
+				)
+					option(value='', selected) Select Template
+					option(*ngIf='icici' value='icici') ICICI
+					option(*ngIf='rbl' value='rbl') RBL
+					option(*ngIf='yes_bank' value='yes_bank') YES BANK
+					option(*ngIf='idfc' value='idfc') IDFC
+					option(*ngIf='ibl' value='ibl') IndusInd
+					option(*ngIf='hdfc' value='hdfc') HDFC
+					option(*ngIf='dbs' value='dbs') DBS
+					option(*ngIf='axis' value='axis') Axis
+
+				a.btn.btn-link.float-right.pt-2(
+					*ngIf='bank',
+					href='{{ downloadFileUrl }}',
+					target='_self',
+					download='{{ sampleFileUrl.split("/")[6] }}',
+					style='padding:0;display:inline-block;'
+				)
+					img.ml-1.float-right(
+						src='/assets/img/excel.png',
+						width='25',
+						height='25',
+						style='display:inline-block;'
+					)
+				.pt-2
+					img.ml-1.float-right(
+						src='/assets/img/excel.png',
+						width='25',
+						height='25',
+						*ngIf='!bank',
+						(click)='onEmptyTemplate()',
+						style='display:inline-block;'
+					)
+	sbpro-card.mt-5.myanchor(
+		*ngIf='bulkTransferStatus !== states.submit',
+		(click)='openUpload()'
+	)
+		.card-body.flex-display.justify-content-center(
+			*ngIf='bulkTransferStatus === states.upload'
+		)
+			p(style='font-size: 18px') Upload File
+			//- button.my.third((click)='openUpload()') Upload
+			svg.bi.bi-file-earmark-arrow-up-fill.ml-3.marginTop(
+				xmlns='http://www.w3.org/2000/svg',
+				width='24',
+				height='24',
+				fill='currentColor',
+				viewbox='0 0 16 16'
+			)
+				path(
+					d='M9.293 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V4.707A1 1 0 0 0 13.707 4L10 .293A1 1 0 0 0 9.293 0zM9.5 3.5v-2l3 3h-2a1 1 0 0 1-1-1zM6.354 9.854a.5.5 0 0 1-.708-.708l2-2a.5.5 0 0 1 .708 0l2 2a.5.5 0 0 1-.708.708L8.5 8.707V12.5a.5.5 0 0 1-1 0V8.707L6.354 9.854z'
+				)
+			input(
+				type='file',
+				#inputFile,
+				accept='.xlsx, .xls, .csv',
+				(change)='uploadExcel($event)',
+				(click)='$event.target.value = null'
+			)
+		.card-body.flex-display.justify-content-around.align-center(
+			*ngIf='bulkTransferStatus === states.error'
+		)
+			p(style='color: red') Error in the fle. Upload again
+			.flex-display
+				p(style='font-size: 18px') Upload Again
+				button.my.third((click)='openUpload()') Upload
+				svg.bi.bi-file-earmark-arrow-up-fill.ml-3.marginTop(
+					xmlns='http://www.w3.org/2000/svg',
+					width='24',
+					height='24',
+					fill='currentColor',
+					viewbox='0 0 16 16'
+				)
+					path(
+						d='M9.293 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V4.707A1 1 0 0 0 13.707 4L10 .293A1 1 0 0 0 9.293 0zM9.5 3.5v-2l3 3h-2a1 1 0 0 1-1-1zM6.354 9.854a.5.5 0 0 1-.708-.708l2-2a.5.5 0 0 1 .708 0l2 2a.5.5 0 0 1-.708.708L8.5 8.707V12.5a.5.5 0 0 1-1 0V8.707L6.354 9.854z'
+					)
+				input(
+					type='file',
+					#inputFile,
+					accept='.xlsx, .xls, .csv',
+					(change)='uploadExcel($event)',
+					(click)='$event.target.value = null'
+				)
+		.card-body.flex-display.justify-content-center(
+			*ngIf='bulkTransferStatus === states.moveToTransferList'
+		)
+			p.logoColor.mr-3 Transfer(s) done successfully
+			button.btn.castlerButtonColor((click)='navigateToTransferList()') Go to Transfer List
+
+	.row.mb-5(
+		*ngIf='!(bulkTransferStatus === states.upload || bulkTransferStatus === states.error || bulkTransferStatus === states.moveToTransferList)'
+	)
+		.col.mb-3
+			.card.noShadow(
+				[hidden]='hideAllFailed',
+				#AllCard,
+				[ngClass]='{ statusBorders: id === 1 }',
+				(click)='changeTableStatusAndData(tables.all)'
+			)
+				.card-body(style='background: #FFFBF4;')
+					.d-flex.align-items-center
+						.flex-grow-1
+							.small.font-weight-bold.mb-1(style='color: #EEA10C;font-size: 16px') All ({{ totalEntries }})
+							.p(style='color: #EEA10C;font-weight: bold;font-size: 20px;') Amount: {{ totalEntriesAmt }}
+
+		.col.mb-3
+			.card.noShadow.noShadow(
+				#successCard,
+				[ngClass]='{ statusBorders: id === 2 }',
+				(click)='changeTableStatusAndData(tables.success)'
+			)
+				.card-body(style='background: #f2fff5;')
+					.d-flex.align-items-center
+						.flex-grow-1
+							.small.font-weight-bold.mb-1(style='color: #389126;font-size: 16px') Success ({{ successEntries }})
+							.p(style='color: #389126;font-weight: bold;font-size: 20px;') Amount: {{ successEntriesAmt }}
+
+		.col.mb-3
+			.card.noShadow.noShadow(
+				[hidden]='hideAllFailed',
+				#failedCard,
+				[ngClass]='{ statusBorders: id === 3 }',
+				(click)='changeTableStatusAndData(tables.failed)'
+			)
+				.card-body(style='background: #fff2f4;')
+					.d-flex.align-items-center
+						.flex-grow-1
+							.small.font-weight-bold.mb-1(style='color: #cc1d28;font-size: 16px') Failed ({{ falseEntries }})
+							.p(style='color: #cc1d28;font-weight: bold;font-size: 20px;') Amount: {{ falseEntriesAmt }}
+
+	p.mt-5.mb-4(*ngIf='bulkTransferStatus === states.moveToTransferList') Invalid entries after successfull transfer will be displayed here-
+
+	.table-responsive.pp-table-container.table-responsive-sm(
+		*ngIf='!(bulkTransferStatus === states.upload || bulkTransferStatus === states.error)'
+	)
+		table.table
+			thead
+				tr
+					th(scope='col' sbSortable='event')
+						span.ws-nowrap Excel row no
+					th(*ngIf='isBulkPayeeEnabled' scope='col' sbSortable='time')
+						span.ws-nowrap Payee Id
+					th(scope='col' sbSortable='time')
+						span.ws-nowrap Beneficiary Name
+					th(*ngIf='isUPIBulkTransfer' scope='col' sbSortable='time')
+						span.ws-nowrap Beneficiary UPI ID
+					th(*ngIf='isUPIBulkTransfer' scope='col' sbSortable='time')
+						span.ws-nowrap UPI Holder Name
+					th(scope='col' sbSortable='time')
+						span.ws-nowrap Amount
+					th(
+						*ngIf='!isBulkPayeeEnabled && !isUPIBulkTransfer',
+						scope='col',
+						sbSortable='time'
+					)
+						span.ws-nowrap Beneficiary A/c Number
+					th(
+						*ngIf='!isBulkPayeeEnabled && !isUPIBulkTransfer',
+						scope='col',
+						sbSortable='time'
+					)
+						span.ws-nowrap IFSC
+					th(
+						*ngIf='!isBulkPayeeEnabled && !isUPIBulkTransfer',
+						scope='col',
+						sbSortable='time'
+					)
+						span.ws-nowrap Bank Name
+					th(scope='col' sbSortable='time')
+						span.ws-nowrap Purpose
+					th(*ngIf='!isBulkPayeeEnabled' scope='col' sbSortable='time')
+						span.ws-nowrap Email Id
+					th(
+						scope='col',
+						sbSortable='time',
+						*ngIf='!selectedBankAccount && selectedAccount.bank !== "icici"'
+					)
+						span.ws-nowrap Transfer Type
+					th(scope='col' sbSortable='time', *ngIf='tableStatuses === tables.all')
+						span Status
+					th(scope='col' sbSortable='time', *ngIf='tableStatuses === tables.failed')
+						span Rejection Reason
+			tbody
+				tr(
+					*ngFor='let excelData of data | slice: (page - 1) * pageSize:page * pageSize'
+				)
+					td
+						ngb-highlight([result]='excelData.rowNumber')
+					td(*ngIf='isBulkPayeeEnabled')
+						ngb-highlight([result]='excelData.payeeId')
+					td
+						ngb-highlight([result]='excelData.beneficiaryName')
+					td(*ngIf='isUPIBulkTransfer')
+						ngb-highlight([result]='excelData.beneficiaryVPA')
+					td(*ngIf='isUPIBulkTransfer')
+						ngb-highlight([result]='excelData.upiHolderName')
+					td
+						ngb-highlight([result]='"₹" + excelData.amount')
+					td(*ngIf='!isBulkPayeeEnabled && !isUPIBulkTransfer')
+						ngb-highlight([result]='excelData.beneficiaryAccNumber')
+					td(*ngIf='!isBulkPayeeEnabled && !isUPIBulkTransfer')
+						ngb-highlight([result]='excelData.beneficiaryIFSC')
+					td(*ngIf='!isBulkPayeeEnabled && !isUPIBulkTransfer')
+						ngb-highlight([result]='excelData.beneficiaryBankName')
+					td
+						ngb-highlight([result]='excelData.purpose')
+					td(*ngIf='!isBulkPayeeEnabled')
+						ngb-highlight([result]='excelData.payeeEmailId')
+					td(
+						*ngIf='!selectedBankAccount && selectedAccount.bank !== "icici"'
+					)
+						ngb-highlight([result]='excelData.transferType')
+					td#greenDot(
+						*ngIf='excelData.status == "Success" && tableStatuses === tables.all',
+						style='color: #18B81F'
+					) {{ excelData.status }}
+					td.redDot(
+						*ngIf='excelData.status == "Failed" && tableStatuses === tables.all',
+						style='color: #FF0000'
+					) {{ excelData.status }}
+					//td(*ngIf='tableStatuses === tables.all')
+					//    ngb-highlight([result]='luci.status')
+					td(*ngIf='tableStatuses === tables.failed')
+						div(
+							*ngFor='let err of excelData.rejectionReason',
+							style='color: red;font-weight: bold'
+						)
+							.redDot {{ err }}
+						//ngb-highlight.logoColor(
+						//    style='font-weight:bold',
+						//    [result]='excelData.rejectionReason ? excelData.rejectionReason : "--"'
+						//)
+	.d-flex.justify-content-between.p-2
+		ngb-pagination(
+			*ngIf='!(bulkTransferStatus === states.upload || bulkTransferStatus === states.error)',
+			[collectionSize]='total$',
+			[maxSize]='5',
+			[(page)]='page',
+			[pageSize]='pageSize',
+			[rotate]='true',
+			[ellipses]='false',
+			(pageChange)='loadPage($event)',
+			[boundaryLinks]='true'
+		)
+
+ngx-spinner
+	p(*ngIf='!uploadInProgress' style='font-size: 20px; color: white') Creating Transfers...
+	p(*ngIf='uploadInProgress' style='font-size: 20px; color: white') Validating...
+
+ng-template(#documentUploadModal)
+	.modal-header
+		h4.col-6.modal-title.text-center(
+			style='display: inline-block;align-self: flex-end; font-size: 22px;'
+		) {{ uploadedDocuments.length > 0 ? uploadedDocuments.length + " Documents Uploaded" : "Upload Documents" }}
+		.crossButton((click)='closeModal()')
+			fa-icon.fa-2x.text-black([icon]='["fas", "times"]')
+
+	//- 	button(
+	//- 		type='button',
+	//- 		aria-label='Close',
+	//- 		(click)='closeModal()'
+	//- 	)
+	//- 		span(aria-hidden='true') ×
+	.modal-body
+		.col-12
+			p Acceptable file formats - .png, .jpg, .pdf, .xlsx, .xls, .csv, .doc, .docx Max size - 5 MB, Multiple files can be uploaded
+			.table-responsive-sm.pp-table-container
+				table.table(*ngIf='uploadedDocuments.length > 0')
+					thead
+						tr
+							th(scope='col')
+								span S.No.
+							th(scope='col')
+								span Documents
+							th(scope='col')
+								span Action
+					tbody(*ngIf='uploadedDocuments.length <= 0 && !uploadedDocuments')
+						tr
+							td
+								span No document linked yet
+					tbody(*ngIf='uploadedDocuments.length > 0')
+						tr(*ngFor='let doc of uploadedDocuments; let i = index')
+							td
+								| {{ i + 1 }}
+							td
+								a(
+									href="#", (click)='downloadFile($event, doc.hash, doc?.name)',
+									*ngIf='doc.hash',
+									style='word-wrap:break-word;'
+								) {{ doc.name }}
+							td
+								sbpro-app-button(
+									(click)='deleteDoc(doc.documentId)',
+									text='Delete',
+									type='button',
+									loadingText='Deleting...',
+									[loading]='doc.deleting',
+									[btnClass]='{ "btn-block": false, "btn-light": true, "btn-sm": true }'
+								)
+		.col-12
+			.div(*ngIf='!(uploadedDocuments.length > 0)')
+				.form-group
+					input#uploadDocs(
+						#myInput,
+						type='file',
+						enctype='multipart/form-data',
+						(change)='onfileChange($event)',
+						multiple,
+						accept='.png, .jpg, .pdf, .xlsx, .xls, .csv, .doc, .docx'
+					)
+					button.btn.castlerButtonColor.btn-block.btn-sm(
+						(click)='docUp()',
+						text='uploading ? \'Uploading...\': \'Upload\'',
+						[disabled]='uploading',
+						width='100%'
+					) 
+						fa-icon.fa-2x.text-gray-200([icon]='["fas", "upload"]')
+						div(*ngIf='uploading')
+							span.ml-5(style='font-size: 1.5em') Uploading... &nbsp;
+							fa-icon.fa-2x.text-gray-200([icon]='["fas", "spinner"]')
+						div(*ngIf='!uploading')
+							span.ml-5(style='font-size: 1.5em') Upload Document &nbsp;
+						//- <i class="fa fa-spinner fa-spin" *ngIf="loading"></i>
+
+			.div(*ngIf='uploadedDocuments.length > 0')
+				.form-group.align-center
+					.row-12
+						input#uploadDocs(
+							#myInput,
+							type='file',
+							enctype='multipart/form-data',
+							(change)='onfileChange($event)',
+							multiple,
+							accept='.png, .jpg, .pdf, .xlsx, .xls, .csv, .doc, .docx'
+						)
+						sbpro-app-button(
+							(click)='docUp()',
+							text='Upload More',
+							loadingText='Uploading...',
+							[buttonStyle]='417505',
+							[loading]='uploading',
+							[btnClass]='{ "btn-block": false, "btn-primary": true, "btn-md": true }'
+						)
+						sbpro-app-button.ml-5(
+							(click)='closeModal()',
+							text='Close',
+							loadingText='Closing...',
+							[loading]='closing',
+							[disabled]='uploading',
+							[btnClass]='{ "btn-block": false, "btn-light": true, "btn-primary": true, "btn-md": true }'
+						)
+	.modal-footer

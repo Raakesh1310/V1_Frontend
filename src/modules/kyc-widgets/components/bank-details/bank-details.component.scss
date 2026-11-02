@@ -1,0 +1,147 @@
+.rightSideWidthHeight {
+  width: 450px;
+  height: 450px;
+}
+
+.flex-display {
+  display: flex;
+  flex-direction: row;
+}
+
+.flex-display-column {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+
+.inputBoxStyle {
+  background: #F1F1F1;
+  height: 42px;
+  width: 400px;
+  border: none;
+}
+
+@media screen and (max-width: 685px) {
+  .flex-display {
+    display: flex;
+    flex-direction: row;
+    //flex-wrap: wrap;
+  }
+
+  .rightSideWidthHeight {
+    width: 350px;
+    height: 600px;
+  }
+
+  .inputBoxStyle {
+    background: #F1F1F1;
+    height: 42px;
+    max-width: 300px;
+    width: 100%;
+    border: none;
+  }
+
+}
+
+@media screen and (max-width: 555px) {
+
+  .rightSideWidthHeight {
+    width: 250px;
+    height: 600px;
+  }
+
+  .inputBoxStyle {
+    background: #F1F1F1;
+    height: 42px;
+    max-width: 250px;
+    width: 100%;
+    border: none;
+  }
+
+}
+
+
+.labelTexts {
+  font-family: Poppins, sans-serif;
+  font-style: normal;
+  font-weight: 500;
+  font-size: 16px;
+  letter-spacing: 0.02em;
+  color: #3E2808;
+}
+
+.yellowBoxDetails {
+  color: rgba(86, 66, 37, 0.49);
+  font-size: 18px;
+}
+
+.yellowBoxHeadings {
+  font-size: 16px;
+  color: #564225;
+}
+
+.continueBtn {
+  margin: 6px;
+  width: 90px;
+  height: 30px;
+  background: #F79A0E;
+  color: white;
+  border: none;
+}
+
+.bottomLeft {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+}
+
+.bottomRight {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+}
+
+.myanchor {
+  text-decoration: none;
+}
+
+.arrowOrange {
+  fill: rgba(255, 92, 0, 0.6);
+}
+
+.arrowBlack {
+  fill: rgba(0, 0, 0, 0.28);
+}
+
+input[type="file"] {
+  display: none;
+}
+
+.chip {
+  //text-align: center;
+  display: flex;
+  flex-direction: row;
+  padding: 0 18px;
+  height: 30px;
+  font-size: 16px;
+  //line-height: 50px;
+  border-radius: 25px;
+  background-color: #f1f1f1;
+}
+
+.closeBtn {
+  padding-left: 10px;
+  color: #888;
+  font-weight: bold;
+  float: right;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.closeBtn:hover {
+  color: #000;
+}
+
+

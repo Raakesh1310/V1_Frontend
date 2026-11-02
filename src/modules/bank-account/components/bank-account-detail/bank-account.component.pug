@@ -1,0 +1,301 @@
+.row.h-100
+  .col-lg-12.col-md-12.col-sm-12.col-xs-12.h-100
+    sbpro-card([headerActions]="true")
+      .card-header.logoColor(*ngIf="!hideHeader")
+        | List of Bank Accounts
+
+      .card-body
+        div
+          form.pb-2
+            .d-flex.mb-2
+              input#search-box.mt-1.form-control.w-100.mr-2(
+                placement="top",
+                ngbPopover="Search by Account Number, Description",
+                type="text",
+                name="s",
+                autocomplete="off",
+                placeholder="Search by Account Number, Account Name",
+                [(ngModel)]='searchString'
+              )
+              select#statusList.mt-1.form-control.w-25.mr-2(
+                  name='Bank',
+                  [(ngModel)]='selectedBank'
+              )
+                  option(value='') Select Bank
+                  option(*ngFor='let st of banks', [ngValue]='st') {{ st }}
+              button.btn.mr-2.ws-wrap.mt-1.mb-1.castlerButtonColor(
+                type="submit",
+                (click)="submitSearchForm()"
+              )
+                fa-icon.d-flex.flex-row.align-items-center(
+                  [icon]="['fas', 'search']"
+                )
+
+              button.btn.btn-link.mr-2.logoColor(
+                type="button",
+                (click)="clearSearchForm()"
+              ) Clear
+
+              a.btn.btn-success.mr-2.ws-nowrap.btn-icon.greenButton(
+                style="color: white",
+                type="button",
+                target="_blank",
+                (click)="downloadReport()",
+                [href]="url"
+              )
+                fa-icon.d-flex.flex-row.align-items-center(
+                  [icon]="['fas', 'arrow-down']"
+                )
+
+              button.btn.mr-2.ws-nowrap.castlerButtonColor(
+                *ngIf = 'refreshAllowed || isAdmin',
+                (click)="refreshPage()"
+              ) Refresh All
+                //- i-feather(name="refresh-cw")
+            .d-flex.mb-2(*ngIf="bankAccounts.length > 0")
+              .flex-row
+                small.mb-2.mt-2 Showing {{ (page - 1) * 10 + 1 }} to {{ (page - 1) * 10 + bankAccounts.length }} of {{ total$ | async }}
+        .table-responsive.pp-table-container.align-self-stretch.flex-grow-1.flex-stretch-1.table-striped
+          table.table
+            thead
+              tr
+                th.th-sticky-top(
+                  *ngIf="isAdmin",
+                  scope="col",
+                  sbSortable="event",
+                  (sort)="onSort($event)"
+                )
+                  span.ws-nowrap Merchant name
+                th.th-sticky-top(
+                  scope="col",
+                  sbSortable="event",
+                  (sort)="onSort($event)"
+                )
+                  span.ws-nowrap Account name
+
+                th.th-sticky-top(
+                  scope="col",
+                  sbSortable="time",
+                  (sort)="onSort($event)"
+                )
+                  span.ws-nowrap Account Number
+
+                th.th-sticky-top(
+                  scope="col",
+                  sbSortable="time",
+                  (sort)="onSort($event)"
+                )
+                  span.ws-nowrap Bank Name
+                th.th-sticky-top(
+                  scope="col",
+                  sbSortable="time",
+                  (sort)="onSort($event)"
+                )
+                  span.ws-nowrap Account Type
+                th.th-sticky-top(
+                  scope="col",
+                  sbSortable="time",
+                  (sort)="onSort($event)"
+                )
+                  span.ws-nowrap Account Balance
+                th.th-sticky-top(
+                  *ngIf="!isAdmin",
+                  scope="col",
+                  sbSortable="time",
+                  (sort)="onSort($event)"
+                )
+                  span.ws-nowrap Effective Castler Balance
+                  i-feather.ml-1(
+                    name="info",
+                    ngbTooltip="Effective Castler Balance = Available Balance - Pending Transfers",
+                    container="body"
+                  )
+                th.th-sticky-top(
+                  scope="col",
+                  sbSortable="time",
+                  (sort)="onSort($event)"
+                )
+                  span.ws-nowrap Last Updated On
+                  i-feather.ml-1(
+                    name="info",
+                    ngbTooltip="Account Balance is updated in every 30 minutes",
+                    container="body"
+                  )
+                th.th-sticky-top(
+                  *ngIf="isAdmin || refreshAllowed",
+                  scope="col",
+                  sbSortable="time",
+                  (sort)="onSort($event)"
+                )
+                  span.ws-nowrap Refresh Now 
+            tbody(*ngIf="bankAccounts.length > 0 && !(loadingList$ | async)")
+              tr(*ngFor="let bankAccount of bankAccounts; index as i")
+                td(*ngIf="isAdmin && bankAccount.merchantName")
+                  span {{ bankAccount.merchantName }}
+                td
+                  span(*ngIf="bankAccount.accountName") {{ bankAccount.accountName }}
+                td
+                  a.nav-link.p-0.tableclickEntryColor(
+                    style="color: #417505;font-weight: bold",
+                    href="javascript:void(0);",
+                    (click)="getStatement(bankAccount.bankAccountNo)"
+                  ) {{ bankAccount.bankAccountNo }}
+                td
+                  span(*ngIf="bankAccount.bankName") {{ capitalizeBankName(bankAccount.bankName) }}
+                td
+                  span(*ngIf="bankAccount.accountType") {{ bankAccount.accountType }}
+                td
+                  span {{ bankAccount.balance || bankAccount.balance === 0 ? toINR(bankAccount.balance) : '--' }}
+                td(*ngIf="!isAdmin") 
+                  span(*ngIf="!isAdmin") {{ bankAccount.effectiveBalance ? toINR(bankAccount.effectiveBalance) : '--' }}
+                td
+                  span {{bankAccount.balanceUpdatedOn? toLocalTime(bankAccount.balanceUpdatedOn): '--'}}
+                td(*ngIf="isAdmin || refreshAllowed") 
+                  button.btn.btn-icon.btn-sm.castlerButtonColor(
+                    (click)="refreshAccountBalance(bankAccount.merchantId, bankAccount.bankAccountNo, bankAccount.bankName)",
+                    [loading]='loading',
+                    loadingText='refreshing...',
+                    [disabled]='loading'
+                  )
+                    i-feather(name="refresh-cw")
+
+        .flex-container.flex-row(
+          *ngIf="bankAccounts.length <= 0 && !(loadingList$ | async)"
+        )
+          .align-self-center No Data available
+        .flex-container.flex-row(*ngIf="loadingList$ | async")
+          .align-self-center Please wait...
+        .d-flex.justify-content-between.pt-2.align-self-end(
+          *ngIf="bankAccounts.length > 0 && !(loadingList$ | async)"
+        )
+          button.btn.castlerButtonColor((click)="goBack()") Back
+          ngb-pagination(
+            [collectionSize]="total$ | async",
+            [maxSize]="5",
+            [(page)]="page",
+            [pageSize]="pageSize",
+            [rotate]="true",
+            [ellipses]="false",
+            [boundaryLinks]="true",
+            (pageChange)="pageChange($event)"
+          )
+
+//- ng-template(#alert)
+//-   sbpro-card([headerActions]='true')
+//-     .card-header.logoColor
+//-       | Add Bank Account
+//-     .card-body.text-left
+//-       div(*ngIf='false')
+//-       .alert.alert-danger.alert-dismissible.fade.show(
+//-         role='alert',
+//-         *ngIf='false'
+//-       )
+//-         | {{ errors[0] }}
+//-         button.close(
+//-           type='button',
+//-           (click)='errors = []',
+//-           data-dismiss='alert',
+//-           aria-label='Close'
+//-         )
+//-           span(aria-hidden='true') ×
+//-       form(autocomplete='off',[formGroup]='bankAccountForm')
+//-         .col
+//-           .form-group(*ngIf='isAdmin')
+//-             label(for='payee') Merchant
+//-             span.text-danger *
+//-             br
+//-             ng-select(
+//-               [items]='merchants',
+//-               bindLabel='title',
+//-               [(ngModel)]='selectedMerchant',
+//-               (change)='updateMerchant()',
+//-               [ngModelOptions]='{ standalone: true }',
+//-               loadingText='Loading...',
+//-               placeholder='Select Merchant',
+//-               (search)='getMerchants($event)',
+//-               name='merchantId'
+//-             )
+//-               ng-template(ng-label-tmp='' let-item='item')
+//-                 span(*ngIf='selectedMerchant') {{ item.title }}
+//-               ng-template(
+//-                 ng-option-tmp='',
+//-                 let-item='item',
+//-                 let-search='searchTerm',
+//-                 let-index='index'
+//-               )
+//-                 span.sup-option {{ item.title }}
+//-                 br
+//-                 span.sub-option {{ item.merchantId }} | {{ item.email }}         
+//-           .form-group
+//-             label(for='bank') Select Bank
+//-             span.text-danger *
+//-             br
+//-             ng-select(
+//-               [items]='banks',
+//-               bindLabel='title',
+//-               [(ngModel)] = 'bankName',
+//-               (change) = 'updateBank($event)',
+//-               loadingText='Loading...',
+//-               placeholder='Select Bank',
+//-               formControlName = 'bankName',
+//-               name='bank'
+//-             )
+//-               ng-template(ng-label-tmp='', let-item='item')
+//-                 span(*ngIf='bankName') {{bankName}} 
+
+//-           .form-group
+//-             label(for ='account') IFSC
+//-             span.text-danger *
+//-             input#amountcontrol.form-control.form-control-sm(
+//-               type='text',
+//-               placeholder='Enter IFSC Code',
+//-               [(ngModel)] = 'ifscCode',
+//-               formControlName = 'ifscCode',
+//-               name = 'ifscCode',
+//-               (change) = 'updateifscCode($event)'
+
+//-             )
+//-           .form-group
+//-             label(for ='account') Bank Branch
+//-             span.text-danger *
+//-             input#amountcontrol.form-control.form-control-sm(
+//-               type='text',
+//-               placeholder='Enter Bank Branch',
+//-               [(ngModel)] = 'branchName',
+//-               formControlName = 'branchName',
+//-               name = 'branchName',
+//-               (change) = 'updatebranchName($event)',
+
+//-             )
+//-           .form-group
+//-             label(for ='account') Account Name
+//-             span.text-danger *
+//-             input#amountcontrol.form-control.form-control-sm(
+//-               type='text',
+//-               placeholder='Enter Account Name',
+//-               [(ngModel)] = 'accountName',
+//-               formControlName = 'accountName',
+//-               name = 'accountName',
+//-               (change) = 'updateAccName($event)'
+
+//-             )
+//-           .form-group
+//-             label(for = 'accountNum') Account Number
+//-             span.text-danger *
+//-             input#purpose.form-control.form-control-sm(
+//-               type='number',
+//-               placeholder='Enter Account Number',
+//-               [(ngModel)] = 'bankAccountNo',
+//-               formControlName = 'bankAccountNo',
+//-               name = 'bankAccountNo',
+//-               (change) = 'updateAccNumber($event)'
+//-             )
+//-     .card-footer
+//-       span
+//-         button.btn.btn-sm.btn-danger.float-left.ml-0.mr-2((click)='closeModal()') Cancel
+//-         span.float-right &nbsp;&nbsp;
+//-         button.btn.btn-sm.btn-success.float-left.greenButton((click)='addBankAccount()') Add Bank Account
+//-     span.float-right &nbsp;&nbsp;
+
+ngx-spinner
+  p(style="font-size: 20px; color: white") Processing. Please wait...

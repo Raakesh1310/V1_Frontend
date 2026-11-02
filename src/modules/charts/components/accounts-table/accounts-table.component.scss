@@ -1,0 +1,27 @@
+@import 'styles/variables.scss';
+
+.table-accounts{
+    display: flex;
+    flex-flow: row wrap;
+    flex-wrap:wrap;
+    justify-content: space-between;
+    align-content: space-between;
+    overflow: hidden;
+}
+
+.table-dashboard{
+    table-layout: fixed;
+    overflow-y: hidden;
+    overflow-x: hidden;
+    height:100%
+}
+
+.table-dashboard:hover{
+    overflow-y: scroll;
+    overflow-x: hidden
+}
+
+.column-container {
+    max-width: 100%;
+    white-space: nowrap;
+  }

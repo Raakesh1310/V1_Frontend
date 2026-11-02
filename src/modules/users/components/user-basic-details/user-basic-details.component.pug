@@ -1,0 +1,120 @@
+div
+	div(*ngIf='errors.length > 0')
+		sbpro-alert(classes='alert-danger', [dismissable]='true')
+			| {{ errors[0] }}
+	form([formGroup]='userForm')
+		.row
+			.col-sm-12.col-md-6.col-lg-6
+				.form-group
+					label(for='inputFirstName') First Name
+					input#inputFirstName.form-control.form-control-sm(
+						formControlName='firstName',
+						type='text',
+						placeholder='Enter first name',
+						autocomplete='new-firstName',
+						[ngClass]='{ "non-editable": readOnly }'
+					)
+
+			.col-sm-12.col-md-6.col-lg-6
+				.form-group
+					label(for='inputLastName') Last Name
+					input#inputLastName.form-control.form-control-sm(
+						formControlName='lastName',
+						type='text',
+						placeholder='Enter last name',
+						autocomplete='new-lastName',
+						[ngClass]='{ "non-editable": readOnly }'
+					)
+		.row
+			.col-sm-8.col-md-6.col-lg-6
+				.form-group
+					label(for='mobile') Mobile
+					input#mobile.form-control.form-control-sm(
+						type='text',
+						placeholder='Enter Mobile',
+						formControlName='mobile',
+						name='mobile',
+						[ngClass]='{ "non-editable": readOnly }',
+					)
+			.col-sm-4.col-md-6.col-lg-6
+				.form-group
+					label Creation Date
+					input#mobile.form-control.form-control-sm(
+						type='text',
+						placeholder='Date',
+						formControlName='createdAt',
+						name='creationDate',
+						readonly,
+						[ngClass]='{ "non-editable": readOnly }',
+					)
+
+		.row 
+			.col-sm-12.col-md-6.col-lg-6 
+				.form-group
+					label(for='inputBusinessName') Business Name 
+					input#businessName.form-control.form-control-sm(
+						type='text',
+						placeholder='Enter Business Name',
+						formControlName='businessName',
+						name='businessName', 
+						[ngClass]='{ "non-editable": readOnly }'
+					)
+			.col-sm-8.col-md-6.col-lg-6
+				.form-group
+					label(for='email') Email
+					input#email.form-control.form-control-sm(
+						type='text',
+						placeholder='Enter email',
+						formControlName='email',
+						name='email',
+						readonly,
+						[ngClass]='{ "non-editable": readOnly }'
+					)
+		.row
+			.col-sm-12.col-md-12.col-lg-12
+				.form-group.row
+					.col
+						label(for='loginLock')
+							| &nbsp;&nbsp; Login Locked 
+					.col
+						input.form-control.form-control-sm(
+							type='checkbox',
+							#checkbox,
+							formControlName='loginLock',
+							[checked]='loginLock',
+							(click)='changeCheckbox("loginLock",$event)'
+						)
+		//- 	.col-sm-4.col-md-6.col-lg-6
+		//- 		.form-group.row
+		//- 			.col
+		//- 				label(for='kycVerified')
+		//- 					| &nbsp;&nbsp; Kyc Verified 
+		//- 			.col
+		//- 				input.form-control.form-control-sm(
+		//- 					type='checkbox',
+		//- 					#checkbox,
+		//- 					formControlName='kycVerified',
+		//- 					[checked]='kycVerified',
+		//- 					(click)='changeCheckbox("kycVerified",$event)'
+		//- 				)
+		//- .row
+		//- 	.col-sm-8.col-md-6.col-lg-6
+		//- 		.form-group.row
+		//- 			.col
+		//- 				label(for='loginOTPEnabled')
+		//- 					| &nbsp;&nbsp; LoginOtp Enabled 
+		//- 			.col
+		//- 				input.form-control.form-control-sm(
+		//- 					type='checkbox',
+		//- 					#checkbox,
+		//- 					formControlName='loginOTPEnabled',
+		//- 					[checked]='loginOTPEnabled',
+		//- 					(click)='changeCheckbox("loginOTPEnabled",$event)'
+		//- 				)
+	sbpro-app-button(
+		text='Update',
+		loadingtext='Updating',
+		[loading]='users$ | async',
+		(click)='update()',
+		[btnClass]='{ "btn-primary": true }'
+	)

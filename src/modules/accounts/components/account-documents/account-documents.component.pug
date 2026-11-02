@@ -1,0 +1,63 @@
+
+.row(*ngIf='!readOnly')
+  .col-12
+    button.btn((click)='openEsign()', class='castlerButtonColor') Create agreement
+hr
+br
+
+center(*ngIf='loading')
+  | Please Wait...
+
+div(*ngIf='account && !loading')
+  .table-responsive.pp-table-container
+    span
+      h5 
+        | Agreements
+
+        .spinner-border.spinner-border-sm.text-danger.mr-1.float-right(
+          role='status',
+          aria-hidden='true',
+          *ngIf='refreshing'
+        )
+        button.btn.btn-red.btn-xs.float-right(
+          *ngIf='!refreshing',
+          (click)='refreshStatus()'
+        )
+          i-feather(name='refresh-cw')
+          span &nbsp; Refresh status
+        span.loading.float-right(*ngIf='generating') Generating File... &nbsp;&nbsp;&nbsp;
+    table.table
+      thead
+        tr
+          th
+            span Document ID
+          th
+            span File Name
+          th
+            span E-sign Order ID
+          th
+            span Status
+          th
+            span Actions
+
+      tbody(*ngIf='account.documents?.length == 0')
+        tr
+          td No Entries Found
+      tbody(*ngIf='account.documents?.length > 0')
+        tr(*ngFor='let doc of account.documents; index as i')
+          td
+            ngb-highlight([result]='doc.documentId')
+          td
+            a(href='{{ docUrlPrefix+doc.hash }}', target='_blank', *ngIf='doc.hash') {{ doc.name }}
+
+          td
+            ngb-highlight([result]='getOrder(doc.documentId).orderUuid')
+          td
+            span {{ getOrder(doc.documentId).status }}
+
+          td(*ngIf='!readOnly')
+            button.btn.btn-xs.mr-2.font-weight-700.ws-nowrap(
+              class='castlerButtonColor',
+              (click)='generateFile(getOrder(doc.documentId).documentUuid)',
+              *ngIf='getOrder(doc.documentId).status === "COMPLETED"'
+            ) Generate File

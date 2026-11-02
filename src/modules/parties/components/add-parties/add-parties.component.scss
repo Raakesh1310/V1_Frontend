@@ -1,0 +1,49 @@
+@import 'styles/variables.scss';
+
+
+.flex-display {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+  }
+  
+  .flex-even {
+    flex: 1; // will get remaining full space..
+  }
+  
+  
+  sbpro-alert {
+    p {
+      margin-bottom: 0rem;
+    }
+  }
+  
+  .block {
+    margin-bottom: 5%;
+  }
+  
+  .detailPage {
+    label {
+      color: black;
+      font-weight: bold;
+    }
+  }
+
+  span.update{
+    color: #417505;
+    font-size: 1.1rem;
+    background: #ffff00;
+    padding: 4px;
+  }  
+  
+  .redDot:before {
+    content: "\A";
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: #790b00;
+    display: inline-block;
+    margin-right: 10px;
+    margin-bottom: 2px;
+  }
+  

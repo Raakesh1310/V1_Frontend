@@ -1,0 +1,276 @@
+div
+  div
+    .sb-preview
+      .sbp-preview-content
+        h4 Business Documents
+        hr
+        form
+          .form-group
+            div(*ngIf='errors.length > 0')
+              sbpro-alert(classes='alert-danger', [dismissable]='true')
+                | {{ errors[0] }}
+
+          .form-group(*ngIf='!isIndividual && gstFile')
+            label Company GST
+            br
+            .form-control
+              span
+                a(href='#', (click)='downloadGst($event)' target='_blank') {{ gstFile }}
+                .p-0.button.btn.btn-lg.btn-light.float-right(
+                  (click)='removeFile("docBusinessGst")',
+                  *ngIf='(merchantId || !verified) && !readOnly'
+                ) 
+                  i-feather(name='trash-2')
+
+          .form-group(*ngIf='!isIndividual && !gstFile && !readOnly')
+            label(for='docBusinessGst') Company GST
+              span.text-danger 
+                | *
+            .custom-file.mb-lg-3
+              input#docBusinessGst.form-control.custom-file-input(
+                type='file',
+                (change)='handleFileInput($event)',
+                enctype='multipart/form-data',
+                [disabled]='docBusinessGst'
+              )
+              label.custom-file-label(for='gstupload') Upload File (Max size 5 MB)
+            div(*ngIf='gstFileProgress')
+              div(*ngIf='progress <= 100')
+                br 
+                sbpro-progress-bar.mb-3([value]='progress') {{ progress }}%
+
+          .form-group(*ngIf='!isIndividual && panRequired() && panFile')
+            label Company PAN
+            span.text-danger 
+              | *
+            br
+            .form-control
+              span
+                a(href='#', (click)='downloadPan($event)' target='_blank') {{ panFile }}
+                .p-0.button.btn.btn-lg.btn-light.float-right(
+                  (click)='removeFile("docBusinessPan")',
+                  *ngIf='(merchantId || !verified) && !readOnly'
+                ) 
+                  i-feather(name='trash-2')
+
+          .form-group(*ngIf='!isIndividual && panRequired() && !panFile && !readOnly')
+            label(for='docBusinessPan') Company PAN
+              span.text-danger 
+                | *
+            .custom-file.mb-lg-3
+              input#docBusinessPan.form-control.custom-file-input(
+                type='file',
+                (change)='handleFileInput($event)',
+                enctype='multipart/form-data',
+                [disabled]='docBusinessPan'
+              )
+              label.custom-file-label(for='panupload') Upload File(Max size 5 MB)
+            div(*ngIf='panFileProgress')
+              div(*ngIf='progress <= 100')
+                br
+                sbpro-progress-bar.mb-3([value]='progress') {{ progress }}%
+
+          .form-group(*ngIf='!isIndividual && cheqFile')
+            label Cancelled Cheque
+            br
+            .form-control
+              span
+                a(href='#', (click)='downloadCheq($event)' target='_blank') {{ cheqFile }}
+                .p-0.button.btn.btn-lg.btn-light.float-right(
+                  (click)='removeFile("docCancelledCheque")',
+                  *ngIf='(merchantId || !verified) && !readOnly'
+                ) 
+                  i-feather(name='trash-2')
+          .form-group(*ngIf='!isIndividual && !cheqFile && !readOnly')
+            label(for='docCancelledCheque') Cancelled Cheque
+              span.text-danger 
+                | *
+            .custom-file.mb-lg-3
+              input#docCancelledCheque.form-control.custom-file-input(
+                type='file',
+                (change)='handleFileInput($event)',
+                enctype='multipart/form-data',
+                [disabled]='docCancelledCheque'
+              )
+              label.custom-file-label(for='chequpload') Upload File(Max size 5 MB)
+            div(*ngIf='cheqFileProgress')
+              div(*ngIf='progress <= 100')
+                br
+                sbpro-progress-bar.mb-3([value]='progress') {{ progress }}%
+
+          .form-group(*ngIf='logoFile')
+            label(*ngIf='!isIndividual') Company Logo
+            label(*ngIf='isIndividual') Profile Picture
+            br
+            .form-control
+              span
+                a(href='#', (click)='downloadLogo($event)' target='_blank') {{ logoFile }}
+                .p-0.button.btn.btn-lg.btn-light.float-right(
+                  (click)='removeFile("docBusinessLogo")',
+                  *ngIf='(merchantId || !verified) && !readOnly'
+                ) 
+                  i-feather(name='trash-2')
+          .form-group(*ngIf='!logoFile && !readOnly')
+            label(for='docBusinessLogo', *ngIf='!isIndividual') Company Logo
+            label(for='docBusinessLogo', *ngIf='isIndividual') Profile Picture
+              span.text-danger(*ngIf='!isIndividual')
+                | *
+            .custom-file.mb-lg-3
+              input#docBusinessLogo.form-control.custom-file-input(
+                type='file',
+                (change)='handleFileInput($event)',
+                enctype='multipart/form-data',
+                [disabled]='docBusinessLogo'
+              )
+              label.custom-file-label(for='logoupload') Upload Image File (Max. Resolution: 512 x 512)
+            div(*ngIf='logoFileProgress')
+              div(*ngIf='progress <= 100')
+                br
+                sbpro-progress-bar.mb-3([value]='progress') {{ progress }}%
+
+          .form-group(*ngIf='authpanFile')
+            label(*ngIf='!isIndividual') Authorized Person PAN
+            label(*ngIf='isIndividual') Authorized Person PAN
+            br 
+            .form-control
+              span
+                a(href='#', (click)='downloadAuthPan($event)' target='_blank') {{ authpanFile }}
+                .p-0.button.btn.btn-lg.btn-light.float-right(
+                  (click)='removeFile("docAuthorizedPersonPan")',
+                  *ngIf='(merchantId || !verified) && !readOnly'
+                ) 
+                  i-feather(name='trash-2')
+          .form-group(*ngIf='!authpanFile && !readOnly')
+            label(for='docAuthorizedPersonPan', *ngIf='!isIndividual') Authorized Person PAN
+            label(for='docAuthorizedPersonPan', *ngIf='isIndividual') PAN
+              span.text-danger 
+                | *
+            .custom-file.mb-lg-3
+              input#docAuthorizedPersonPan.form-control.custom-file-input(
+                type='file',
+                (change)='handleFileInput($event)',
+                enctype='multipart/form-data',
+                [disabled]='docAuthorizedPersonPan'
+              )
+              label.custom-file-label(for='authpersonpanupload') Upload File(Max size 5 MB)
+            div(*ngIf='authpanFileProgress')
+              div(*ngIf='progress <= 100')
+                br
+                sbpro-progress-bar.mb-3([value]='progress') {{ progress }}%
+          .form-group(
+            *ngIf='(merchantId && coiFile) || (coiRequired() && coiFile)' 
+          )
+            label Certificate of Incorporation (COI)
+            br 
+            .form-control
+              span
+                a(href='#', (click)='downloadCOI($event)' target='_blank') {{ coiFile }}
+                .p-0.button.btn.btn-lg.btn-light.float-right(
+                  (click)='removeFile("docCOI")',
+                  *ngIf='(merchantId || !verified) && !readOnly'
+                ) 
+                  i-feather(name='trash-2')
+          .form-group(
+            *ngIf='(merchantId && coiRequired() && !coiFile && !readOnly)' 
+          )
+            label(for='docCOI') Certificate of Incorporation (COI)
+              span.text-danger 
+                | *
+            .custom-file.mb-lg-3
+              input#docCOI.form-control.custom-file-input(
+                type='file',
+                (change)='handleFileInput($event)',
+                enctype='multipart/form-data',
+                [disabled]='docCOI'
+              )
+              label.custom-file-label(for='coiupload') Upload File(Max size 5 MB)
+            div(*ngIf='coiFileProgress')
+              div(*ngIf='progress <= 100')
+                br
+                sbpro-progress-bar.mb-3([value]='progress') {{ progress }}%
+          .form-group(
+            *ngIf='brFile'
+          )
+            label Board Resolution (BR)  / Partnership Letter / Proprietorship Letter
+            br 
+            .form-control
+              span
+                a(href ="#", (click)='downloadBR($event)' target='_blank') {{ brFile }}
+                .p-0.button.btn.btn-lg.btn-light.float-right(
+                  (click)='removeFile("docBR")',
+                  *ngIf='(merchantId || !verified) && !readOnly'
+                ) 
+                  i-feather(name='trash-2')
+          .form-group(
+            *ngIf='!brFile && !readOnly'
+          )
+            label(for='docBR') Board Resolution (BR) / Partnership Letter / Proprietorship Letter
+              span.text-danger 
+                | *
+            .custom-file.mb-lg-3
+              input#docBR.form-control.custom-file-input(
+                type='file',
+                (change)='handleFileInput($event)',
+                enctype='multipart/form-data',
+                [disabled]='docBR'
+              )
+              label.custom-file-label(for='docBR') Upload File(Max size 5 MB)
+            div(*ngIf='brFileProgress')
+              div(*ngIf='progress <= 100')
+                br
+                sbpro-progress-bar.mb-3([value]='progress') {{ progress }}%
+                
+          .form-group(*ngIf='caFile')
+            label Commerical Agreement
+            br
+            .form-control
+              span
+                a(href='#', (click)='downloadCA($event)' target='_blank') {{caFile}}
+                .p-0.button.btn.btn-lg.btn-light.float-right(
+                  (click)='removeFile("docCA")',
+                  *ngIf='(merchantId || !verified) && !readOnly'
+                ) 
+                  i-feather(name='trash-2')
+          .form-group(*ngIf='!isIndividual && !caFile && !readOnly')
+            label(for='docCA') Commerical Agreement
+              span.text-danger 
+                | *
+            .custom-file.mb-lg-3
+              input#docCA.form-control.custom-file-input(
+                type='file',
+                accept = '.pdf, .docx, .png ,.jpeg, .jpg',
+                (change)='handleFileInput($event)',
+                enctype='multipart/form-data',
+                [disabled]='docCA',
+              )
+              label.custom-file-label(for='docCA') Upload File(Max size 5 MB)
+            div(*ngIf='caFileProgress')
+              div(*ngIf='progress <= 100')
+                br
+                sbpro-progress-bar.mb-3([value]='progress') {{ progress }}%
+
+          .form-group(*ngIf='otherFiles')
+            label Upload Additional Documents 
+            br
+            .form-control.mb-lg-3(*ngFor='let otherFile of otherFiles; let i = index')
+              span
+                a(href='#', (click)='downloadOtherDoc($event,otherFile)' target='_blank') {{otherFile.docOtherOriginal}}
+                .p-0.button.btn.btn-lg.btn-light.float-right(
+                  (click)='deleteDocOthers(otherFile)',
+                  *ngIf='(merchantId || !verified) && !readOnly'
+                ) 
+                  i-feather(name='trash-2')
+          .form-group(*ngIf='!isIndividual && !readOnly')
+            label(*ngIf = '!otherFiles',for='docOther') Others 
+            .custom-file.mb-lg-3(*ngFor='let file of otherFileIndex; let i = index')
+              input#docOther.form-control.custom-file-input(
+                type='file',
+                accept = '.pdf, .docx, .png ,.jpeg, .jpg',
+                (change)='handleFileInput($event,i)',
+                enctype='multipart/form-data',
+              )
+              label.custom-file-label(for='other') Upload File(Max size 5 MB)
+            button.btn-xs.castlerButtonColor.mt-1(*ngIf = 'addIndexDoc',type='button', (click)='addFileInput()') +   
+          
+
+button.btn.btn-light.align-self-start(*ngIf='merchantId', (click)='goBack()') Back

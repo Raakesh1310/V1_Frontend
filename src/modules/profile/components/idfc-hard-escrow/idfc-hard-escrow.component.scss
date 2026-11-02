@@ -1,0 +1,12 @@
+@import 'styles/variables.scss';
+
+.checkboxes label {
+    display: inline-block;
+    white-space: nowrap;
+  }
+  .checkboxes input {
+    vertical-align: middle;
+  }
+  .checkboxes label span {
+    vertical-align: middle;
+  }

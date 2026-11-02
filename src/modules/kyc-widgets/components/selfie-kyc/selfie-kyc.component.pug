@@ -1,0 +1,29 @@
+//div(*ngIf="!permissionCheck" )
+//    div Click on allow in the pop up.
+div.p-3(style='display: flex; justify-content: center')
+    span((click)="dismissModal.emit();stopStreamedVideo(video)", style='position: absolute; top: 5px; right: 16px; font-size: 25px; Cursor: pointer') &times;
+    div([hidden]="imgCaptured", style='display: flex; align-items: center; flex-direction: column')
+        div.mt-5(*ngIf="permissionCheck === 2") Click on Allow in the pop up.
+        div.mt-5(*ngIf="permissionCheck === 1") Go to browser settings and allow camera permission.
+        video(#video, width='300', height='200', autoplay)
+        input.continueBtn.rounded(
+            *ngIf="!isLoading && (permissionCheck === 0)",
+            type='button',
+            (click)='captureImage()',
+            value='Snap',
+        )
+    div([hidden]='!imgCaptured', style='display: flex; align-items: center; flex-direction: column')
+        img([src]="imgSrc", width='280', height='200')
+        div(style='display: flex; justify-content: center')
+            input.uploadAgainBtn.rounded(
+                *ngIf="!isLoading",
+                type='button',
+                (click)='imgCaptured = !imgCaptured; ngAfterViewInit()',
+                value='Re-take',
+            )
+            input.continueBtn.rounded(
+                type='button',
+                (click)='postKycDocs(imgFile, "userSelfie")',
+                [value]='isLoading ? "Uploading.." : "Upload"',
+            )
+    canvas(#canvas, width='245', height='200', hidden)

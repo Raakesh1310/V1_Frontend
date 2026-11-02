@@ -1,0 +1,417 @@
+div
+  div 
+  div
+    div(*ngIf='errors.length > 0')
+      sbpro-alert(
+        classes='alert-danger',
+        [dismissable]='true',
+        (click)='errors = []'
+      )
+        | {{ errors[0] }}
+    form.pb-2
+      .d-flex.mb-2
+        input#search-box.mt-1.form-control.w-100.mr-2(
+          type='text',
+          name='s',
+          placement='top',
+          autocomplete='off',
+          (input)='Search($event)',
+          [(ngModel)]='searchTerm',
+          ngbPopover='Search by Log Id, Activity, API/Portal, Created By',
+          placeholder='Search by Log Id, Activity, API/Portal, Created By'
+        )
+        input#date-from.mt-1.form-control.w-25.mr-2(
+          type='text',
+          placeholder='Start Date',
+          name='dateFrom',
+          ngbDatepicker,
+          outsideDays='hidden',
+          autocomplete='off',
+          #dateFrom='ngbDatepicker',
+          (click)='dateFrom.toggle()',
+          [(ngModel)]='startDate',
+          (ngModelChange)='startDateChange()',
+          [maxDate]='maxDate'
+        )
+        input#date-to.mt-1.form-control.w-25.mr-2(
+          type='text',
+          placeholder='End Date',
+          name='dateTo',
+          ngbDatepicker,
+          outsideDays='hidden',
+          autocomplete='off',
+          #dateTo='ngbDatepicker',
+          (click)='dateTo.toggle()',
+          [(ngModel)]='endDate',
+          (ngModelChange)='endDateChange()',
+          [maxDate]='maxDate',
+          [minDate]='startDate'
+        )
+        button.btn.ws-nowrap.mt-1.mb-1.castlerButtonColor(
+          type='submit',
+          (click)='filterData()'
+        )
+          fa-icon.d-flex.flex-row.align-items-center([icon]='["fas", "search"]')
+        button.btn.btn-link.mt-1.mb-1.mr-5.logoColor(
+          type='button',
+          (click)='clearButtonClick()'
+        )
+          | Clear
+      .d-flex.mb-2(*ngIf='data?.length > 0')
+        .flex-row
+          small.mb-2.mt-2 Showing {{ (page - 1) * 10 + 1 }} to {{ (page - 1) * 10 + data?.length }} of {{ total$  }}
+    .table-responsive.pp-table-container.table-responsive-sm
+      table.table
+        thead
+          tr
+            th(scope='col', sbSortable='time')
+              span.ws-nowrap Log Id
+            th(scope='col', sbSortable='event')
+              span.ws-nowrap API/Portal
+            th(scope='col', sbSortable='event')
+              span.ws-nowrap Date/Time
+            th(scope='col', sbSortable='event', *ngIf='!accountId')
+              span.ws-nowrap Business Name
+            th(scope='col', sbSortable='time', *ngIf='!accountId')
+              span.ws-nowrap Escrow ID
+            th(scope='col', sbSortable='time')
+              span.ws-nowrap Activity
+            th(scope='col', sbSortable='time')
+              span.ws-nowrap Created By
+            th(scope='col', sbSortable='time')
+              span.ws-nowrap IP Address
+
+        tbody
+          tr(*ngIf='isLoading')
+            .spinner-border.text-primary(role='status')
+              span.sr-only Loading...
+          tr(*ngIf='data.length == 0 && !isLoading')
+            td No Entries Found
+          tr(*ngFor='let log of data; index as i')
+            td(*ngIf='log.type !== "Login"')
+              ngb-highlight.ws-nowrap.tableClickEntryColor.myanchor(
+                [result]='log.logId',
+                (click)='showDetails(log)'
+              )
+            th(*ngIf='log.type === "Login"')
+              ngb-highlight([result]='log.logId')
+            td
+              ngb-highlight([result]='log.mode')
+            td
+              ngb-highlight([result]='toIST(log.createdAt)')
+            td(*ngIf='!accountId && log.business')
+              ngb-highlight([result]='log.business.title')
+            td(*ngIf='log.va && !accountId')
+              ngb-highlight.ws-nowrap.tableClickEntryColor.myanchor(
+                [result]='log.va.accountId',
+                (click)='accountDetails(log.va.accountId)'
+              )
+            td(*ngIf='!log.accountId')
+              | --
+            td
+              ngb-highlight([result]='log.action')
+            td(*ngIf='log.createdByUser')
+              ngb-highlight([result]='log.createdByUser.email')
+            td(*ngIf='!log.createdBy')
+              ngb-highlight([result]='')
+            td(*ngIf='log.ipAddress')
+              ngb-highlight([result]='log.ipAddress')
+            td(*ngIf='!log.ipAddress')
+              ngb-highlight([result]='')
+    .d-flex.justify-content-between.p-2
+      ngb-pagination(
+        [collectionSize]='total$',
+        [maxSize]='5',
+        [(page)]='page',
+        [pageSize]='pageSize',
+        [rotate]='true',
+        [ellipses]='false',
+        (pageChange)='pageChange($event)',
+        [boundaryLinks]='true'
+      )
+
+ng-template(#details)
+  .card-header 
+    span {{ type }}
+  .card-body(*ngIf='type === "Unlinked Payee" || type === "Linked Payee"')
+    .table-responsive.pp-table-container.table-responsive-sm
+      table.table
+        thead
+          tr
+            th(scope='col')
+              span.ws-nowrap Payee Id
+            th(scope='col')
+              span.ws-nowrap Email
+            th(scope='col', *ngIf='logDetails.va.shareUnit === "INR"') 
+              span.ws-nowrap Share(INR)
+            th(scope='col', *ngIf='logDetails.va.shareUnit === "%"') 
+              span.ws-nowrap Share(%)
+            th(scope='col')
+              span.ws-nowrap Status
+        tbody.font-weight-bold
+          tr
+            td {{ logDetails.data.payeeId }}
+            td {{ logDetails.data.email }}
+            td {{ logDetails.data.share }}
+            td {{ logDetails.data.status }}
+  .card-body(*ngIf='type === "Activated Link Payee"')
+    label Activated following linked payees
+    ul 
+      li.font-weight-bold(*ngFor='let val of logDetails.data.activePayees') {{ val }}
+  .card-body.pl-5(*ngIf='type === "Single Transfer"')
+    .row 
+      .col 
+        div 
+          label Transfer Id :
+        .font-weight-bold
+          label {{ logDetails.data.transaction.transferId }}
+      .col 
+        div 
+          label Amount :
+        .font-weight-bold
+          label {{ logDetails.data.transaction.amount }}
+    br
+    .row 
+      .col 
+        div 
+          label Beneficiary Name :
+        .font-weight-bold
+          label {{ logDetails.data.transaction.beneficiaryName }}
+      .col 
+        div 
+          label Payee Id :
+        .font-weight-bold
+          label {{ logDetails.data.transaction.payeeId }}
+    br
+    .row 
+      .col 
+        div 
+          label Beneficiary Account Number :
+        .font-weight-bold
+          label {{ logDetails.data.transaction.beneficiaryAccNumber }}
+      .col 
+        div 
+          label Beneficiary IFSC :
+        .font-weight-bold
+          label {{ logDetails.data.transaction.beneficiaryIFSC }}
+    br
+    .row 
+      .col 
+        div 
+          label Escrow ID :
+        .font-weight-bold
+          label {{ logDetails.data.transaction.accountId }}
+      .col 
+        div 
+          label Escrow Balance :
+        .font-weight-bold
+          label {{ logDetails.data.transaction.accountBalance }}
+  .card-body.pl-5(*ngIf='type === "Bulk Transfer"')
+    .row 
+      .col 
+        div 
+          label Batch Id :
+        .font-weight-bold
+          label {{ logDetails.data.transaction.batchId }}
+      .col 
+        div 
+          label Batch Name :
+        .font-weight-bold
+          label {{ logDetails.data.transaction.batchName }}
+    br
+    .row 
+      .col 
+        div 
+          label Total Amount :
+        .font-weight-bold
+          label {{ logDetails.data.transaction.totalAmount }}
+      .col 
+        div 
+          label Escrow Balance :
+        .font-weight-bold
+          label {{ logDetails.data.transaction.accountBalance }}
+  .card-body.pl-5(*ngIf='type === "Created VA"')
+    .row 
+      .col 
+        div 
+          label Escrow Id :
+        .font-weight-bold
+          label {{ logDetails.data.accountId }}
+      .col 
+        div 
+          label Name :
+        .font-weight-bold
+          label {{ logDetails.data.name }}
+    br
+    .row 
+      .col 
+        div 
+          label Email :
+        .font-weight-bold
+          label {{ logDetails.data.email }}
+      .col 
+        div 
+          label Status :
+        .font-weight-bold
+          label {{ logDetails.data.status }}
+    br
+    .row 
+      .col 
+        div 
+          label Bank :
+        .font-weight-bold
+          label {{ logDetails.data.bank }}
+      .col 
+        div 
+          label IFSC :
+        .font-weight-bold
+          label {{ logDetails.data.ifsc }}
+  .card-body.pl-5(*ngIf='type === "Uploaded Document"')
+    .row 
+      .col 
+        div 
+          label Document Name :
+        .font-weight-bold
+          label {{ logDetails.data.name }}
+      .col 
+        div 
+          label Document type :
+        .font-weight-bold
+          label {{ logDetails.data.docType }}
+    br
+  .card-body.pl-5(*ngIf='type === "Activated Account"')
+    label Activated account with following linked payees
+    .table-responsive.pp-table-container.table-responsive-sm
+      table.table
+        thead
+          tr
+            th(scope='col')
+              span.ws-nowrap Payee Id
+            th(scope='col')
+              span.ws-nowrap Email
+            th(scope='col') 
+              span.ws-nowrap Share
+        tbody.font-weight-bold
+          tr(*ngFor='let val of logDetails.data.linkedPayees')
+            td {{ val.payeeId }}
+            td {{ val.email }}
+            td {{ val.share }}
+  .card-body.pl-5(*ngIf='type === "Updated Account"')
+    .row 
+      .col 
+        div 
+          label Name :
+        .font-weight-bold
+          label {{ logDetails.data.name }}
+      .col 
+        div 
+          label Purpose :
+        .font-weight-bold
+          label {{ logDetails.data.purpose }}
+    .row 
+      .col 
+        div 
+          label email :
+        .font-weight-bold
+          label {{ logDetails.data.email }}
+      .col 
+        div 
+          label Validity :
+        .font-weight-bold
+          label {{ logDetails.data.validity }}
+    .row 
+      .col 
+        div 
+          label Start Date :
+        .font-weight-bold
+          label {{ toIST(logDetails.data.startDate) }}
+      .col 
+        div 
+          label Expected Volume :
+        .font-weight-bold
+          label {{ logDetails.data.expectedVolume }}
+  .card-body.pl-5(*ngIf='type === "Updated Payee Share"')
+    .row 
+      .col 
+        div 
+          label Payee Email :
+        .font-weight-bold
+          label {{ logDetails.data.email }}
+    .row 
+      .col 
+        div 
+          label Old Share :
+        .font-weight-bold
+          label {{ logDetails.data.oldShare }}
+      .col 
+        div 
+          label New Share :
+        .font-weight-bold
+          label {{ logDetails.data.newShare }}
+  .card-body.pl-5(*ngIf='type === "Updated Share Unit"')
+    .row 
+      div 
+        label Share Unit :
+      .font-weight-bold
+        label {{ logDetails.data.shareUnit }}
+  .card-body.pl-5(*ngIf='type === "Update Merchant Details"')
+    .row(*ngIf="logDetails.data.businessName")
+      div 
+        label Business Name :
+      .font-weight-bold
+        label {{ logDetails.data.businessName }}
+    .row(*ngIf="logDetails.data.mobile")
+      div 
+        label Mobile Number :
+      .font-weight-bold
+        label {{ logDetails.data.mobile }}
+    .row(*ngIf="logDetails.data.email")
+      div 
+        label Email :
+      .font-weight-bold
+        label {{ logDetails.data.email }}
+  .card-body.pl-5(*ngIf='type === "Create Challan"')
+    .row 
+      .col 
+        div 
+          label Payer Name :
+        .font-weight-bold
+          label {{ logDetails.data.payerName }}
+      .col 
+        div 
+          label Challan Id :
+        .font-weight-bold
+          label {{ logDetails.data.challanId }}
+    br
+    .row 
+      .col 
+        div 
+          label Payer Details 1 :
+        .font-weight-bold
+          label {{ logDetails.data.payerDetail1 }}
+      .col 
+        div 
+          label Payer Details 2 :
+        .font-weight-bold
+          label {{ logDetails.data.payerDetail2 }}
+    br
+    .row 
+      .col 
+        div 
+          label Contact 1 :
+        .font-weight-bold
+          label {{ logDetails.data.contact1 }}
+      .col 
+        div 
+          label Contact 2 :
+        .font-weight-bold
+          label {{ logDetails.data.contact2 }}
+    br
+    .row 
+      .col 
+        div 
+          label Amount :
+        .font-weight-bold
+          label {{ logDetails.data.amount }}
+  .card-footer 
+    button.btn.float-right.castlerButtonColor((click)='closeModal()') close

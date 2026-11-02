@@ -1,0 +1,142 @@
+
+div
+  .alert.alert-danger.alert-dismissible.fade.show(
+    role='alert',
+    *ngIf='errors.length > 0'
+  )
+    | {{ errors[0] }}
+    button.close(
+      (click)='errors = []',
+      type='button',
+      data-dismiss='alert',
+      aria-label='Close'
+    )
+      span(aria-hidden='true') ×
+  form([formGroup]='dealDataForm')
+    .form-group
+      label Security Deposit (in Rs.)
+      span.text-danger(*ngIf='!viewMode') *
+      input.form-control(
+        type='number',
+        formControlName='securityDeposit',
+        *ngIf='!viewMode'
+      )
+      span.form-control(
+        *ngIf='viewMode',
+        [ngClass]='{ "no-border": viewMode, "pl-0": viewMode }'
+      )
+        b {{ dealData.securityDeposit }}
+
+      span(
+        *ngIf='securityDeposit.invalid && (securityDeposit.dirty || securityDeposit.touched)'
+      )
+        span.text-danger(*ngIf='securityDeposit.errors.required') Security Deposit is required.
+
+  form([formGroup]='dealForm', ngNativeValidate)
+    .form-group(*ngIf='!viewMode')
+      label Rent Agreement
+      .custom-file.mb-lg-3(*ngIf='!file')
+        input#agreement.form-control.custom-file-input(
+          type='file',
+          (change)='captureFile($event)',
+          enctype='multipart/form-data'
+        )
+        label.custom-file-label Upload File (Max size 5 MB)
+      div(*ngIf='file')
+        span.form-control
+          b 
+            a(href='{{ docUrlPrefix+file.hash }}', target='_blank', *ngIf='file.hash') {{ file.name }}
+          .p-0.button.btn.btn-lg.btn-light.float-right((click)='deleteDoc()') 
+            i-feather(name='trash-2')
+
+    .form-group(*ngIf='viewMode')
+      div(*ngFor='let doc of deal.documents')
+        label {{ doc.docType }}
+        span.form-control(
+        *ngIf='viewMode',
+        [ngClass]='{ "no-border": viewMode, "pl-0": viewMode }'
+      )
+          b 
+            a(href='{{ docUrlPrefix+doc.hash }}', target='_blank', *ngIf='doc.hash') {{ doc.name }}
+
+    div 
+      .row 
+        .col-md-4.col-sm-12 
+          .form-group
+            label(for='frm-cntrl-start-date') Start Date
+            span.text-danger(*ngIf='!viewMode') *
+            input#frm-cntrl-start-date.aria-readonly.form-control(
+              type='text',
+              name='sd',
+              placeholder='DD MM YYYY',
+              autocomplete='off',
+              formControlName='startDate',
+              ngbDatepicker,
+              outsideDays='hidden',
+              #sd='ngbDatepicker',
+              (click)='sd.toggle()',
+              [minDate]='startDateMin',
+              *ngIf='!viewMode'
+            )
+            span.form-control(
+        *ngIf='viewMode',
+        [ngClass]='{ "no-border": viewMode, "pl-0": viewMode }'
+      )
+              b {{ deal.startDate | date: "d MMM yyyy" }}
+            span(*ngIf='!viewMode')
+            span(
+              *ngIf='startDate.invalid && (startDate.dirty || startDate.touched)'
+            )
+              span.text-danger(*ngIf='startDate.errors.required') Start Date is required.
+        .col-md-4.col-sm-12
+          .form-group
+            label Tenure (months)
+            span.text-danger(*ngIf='!viewMode') *
+            input.form-control(
+              type='number',
+              (keyup)='updateEndDate()',
+              formControlName='tenure',
+              min=1,
+              step=1,
+              *ngIf='!viewMode'
+            )
+            span.form-control(
+              *ngIf='viewMode',
+              [ngClass]='{ "no-border": viewMode, "pl-0": viewMode }'
+            )
+              b {{ deal.tenure }}
+            span(*ngIf='tenure.invalid && (tenure.dirty || tenure.touched)')
+              span.text-danger(*ngIf='tenure.errors.required') Tenure is required.
+
+        .col-md-4.col-sm-12
+          .form-group
+            label(for='frm-cntrl-end-date') End Date
+            input#frm-cntrl-end-date.aria-readonly.form-control(
+              type='text',
+              name='ed',
+              placeholder='DD MM YYYY',
+              autocomplete='off',
+              formControlName='endDate',
+              ngbDatepicker,
+              outsideDays='hidden',
+              #ed='ngbDatepicker',
+              (click)='ed.toggle()',
+              [minDate]='endDateMin',
+              [readonly]='true',
+              *ngIf='!viewMode'
+            )
+            span.form-control(
+              *ngIf='viewMode',
+              [ngClass]='{ "no-border": viewMode, "pl-0": viewMode }'
+            )
+              b {{ deal.endDate | date: "d MMM yyyy" }}
+
+    .form-group(*ngIf='viewMode') 
+      button.btn((click)='goBack()', class='castlerButtonColor') Back
+    button.btn(
+      *ngIf='!viewMode', 
+      loadingText='Creating',
+      class='castlerButtonColor',
+      [loading]='loading',
+      (click)='validateAllForms()'
+    ) {{ !isEditDeal ? "Create Deal" : "Update Deal" }}

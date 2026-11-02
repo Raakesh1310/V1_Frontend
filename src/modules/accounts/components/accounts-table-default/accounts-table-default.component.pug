@@ -1,0 +1,289 @@
+sbpro-card(*ngIf='!isSelected', [headerActions]='true')
+  .card-header.logoColor
+    | Escrows List
+    span
+      label Auto Transfer Escrows &nbsp;
+      label.switch
+        input(
+          type='checkbox',
+          #checkbox,
+          [checked]='isAuto',
+          (click)='checkboxAction(checkbox)'
+        )
+        span.slider.round
+  .card-body
+    form
+      .d-flex.mb-2
+        input#search-box.mt-1.form-control.w-50.mr-2(
+          type='text',
+          name='s',
+          autocomplete='off',
+          placement='top',
+          ngbPopover='Search by Escrow Name, Escrow ID',
+          placeholder='Search by Escrow Name, Escrow ID',
+          [(ngModel)]='accountsService.searchTerm'
+        )
+        button.btn.mr-2.ws-nowrap.mt-1.castlerButtonColor(
+          type='submit',
+          (click)='submitSearchForm()'
+        )
+          fa-icon.d-flex.flex-row.align-items-center([icon]='["fas", "search"]')
+        button.btn.btn-link.mt-1.mr-2.logoColor(
+          type='button',
+          (click)='clearSearchForm()'
+        )
+          | Clear
+        .justify-content-end 
+          a.btn.btn-success.ws-wrap.float-right.mt-1.mb-1.btn-icon(
+            type='button',
+            target='_blank',
+            [href]='accountsService.reportDownloadLink$ | async'
+          )
+            fa-icon.d-flex.flex-row.align-items-center(
+              [icon]='["fas", "arrow-down"]'
+            )
+
+      .d-flex.mb-2(*ngIf='(account$ | async)?.length > 0')
+        .flex-row
+          small.mb-2.mt-2 Showing {{ (accountsService.page - 1) * 10 + 1 }} to {{ (accountsService.page - 1) * 10 + (account$ | async)?.length }} of {{ total$ | async }}
+      .table-responsive.pp-table-container
+        table.table
+          thead
+            tr
+              th(scope='col', sbSortable='date', (sort)='onSort($event)')
+                span Escrow Name
+                sb-sort-icon(
+                  *ngIf='sortedColumn === "date"',
+                  [direction]='sortedDirection'
+                )
+              th(scope='col', sbSortable='date', (sort)='onSort($event)')
+                span Escrow ID
+                sb-sort-icon(
+                  *ngIf='sortedColumn === "date"',
+                  [direction]='sortedDirection'
+                )
+              th(scope='col', sbSortable='event', (sort)='onSort($event)')
+                span IFSC
+                sb-sort-icon(
+                  *ngIf='sortedColumn === "date"',
+                  [direction]='sortedDirection'
+                )
+              th(
+                *ngIf='upiEnabled',
+                scope='col',
+                sbSortable='event',
+                (sort)='onSort($event)'
+              )
+                span UPI ID
+                sb-sort-icon(
+                  *ngIf='sortedColumn === "date"',
+                  [direction]='sortedDirection'
+                )
+              th(
+                *ngIf='upiEnabled',
+                scope='col',
+                sbSortable='event',
+                (sort)='onSort($event)'
+              )
+                span QR
+                sb-sort-icon(
+                  *ngIf='sortedColumn === "date"',
+                  [direction]='sortedDirection'
+                )
+              th(
+                *ngIf='!upiEnabled',
+                scope='col',
+                sbSortable='event',
+                (sort)='onSort($event)'
+              )
+                span Email
+                sb-sort-icon(
+                  *ngIf='sortedColumn === "event"',
+                  [direction]='sortedDirection'
+                )
+              th(scope='col', sbSortable='time', (sort)='onSort($event)')
+                span Escrow Creation Date
+                sb-sort-icon(
+                  *ngIf='sortedColumn === "time"',
+                  [direction]='sortedDirection'
+                )
+              th(scope='col', sbSortable='time', (sort)='onSort($event)')
+                span Escrow Status
+                sb-sort-icon(
+                  *ngIf='sortedColumn === "time"',
+                  [direction]='sortedDirection'
+                )
+              th(scope='col', sbSortable='time', (sort)='onSort($event)')
+                span Available Balance
+                sb-sort-icon(
+                  *ngIf='sortedColumn === "time"',
+                  [direction]='sortedDirection'
+                )
+
+          tbody(*ngIf='(account$ | async)?.length == 0')
+            tr
+              td(
+                *ngIf='!(accountsService.loading$ | async) && (account$ | async)?.length == 0'
+              ) No Entries Found
+              td.spinner(*ngIf='accountsService.loading$ | async')
+                .spinner-border.text-primary(role='status')
+                  span.sr-only Loading...
+          tbody(*ngIf='(account$ | async)?.length > 0')
+            tr(*ngFor='let account of account$ | async')
+              td
+                ngb-highlight(
+                  *ngIf='account.name',
+                  [result]='account.name',
+                  [term]='account$.name'
+                )
+              td.myanchor
+                ngb-highlight(
+                  style='color: #417505;font-weight: bold',
+                  [result]='account.accountId',
+                  [term]='account$.accountId',
+                  (click)='fetchDetails(account)'
+                )
+              td
+                ngb-highlight(
+                  *ngIf='account.ifsc',
+                  [result]='account.ifsc',
+                  [term]='account$.ifsc'
+                )
+              td(*ngIf='upiEnabled')
+                ngb-highlight(
+                  *ngIf='account.vpa',
+                  [result]='account.vpa',
+                  [term]='account$.vpa'
+                )
+              td(*ngIf='upiEnabled')
+                button.btn.btn-sm.btn-primary(
+                  *ngIf='account.bank === "rbl" && account.vpa',
+                  type='button',
+                  (click)='showQRCode(account.accountId, account.vpa)'
+                ) View QR
+              td(*ngIf='!upiEnabled')
+                ngb-highlight([result]='account.email', [term]='account$.email')
+              //- td
+              //-   ngb-highlight(
+              //-     [result]='account.createdByUser.email'
+              //-   )
+              td
+                ngb-highlight(
+                  [result]='account.createdAt | date: "d MMM yyyy" || "--"',
+                  [term]='account$.createdAt'
+                )
+              td
+                ngb-highlight([result]='account.status', [term]='account$.status')
+              td
+                ngb-highlight(
+                  [result]='toINR(account.balance.toFixed(2))',
+                  [term]='account$.balance'
+                )
+    .d-flex.justify-content-between.p-2
+      ngb-pagination#dir(
+        ,
+        [collectionSize]='total$ | async',
+        [(page)]='accountsService.page',
+        [maxSize]='5',
+        [rotate]='true',
+        [ellipses]='false',
+        [boundaryLinks]='true'
+      )
+
+sbpro-card#selected(*ngIf='isSelected')
+  .card-header Escrow details
+  .card-body
+    .form-group
+      table.table
+        tr
+          td Escrow Name
+          td
+            span(*ngIf='selectedAccount.name')
+              span {{ selectedAccount.name }}
+        tr
+          td Escrow Id
+          td
+            span(*ngIf='selectedAccount.accountId')
+              span {{ selectedAccount.accountId }}
+        tr
+          td IFSC
+          td
+            span(*ngIf='selectedAccount.accountId')
+              span {{ selectedAccount.ifsc }}
+        tr
+          td Email
+          td
+            span(*ngIf='selectedAccount.accountId')
+              span {{ selectedAccount.email }}
+        tr
+          td Purpose
+          td
+            span(*ngIf='selectedAccount.accountId')
+              span {{ selectedAccount.purpose }}
+        tr
+          td Start Date
+          td
+            span(*ngIf='selectedAccount.accountId')
+              span {{ selectedAccount.startDate }}
+        tr
+          td Validity
+          td
+            span(*ngIf='selectedAccount.accountId')
+              span {{ selectedAccount.validity }} days
+        tr
+          td Status
+          td
+            span(*ngIf='selectedAccount.accountId')
+              span {{ selectedAccount.status }}
+        tr
+          td Expected Volume
+          td
+            span(*ngIf='selectedAccount.accountId')
+              span Rs. &nbsp;{{ selectedAccount.expectedVolume }}
+        tr
+          td Balance
+          td
+            span(*ngIf='selectedAccount.accountId')
+              span Rs. &nbsp;{{ selectedAccount.balance }}
+        tr
+          td Documents
+          td
+            tr(*ngFor='let doc of selectedAccount.docs; let i = index')
+              #myDocs
+                a(href='{{ apiDomain+doc.docName }}', target='_blanlk') {{ doc.name }}
+
+    button.btn.btn-primary.mybutton(type='button', (click)='toggle()') Back
+
+ng-template(#detailsTemplate)
+  sbpro-card([headerActions]='true')
+  #screen.div(style='background-color: white') 
+    .card-header.logoColor
+      | QR Code
+      img([src]="'/assets/img/Bhim-Upi-Logo.png'",alt='bhim-upi-logo',style="float: right; width: 150px; height: auto; margin-left: 10px;")
+    div.card-body.text-center.bg-white
+      small
+        small Powered By
+      p
+        img([src]='rbl', alt='RBL', height='50')
+      br
+      img#qrcode.svgIcon([src]='qrCode')
+      br
+      .bold
+        img([src]="'/assets/img/fast-forward-logo.png'",alt='fast-forward-logo',style="width: 25px; height: auto; margin-right: 10px;")
+        | Scan and Pay using any UPI App
+      .d-flex.justify-content-around.align-items-center(style='height: 70px;')
+        img.p-1.m-0([src]='paytm', alt='Paytm', width='100px')
+        img.p-1.m-0([src]='phonepe', alt='PhonePe', width='150px')
+        img.p-1.m-0([src]='gpay', alt='GPay', width='95px')
+      br
+      strong {{ merchantName }}
+      br
+  .card-footer
+    span
+      button.btn.btn-sm.btn-success.float-right((click)='downloadQR(upiId)') Download QR
+      span.float-right &nbsp;&nbsp;
+      button.btn.btn-sm.btn-danger.float-right((click)='onCancel()') Close
+  span.float-right &nbsp;&nbsp;
+
+ngx-spinner
+  p(style='font-size: 20px; color: white') Processing. Please wait...

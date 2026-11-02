@@ -1,0 +1,1347 @@
+div
+  div
+    button.btn.btn-sm.float-right.castlerButtonColor(
+      (click)='openModal(inviteModal)',
+      *ngIf='!readOnly && (!merchantProfile.connectedBanking || !merchantProfile.isAccountAddAllowed) && !disableInvite'
+    ) Invite New Member
+    button.btn.btn-sm.float-right.castlerButtonColor(
+      (click)='openModal(inviteCbWithVa)',
+      *ngIf='!readOnly && (merchantProfile.connectedBanking && merchantProfile.isAccountAddAllowed) && !disableInvite'
+    ) Invite New Member
+    br
+    //- .sb-preview
+    //-   .sbp-preview-content
+    //-     div
+    //-       h4 Pending Invites
+    //-       .table-responsive.pp-table-container.table-responsive-sm
+    //-         table.table
+    //-           thead
+    //-             tr
+    //-               th
+    //-                 span S.No.
+    //-               th
+    //-                 span.ws-nowrap Email ID
+
+    //-               th
+    //-                 span Role
+
+    //-               th
+    //-                 span Action
+
+    //-           tbody(*ngIf='invites.length === 0')
+    //-             p
+    //-               b No pending invites
+    //-           tbody(*ngIf='invites.length > 0')
+    //-             tr(*ngFor='let invite of invites; let i = index')
+    //-               td
+    //-                 span {{ i + 1 }}
+    //-               td
+    //-                 span(*ngIf='invite.email') {{ invite.email }}
+    //-                 span(*ngIf='!invite.email') --
+
+    //-               td
+    //-                 span(*ngIf='invite.role') {{ invite.role }}
+    //-                 span(*ngIf='!invite.role') --
+
+    //-               td
+    //-                 button.btn.mr-2.btn-primary.btn-sm(
+    //-                   type='button',
+    //-                   (click)='openResendModal(resendModal, invite.email, invite.role)'
+    //-                 ) Resend &nbsp;
+    //-                   i-feather(name='send')
+    //-                 button.btn.btn-red.mr-2.btn-transparent-dark.btn-sm(
+    //-                   type='button',
+    //-                   (click)='openInviteAlertModal(alertModalInvite, invite.email)'
+    //-                 ) Delete &nbsp;
+    //-                   i-feather(name='trash-2')
+    //-         br
+    //-         br
+  div
+    h4 Team Members
+    .table-responsive.pp-table-container.table-responsive-sm
+      table.table
+        thead
+          tr
+            th
+              span.ws-nowrap S.No.
+            th
+              span.ws-nowrap Member Name
+
+            th
+              span Mobile number
+
+            th
+              span.ws-nowrap Email ID
+
+            th
+              span.ws-nowrap Role
+
+            th
+              span.ws-nowrap(*ngIf='!disableInvite') Action
+
+        tbody(*ngIf='members.length === 0')
+          tr
+            td No Entries Found
+        tbody(*ngIf='members.length > 0')
+          tr(
+            *ngFor='let member of members; let i = index',
+            (mouseover)='selectedToolTipData = member'
+          )
+            td
+              span {{ i + 1 }}
+            td
+              span(*ngIf='member.user.firstName') {{ member.user.firstName + " " + member.user.lastName }}
+              span(*ngIf='!member.user.firstName') --
+            td
+              span(*ngIf='member.user.mobile') {{ member.user.mobile }}
+              span(*ngIf='!member.user.mobile') --
+            td
+              span(*ngIf='member.email') {{ member.email }}
+              span(*ngIf='!member.email') --
+            td
+              span.tableClickEntryColor(
+                *ngIf='member.role',
+                style='cursor: pointer; white-space: pre-line',
+                [ngbPopover]='ToolTip',
+                triggers='mouseenter:mouseleave'
+              ) {{ member.role }}
+              span(*ngIf='!member.role') --
+            td
+              button.btn.mr-2.btn-sm.castlerButtonColor(
+                type='button',
+                (click)='openUpdateModalOnRoleClick(UpdateMember, member.email, member.role, member.user.mobile, member.user.firstName, member.user.lastName)',
+                *ngIf='!member.role.includes("owner") && !readOnly && (!merchantProfile.connectedBanking || !merchantProfile.isAccountAddAllowed) && !disableInvite'
+              ) Update &nbsp;
+                i-feather(name='edit-3')
+              button.btn.mr-2.btn-sm.castlerButtonColor(
+                type='button',
+                (click)='openUpdateModalOnRoleClick(UpdateMemberCbWithVa, member.email, member.role, member.user.mobile, member.user.firstName, member.user.lastName)',
+                *ngIf='!member.role.includes("owner") && !readOnly && (merchantProfile.connectedBanking && merchantProfile.isAccountAddAllowed) && !disableInvite'
+              ) Update &nbsp;
+                i-feather(name='edit-3')
+              button.btn.btn-red.mr-2.btn-transparent-dark.btn-sm(
+                type='button',
+                (click)='openMemberAlertModal(alertModalMember, member.email)',
+                *ngIf='!member.role.includes("owner") && !readOnly && !disableInvite'
+              ) Delete &nbsp;
+                i-feather(name='trash-2')
+
+button.btn.btn-light.align-self-start(*ngIf='merchantId', (click)='goBack()') Back
+
+ng-template(#inviteModal)
+  .modal-header
+    h4.col-12.modal-title.text-center Invite New Member
+  .modal-body
+    div(*ngIf='inviteProcessingErrors.length > 0')
+      sbpro-alert(classes='alert-danger', [dismissable]='true')
+        | {{ inviteProcessingErrors[0] }}
+    //.text-warning(
+    //  *ngIf='inviteProcessingErrors && inviteProcessingErrors.length > 0'
+    //)
+    //  sbpro-alert([icon]='true', classes='alert-danger sb-alert-solid', [dismissable]='true')
+    //    ul
+    //      li(*ngFor='let error of inviteProcessingErrors') {{ error }}
+
+    .form-group
+      label.small.mb-1(for='inputEmailAddress') First Name
+      span.text-danger *
+      input#inputFName.form-control.py-1(
+        autocomplete='off',
+        type='text',
+        [(ngModel)]='selectedFName',
+        placeholder='Enter First Name'
+      )
+    .form-group
+      label.small.mb-1(for='inputEmailAddress') Last Name
+      span.text-danger *
+      input#inputLName.form-control.py-1(
+        autocomplete='off',
+        type='text',
+        [(ngModel)]='selectedLName',
+        placeholder='Enter Last Name'
+      )
+    .form-group
+      label.small.mb-1(for='inputEmailAddress') Email
+      span.text-danger *
+      input#inputEmailAddress.form-control.py-1(
+        autocomplete='off',
+        type='email',
+        [(ngModel)]='selectedEmail',
+        placeholder='Enter email address'
+      )
+    .form-group
+      label.small.mb-1(for='inputEmailAddress') Phone
+      span.text-danger *
+      input#inputPhone.form-control.py-1(
+        autocomplete='off',
+        type='number',
+        [(ngModel)]='selectedPhone',
+        placeholder='Enter Phone Number'
+      )
+    .form-group
+      label.small.mb-1(for='role') Role
+      span.text-danger *
+      select#role.form-control([(ngModel)]='selectedRole')
+        option(value='') Select Role
+        option(*ngFor='let r of roles', [ngValue]='r') {{ r }}
+    .form-group(*ngIf='selectedRole === "Custom"  && (!merchantProfile?.connectedBanking && merchantProfile?.isAccountAddAllowed)')
+      label.small.mb-1(for='accounts') Escrows
+      span.text-danger *
+      angular2-multiselect#accounts(
+        [data]='dropdownListEscrows',
+        [(ngModel)]='selectedItems',
+        [settings]='dropdownSettingsEscrows',
+        (onSelect)='onItemSelect($event)',
+        (onDeSelect)='OnItemDeSelect($event)',
+        (onSelectAll)='onSelectAll($event)',
+        (onDeSelectAll)='onDeSelectAll($event)'
+      )
+    .form-group(*ngIf='selectedRole === "Custom"  && (merchantProfile?.connectedBanking && !merchantProfile?.isAccountAddAllowed)')
+      label.small.mb-1(for='accounts') Bank Accounts
+      span.text-danger *
+      angular2-multiselect#bankAccounts(
+        [data]='dropdownListBankAccounts',
+        [(ngModel)]='selectedBankAccounts',
+        [settings]='dropdownSettingsBankAccounts',
+        (onSelect)='onItemSelect($event)',
+        (onDeSelect)='OnItemDeSelect($event)',
+        (onSelectAll)='onSelectAll($event)',
+        (onDeSelectAll)='onDeSelectAll($event)'
+      )
+    .form-group(*ngIf='selectedRole === "Custom"')
+      label.small.mb-1(for='roleName') Role Name
+      span.text-danger *
+      input#roleName.form-control.py-1(
+        autocomplete='off',
+        type='text',
+        [(ngModel)]='roleName',
+        placeholder='Enter Role Name'
+      )
+    .form-group
+      sbpro-alert(
+        classes='alert-primary text-center',
+        *ngIf='selectedRole === "Admin"'
+      )
+        | Has access to all features excluding Manage Team
+      sbpro-alert(
+        classes='alert-primary text-center',
+        *ngIf='selectedRole === "Finance"'
+      )
+        | Has access to payments-related data like transaction report and passbook
+      sbpro-alert(
+        classes='alert-primary text-center',
+        *ngIf='selectedRole === "Payee"'
+      )
+        | Has Access to all escrows in which Payee is linked
+      sbpro-alert(
+        classes='alert-primary text-center',
+        *ngIf='selectedRole === "Custom"'
+      )
+        h3 Select Features
+        small
+          | Access to selected features will be given
+    .form-group(*ngIf='selectedRole === "Custom"  && (!merchantProfile?.connectedBanking && merchantProfile?.isAccountAddAllowed)', (change)= 'checkValues()')
+      .form-check.pl-5
+        input#selectAll.form-check-input(
+          type='checkbox',
+          [(ngModel)]='selectAllItemsCheckBox',
+          (change)='selectAllItems($event)'
+        )
+        label.form-check-label(for='selectAll')
+          | Select All
+      .form-check.pl-5
+        input#accountList.form-check-input(
+          type='checkbox',
+          [(ngModel)]='features.createAccount',
+          (change)='checkBoxVal($event,"createAccount")',
+          [disabled]='disableAddEscrow',
+        )
+        label.form-check-label(for='createAccount')
+          | Create Escrow
+      .form-check.pl-5
+        input#accountList.form-check-input(
+          type='checkbox',
+          [(ngModel)]='features.accountList',
+          (change)='checkBoxVal($event,"accountList")',
+        )
+        label.form-check-label(for='accountList')
+          | Escrow List 
+      .form-check.pl-5
+        input#addPayee.form-check-input(
+          type='checkbox',
+          [(ngModel)]='features.addPayee',
+          (change)='checkBoxVal($event,"addPayee")'
+        )
+        label.form-check-label(for='addPayee')
+          | Add Payee
+      .form-check.pl-5
+        input#payeeList.form-check-input(
+          type='checkbox',
+          [(ngModel)]='features.payeeList',
+          (change) = 'checkBoxVal($event, "payeeList")'
+        )
+        label.form-check-label(for='payeeList')
+          | Payee List
+      .form-check.pl-5
+        input#singleTransfer.form-check-input(
+          type='checkbox',
+          [(ngModel)]='features.singleTransfer',
+          (change)='checkBoxVal($event,"singleTransfer")'
+        )
+        label.form-check-label(for='singleTransfer')
+          | Single Transfer
+      .form-check.pl-5
+        input#bulkTransfer.form-check-input(
+          type='checkbox',
+          [(ngModel)]='features.bulkTransfer',
+          (change)='checkBoxVal($event,"bulkTransfer")'
+        )
+        label.form-check-label(for='bulkTransfer')
+          | Bulk Transfer      
+      .form-check.pl-5
+        input#myPassbook.form-check-input(
+          type='checkbox',
+          [(ngModel)]='features.myPassbook',
+          (change)='checkBoxVal($event, "myPassbook")'
+        )
+        label.form-check-label(for='myPassbook')
+          | My Passbook
+    .form-group(*ngIf='selectedRole === "Custom"  && (merchantProfile?.connectedBanking && !merchantProfile?.isAccountAddAllowed)', (change)='checkValues()')
+      .form-check.pl-5
+        input#selectAll.form-check-input(
+          type='checkbox',
+          [(ngModel)]='selectAllConnectedBanking',
+          (change)='selectAllItemsConnectedBanking($event)'
+        )
+        label.form-check-label(for='selectAll')
+          | Select All
+      .form-check.pl-5
+        input#bankAccounts.form-check-input(
+          type='checkbox',
+          [(ngModel)]='featuresConnectedBanking.bankAccounts'
+        )
+        label.form-check-label(for='bankAccounts')
+          | Bank Accounts
+      .form-check.pl-5
+        input#addPayee.form-check-input(
+          type='checkbox',
+          [(ngModel)]='featuresConnectedBanking.addPayee',
+          (change)='checkBoxVal($event,"cbAddPayee")'
+        )
+        label.form-check-label(for='addPayee')
+          | Add Payee
+      .form-check.pl-5
+        input#payeeList.form-check-input(
+          type='checkbox',
+          [(ngModel)]='featuresConnectedBanking.payeeList',
+          (change) = 'checkBoxVal($event, "cbPayeeList")'
+        )
+        label.form-check-label(for='payeeList')
+          | Payee List
+      .form-check.pl-5
+        input#singleTransfer.form-check-input(
+          type='checkbox',
+          [(ngModel)]='featuresConnectedBanking.singleTransfer',
+          (change)='checkBoxVal($event, "cbSingleTransfer")'
+        )
+        label.form-check-label(for='singleTransfer')
+          | Single Transfer
+      .form-check.pl-5
+        input#bulkTransfer.form-check-input(
+          type='checkbox',
+          [(ngModel)]='featuresConnectedBanking.bulkTransfer',
+          (change)='checkBoxVal($event, "cbBulkTransfer")'
+        )
+        label.form-check-label(for='bulkTransfer')
+          | Bulk Transfer
+      .form-check.pl-5
+        input#bankAccountTransfer.form-check-input(
+          type='checkbox',
+          [(ngModel)]='featuresConnectedBanking.bankAccountTransfer',
+          (change) = 'checkBoxVal($event,"bankAccountTransfer")'
+        )
+        label.form-check-label(for='bankAccountTransfer')
+          | Transfers List 
+      .form-check.pl-5
+        input#depositList.form-check-input(
+          type='checkbox',
+          [(ngModel)]='featuresConnectedBanking.depositList'
+        )
+        label.form-check-label(for='depositList')
+          | Deposit List
+  .modal-footer
+    button.btn.btn-light(type='button', (click)='closeModal()') Cancel
+    sbpro-app-button((click)='sendInvite()', text='Invite', [loading]='')
+
+ng-template(#updateModal)
+  .modal-header
+    h4 Update Member
+  .modal-body
+    div(*ngIf='inviteProcessingErrors.length > 0')
+      sbpro-alert(classes='alert-danger', [dismissable]='true')
+        | {{ inviteProcessingErrors[0] }}
+  .modal-body
+    .form-group
+      label.small.mb-1(for='inputEmailAddress') Email
+      span#inputEmailAddress.form-control {{ selectedEmail }}
+    .form-group
+      label(for='role') Role
+      span.text-danger *
+      select#role.form-control(
+        [(ngModel)]='selectedRole',
+        (change)='onChange($event)'
+      )
+        option(value='') Select Role
+        option(*ngFor='let role of filteredRoles', [ngValue]='role') {{ role }}
+    .form-group(*ngIf='selectedRole === "Custom"')
+      label(for='roleName') Role Name
+      span.text-danger *
+      input#roleName.form-control.py-1(
+        autocomplete='off',
+        type='text',
+        [(ngModel)]='roleName',
+        placeholder='Enter Role Name'
+      )
+    .form-group
+      sbpro-alert(
+        classes='alert-primary text-center',
+        *ngIf='selectedRole === "Admin"'
+      )
+        | Has access to all features excluding Manage Team
+      sbpro-alert(
+        classes='alert-primary text-center',
+        *ngIf='selectedRole === "Finance"'
+      )
+        | Has access to payments-related data like transaction report and passbook
+      sbpro-alert(
+        classes='alert-primary text-center',
+        *ngIf='selectedRole === "Payee"'
+      )
+        | Has Access to all escrows in which Payee is linked
+      sbpro-alert(
+        classes='alert-primary text-center',
+        *ngIf='selectedRole === "Custom"'
+      )
+        h3 Select Features
+        small
+          | Access to selected features will be given
+    .form-group(*ngIf='selectedRole === "Custom"  && (!merchantProfile?.connectedBanking && merchantProfile?.isAccountAddAllowed)')
+      .form-check.pl-5
+        input#selectAll.form-check-input(
+          type='checkbox',
+          (change)='selectAllItems($event)'
+        )
+        label.form-check-label(for='selectAll')
+          | Select All
+      .form-check.pl-5
+        input#accountList.form-check-input(
+          type='checkbox',
+          [(ngModel)]='features.createAccount',
+          (change)='checkBoxVal($event,"createAccount")',
+        )
+        label.form-check-label(for='createAccount')
+          | Create Escrow 
+      .form-check.pl-5
+        input#accountList.form-check-input(
+          type='checkbox',
+          [(ngModel)]='features.accountList',
+          (change)='checkBoxValCreateTransfer($event,"accountList")',
+        )
+        label.form-check-label(for='accountList')
+          | Escrow List 
+      .form-check.pl-5
+        input#addPayee.form-check-input(
+          type='checkbox',
+          [(ngModel)]='features.addPayee'
+        )
+        label.form-check-label(for='addPayee')
+          | Add Payee
+      .form-check.pl-5
+        input#payeeList.form-check-input(
+          type='checkbox',
+          [(ngModel)]='features.payeeList'
+        )
+        label.form-check-label(for='payeeList')
+          | Payee List
+      .form-check.pl-5
+        input#singleTransfer.form-check-input(
+          type='checkbox',
+          [(ngModel)]='features.singleTransfer'
+        )
+        label.form-check-label(for='singleTransfer')
+          | Single Transfer
+      .form-check.pl-5
+        input#bulkTransfer.form-check-input(
+          type='checkbox',
+          [(ngModel)]='features.bulkTransfer'
+        )
+        label.form-check-label(for='bulkTransfer')
+          | Bulk Transfer
+      .form-check.pl-5
+        input#myPassbook.form-check-input(
+          type='checkbox',
+          [(ngModel)]='features.myPassbook'
+        )
+        label.form-check-label(for='myPassbook')
+          | My Passbook
+      .form-check.pl-5
+        input#escrowQr.form-check-input(
+          type='checkbox',
+          [(ngModel)]='features.escrowQr'
+        )
+        label.form-check-label(for='escrowQr')
+          | Escrow QR
+      .form-check.pl-5
+        input#escrowPages.form-check-input(
+          type='checkbox',
+          [(ngModel)]='features.escrowPages'
+        )
+        label.form-check-label(for='escrowPages')
+          | Escrow Pages
+      .form-check.pl-5
+        input#challans.form-check-input(
+          type='checkbox',
+          [(ngModel)]='features.challans'
+        )
+        label.form-check-label(for='challans')
+          | Challans
+
+    .form-group(*ngIf='selectedRole === "Custom"  && (merchantProfile?.connectedBanking && !merchantProfile?.isAccountAddAllowed)')
+      .form-check.pl-5
+        input#selectAll.form-check-input(
+          type='checkbox',
+          (change)='selectAllItemsConnectedBanking($event)'
+        )
+        label.form-check-label(for='selectAll')
+          | Select All
+      .form-check.pl-5
+        input#bankAccounts.form-check-input(
+          type='checkbox',
+          [(ngModel)]='featuresConnectedBanking.bankAccounts'
+        )
+        label.form-check-label(for='bankAccounts')
+          | Bank Accounts
+      .form-check.pl-5
+        input#addPayee.form-check-input(
+          type='checkbox',
+          [(ngModel)]='featuresConnectedBanking.addPayee'
+        )
+        label.form-check-label(for='addPayee')
+          | Add Payee
+      .form-check.pl-5
+        input#payeeList.form-check-input(
+          type='checkbox',
+          [(ngModel)]='featuresConnectedBanking.payeeList'
+        )
+        label.form-check-label(for='payeeList')
+          | Payee List
+      .form-check.pl-5
+        input#connectedBankingTransfer.form-check-input(
+          type='checkbox',
+          [(ngModel)]='featuresConnectedBanking.connectedBankingTransfer'
+        )
+        label.form-check-label(for='connectedBankingTransfer')
+          | Create Transfer
+      .form-check.pl-5
+        input#bankAccountTransfer.form-check-input(
+          type='checkbox',
+          [(ngModel)]='featuresConnectedBanking.bankAccountTransfer'
+        )
+        label.form-check-label(for='bankAccountTransfer')
+          | Transfers List
+      .form-check.pl-5
+        input#depositList.form-check-input(
+          type='checkbox',
+          [(ngModel)]='featuresConnectedBanking.depositList'
+        )
+        label.form-check-label(for='depositList')
+          | Deposit List
+  .modal-footer
+    button.btn.castlerButtonColor((click)='updateMember()') Update
+    button.btn.btn-link.castlerButtonColor((click)='closeModal()') cancel
+
+ng-template(#resendModal)
+  .modal-header
+    h4 Resend Invite
+  .modal-body
+    div(*ngIf='inviteProcessingErrors.length > 0')
+      sbpro-alert(classes='alert-danger', [dismissable]='true')
+        | {{ inviteProcessingErrors[0] }}
+  .modal-body
+    .form-group
+      label.small.mb-1(for='inputEmailAddress') Email
+      span#inputEmailAddress.form-control {{ selectedEmail }}
+    .form-group
+      label.small.mb-1(for='role') Role
+      span#role.form-control {{ selectedRole }}
+    .form-group
+      sbpro-alert(classes='alert-primary', *ngIf='selectedRole === "Admin"')
+        | Has access to all features excluding Manage Team
+      sbpro-alert(classes='alert-primary', *ngIf='selectedRole === "Manager"')
+        | Has access to the creation of Escrow and Add payees
+      sbpro-alert(classes='alert-primary', *ngIf='selectedRole === "Finance"')
+        | Has access to payments-related data like transaction report and passbook
+  .modal-footer
+    button.btn.castlerButtonColor((click)='resendInvite()') Resend
+    button.btn.btn-link((click)='closeModal()') cancel
+
+ng-template(#alertModalMember)
+  .modal-header
+    h4 Are you sure!
+  .modal-body
+    sbpro-alert(classes='alert-warning')
+      | Do you want to remove "{{ selectedEmail }}" as a member of your team.
+  .modal-footer
+    button.btn.castlerButtonColor((click)='deleteMember()') Yes, remove
+    button.btn.btn-link.logoColor((click)='closeModal()') No, Don't remove
+
+ng-template(#alertModalInvite)
+  .modal-header
+    h4 Are you sure!
+  .modal-body
+    sbpro-alert(classes='alert-warning')
+      | Do you want to remove "{{ selectedEmail }}" invite.
+  .modal-footer
+    button.btn.castlerButtonColor((click)='deleteInvitee()') Yes, remove
+    button.btn.btn-link((click)='closeModal()') No, Don't remove
+
+ng-template(#UpdateMember)
+  .modal-header(style='flex: display; justify-content: center')
+    h4 Update Member
+  .modal-body
+    div(*ngIf='inviteProcessingErrors.length > 0')
+      sbpro-alert(classes='alert-danger', [dismissable]='true')
+        | {{ inviteProcessingErrors[0] }} 
+  .modal-body
+    .alert.alert-danger.alert-dismissible.fade.show(
+      role='alert',
+      *ngIf='errors.length > 0'
+    )
+      | {{ errors[0] }}
+      button.close(
+        type='button',
+        (click)='errors = []',
+        data-dismiss='alert',
+        aria-label='Close'
+      )
+        span(aria-hidden='true') ×
+    .row
+      .col.mr-2
+        .detailsText First Name
+        div {{ selectedFName || "--" }}
+      .col
+        .detailsText Last Name
+        div {{ selectedLName || "--" }}
+      .w-100.mb-3
+      .col.mr-2
+        .detailsText Email Id
+        div {{ selectedEmail || "--" }}
+      .col
+        .detailsText Mobile
+        div {{ selectedPhone || "--" }}
+
+    .row
+      .col-4.mt-3.flex-display
+        label.mt-2(for='role') Role
+        span.text-danger.mr-3.mt-2 *
+      .col-8.mt-3
+        select#role.form-control([(ngModel)]='selectedRole')
+          option(value='') Select Role
+          option(*ngFor='let role of filteredRoles', [ngValue]='role') {{ role }}
+    .row(*ngIf='selectedRole === "Custom" && (!merchantProfile?.connectedBanking && merchantProfile?.isAccountAddAllowed)')
+      .col-4.mt-3.flex-display
+        label.mt-2(for='accounts') Escrows
+        span.text-danger.mr-3.mt-2 *
+      .col-8.mt-3
+        angular2-multiselect#accounts(
+          [data]='dropdownListEscrows',
+          [(ngModel)]='selectedItems',
+          [settings]='dropdownSettingsEscrows',
+          (onSelect)='onItemSelect($event)',
+          (onDeSelect)='OnItemDeSelect($event)',
+          (onSelectAll)='onSelectAll($event)',
+          (onDeSelectAll)='onDeSelectAll($event)'
+        )
+  
+    .row(*ngIf='selectedRole === "Custom" && (merchantProfile?.connectedBanking && !merchantProfile?.isAccountAddAllowed)')
+      .col-4.mt-3.flex-display
+        label.mt-2(for='accounts') Bank Accounts
+        span.text-danger.mr-3.mt-2 *
+      .col-8.mt-3
+        angular2-multiselect#bankAccounts(
+          [data]='dropdownListBankAccounts',
+          [(ngModel)]='selectedBankAccounts',
+          [settings]='dropdownSettingsBankAccounts',
+          (onSelect)='onItemSelect($event)',
+          (onDeSelect)='OnItemDeSelect($event)',
+          (onSelectAll)='onSelectAll($event)',
+          (onDeSelectAll)='onDeSelectAll($event)'
+        )
+
+    .row(*ngIf='selectedRole === "Custom"')
+      .col-4.mt-3.flex-display
+        label.mt-2(for='role') Role Name
+        span.text-danger.mr-3.mt-2 *
+      .col-8.mt-3
+        input#roleName.form-control.py-1(
+          autocomplete='off',
+          type='text',
+          [(ngModel)]='roleName',
+          placeholder='Enter Role Name'
+        )
+
+    .form-group.mt-3
+      sbpro-alert(
+        classes='alert-primary text-center',
+        *ngIf='selectedRole === "Admin"'
+      )
+        | Has access to all features excluding Manage Team
+      sbpro-alert(
+        classes='alert-primary text-center',
+        *ngIf='selectedRole === "Finance"'
+      )
+        | Has access to payments-related data like transaction report and passbook
+      sbpro-alert(
+        classes='alert-primary text-center',
+        *ngIf='selectedRole === "Payee"'
+      )
+        | Has Access to all escrows in which Payee is linked
+
+      .row(*ngIf='selectedRole === "Custom"')
+        .col-4.mt-2.flex-display
+          label Select Features
+        .col-8.mt-2
+          small Access to selected features will be given
+      //sbpro-alert(
+      //  classes='alert-primary text-center',
+      //  *ngIf='selectedRole === "Custom"'
+      //)
+      //  h3 Select Features
+      //  small
+      //    | Access to selected features will be given
+    .row(*ngIf='selectedRole === "Custom" && (!merchantProfile?.connectedBanking && merchantProfile?.isAccountAddAllowed)', (change)='checkValues()')
+      .col(style='padding-left: 32px')
+        input#selectAll.form-check-input(
+          type='checkbox',
+          [(ngModel)]='selectAllItemsCheckBox',
+          (change)='selectAllItems($event)'
+        )
+        label.form-check-label(for='selectAll')
+          | Select All
+      .w-100
+      .col(style='padding-left: 32px')
+        input#accountList.form-check-input(
+          type='checkbox',
+          [(ngModel)]='features.createAccount',
+          (change)='checkBoxVal($event,"createAccount")',
+          [disabled]='disableAddEscrow',
+        )
+        label.form-check-label(for='createAccount')
+          | Add Escrow
+      .col
+        input#accountList.form-check-input(
+          type='checkbox',
+          [(ngModel)]='features.accountList',
+          (change)='checkBoxVal($event,"accountList")',
+        )
+        label.form-check-label(for='accountList')
+          | Escrow List
+      .w-100
+      .col(style='padding-left: 32px')
+        input#addPayee.form-check-input(
+          type='checkbox',
+          [(ngModel)]='features.addPayee',
+          (change)='checkBoxVal($event,"addPayee")'
+        )
+        label.form-check-label(for='addPayee')
+          | Add Payee
+      .col
+        input#payeeList.form-check-input(
+          type='checkbox',
+          [(ngModel)]='features.payeeList',
+          (change) = 'checkBoxVal($event, "payeeList")'
+        )
+        label.form-check-label(for='payeeList')
+          | Payee List
+      .w-100
+      .col(style='padding-left: 32px')
+        input#singleTransfer.form-check-input(
+          type='checkbox',
+          [(ngModel)]='features.singleTransfer',
+          (change)='checkBoxVal($event,"singleTransfer")'
+        )
+        label.form-check-label(for='singleTransfer')
+          | Single Transfer
+      .col
+        input#bulkTransfer.form-check-input(
+          type='checkbox',
+          [(ngModel)]='features.bulkTransfer',
+          (change)='checkBoxVal($event,"bulkTransfer")'
+        )
+        label.form-check-label(for='bulkTransfer')
+          | Bulk Transfer 
+      .w-100 
+      .col(style='padding-left: 32px')
+        input#myPassbook.form-check-input(
+          type='checkbox',
+          [(ngModel)]='features.myPassbook',
+          (change)='checkBoxVal($event, "myPassbook")'
+        )
+        label.form-check-label(for='myPassbook')
+          | My Passbook
+
+    .row(*ngIf='selectedRole === "Custom" && (merchantProfile?.connectedBanking && !merchantProfile?.isAccountAddAllowed)', (change)='checkValues()')
+      .col(style='padding-left: 32px')
+        input#selectAll.form-check-input(
+          type='checkbox',
+          [(ngModel)]='selectAllConnectedBanking',
+          (change)='selectAllItemsConnectedBanking($event)'
+        )
+        label.form-check-label(for='selectAll')
+          | Select All
+      .col
+        input#bankAccounts.form-check-input(
+          type='checkbox',
+          [(ngModel)]='featuresConnectedBanking.bankAccounts'
+        )
+        label.form-check-label(for='bankAccounts')
+          | Bank Account
+      .w-100
+      .col(style='padding-left: 32px')
+        input#addPayee.form-check-input(
+          type='checkbox',
+          [(ngModel)]='featuresConnectedBanking.addPayee',
+          (change) = 'checkBoxVal($event,"cbAddPayee")'
+        )
+        label.form-check-label(for='addPayee')
+          | Add Payee
+      .col
+        input#payeeList.form-check-input(
+          type='checkbox',
+          [(ngModel)]='featuresConnectedBanking.payeeList',
+          (change)='checkBoxVal($event, "cbPayeeList")'
+        )
+        label.form-check-label(for='payeeList')
+          | Payee List
+      .w-100
+      .col(style='padding-left: 32px')
+        input#singleTransfer.form-check-input(
+          type='checkbox',
+          [(ngModel)]='featuresConnectedBanking.singleTransfer',
+          (change)='checkBoxVal($event, "cbSingleTransfer")'
+        )
+        label.form-check-label(for='singleTransfer')
+          | Single Transfer
+      .col
+        input#bulkTransfer.form-check-input(
+          type='checkbox',
+          [(ngModel)]='featuresConnectedBanking.bulkTransfer',
+          (change)='checkBoxVal($event, "cbSingleTransfer")'
+        )
+        label.form-check-label(for='bulkTransfer')
+          | Bulk Transfer
+      .w-100
+      .col(style='padding-left: 32px')
+        input#bankAccountTransfer.form-check-input(
+          type='checkbox',
+          [(ngModel)]='featuresConnectedBanking.bankAccountTransfer',
+          (change)='checkBoxVal($event,"bankAccountTransfer")'
+        )
+        label.form-check-label(for='bankAccountTransfer')
+          | Transfers List 
+      .col
+        input#depositList.form-check-input(
+          type='checkbox',
+          [(ngModel)]='featuresConnectedBanking.depositList'
+        )
+        label.form-check-label(for='depositList')
+          | Deposit List
+  .modal-footer.flex-display(style='justify-content: center')
+    button.btn.btn-light.mr-5(type='button', (click)='closeModal()') Cancel
+    button.btn.castlerButtonColor((click)='updateMember()') Update
+    //button.btn.btn-transparent-light((click)='closeModal()', class='castlerButtonColor') cancel
+
+ng-template(#inviteCbWithVa)
+  .modal-header
+    h4.col-12.modal-title.text-center Invite New Member
+  .modal-body
+    div(*ngIf='inviteProcessingErrors.length > 0')
+      sbpro-alert(classes='alert-danger', [dismissable]='true')
+        | {{ inviteProcessingErrors[0] }}
+    .alert.alert-danger.alert-dismissible.fade.show(
+      role='alert',
+      *ngIf='errors.length > 0'
+    )
+      | {{ errors[0] }}
+      button.close(
+        type='button',
+        (click)='errors = []',
+        data-dismiss='alert',
+        aria-label='Close'
+      )
+        span(aria-hidden='true') ×
+    .form-group
+      label.small.mb-1(for='inputEmailAddress') First Name
+      span.text-danger *
+      input#inputFName.form-control.py-1(
+        autocomplete='off',
+        type='text',
+        [(ngModel)]='selectedFName',
+        placeholder='Enter First Name'
+      )
+    .form-group
+      label.small.mb-1(for='inputEmailAddress') Last Name
+      span.text-danger *
+      input#inputLName.form-control.py-1(
+        autocomplete='off',
+        type='text',
+        [(ngModel)]='selectedLName',
+        placeholder='Enter Last Name'
+      )
+    .form-group
+      label.small.mb-1(for='inputEmailAddress') Email
+      span.text-danger *
+      input#inputEmailAddress.form-control.py-1(
+        autocomplete='off',
+        type='email',
+        [(ngModel)]='selectedEmail',
+        placeholder='Enter email address'
+      )
+    .form-group
+      label.small.mb-1(for='inputEmailAddress') Phone
+      span.text-danger *
+      input#inputPhone.form-control.py-1(
+        autocomplete='off',
+        type='number',
+        [(ngModel)]='selectedPhone',
+        placeholder='Enter Phone Number'
+      )
+    .form-group
+      label.small.mb-1(for='role') Role
+      span.text-danger *
+      select#role.form-control([(ngModel)]='selectedRole')
+        option(value='') Select Role
+        option(*ngFor='let r of roles', [ngValue]='r') {{ r }}
+  
+    .form-group(*ngIf='selectedRole === "Custom"')
+      label.small.mb-1(for='accounts') Bank Accounts
+      span.text-danger *
+      angular2-multiselect#bankAccounts(
+        [data]='dropdownListBankAccounts',
+        [(ngModel)]='selectedBankAccounts',
+        [settings]='dropdownSettingsBankAccounts',
+        (onSelect)='onItemSelect($event)',
+        (onDeSelect)='OnItemDeSelect($event)',
+        (onSelectAll)='onSelectAll($event)',
+        (onDeSelectAll)='onDeSelectAll($event)',
+        (onClose) = 'onBlur()',
+      )
+
+    .form-group(*ngIf='selectedRole === "Custom"')
+      label.small.mb-1(for='accounts') Escrows
+      span.text-danger(*ngIf = 'escrowMandatory') *
+      angular2-multiselect#accounts(
+        [data]='dropdownListEscrows',
+        [(ngModel)]='selectedItems',
+        [settings]='dropdownSettingsEscrows',
+        (onSelect)='onItemSelect($event)',
+        (onDeSelect)='OnItemDeSelect($event)',
+        (onSelectAll)='onSelectAll($event)',
+        (onDeSelectAll)='onDeSelectAll($event)'
+      )
+    .form-group(*ngIf='selectedRole === "Custom"')
+      label.small.mb-1(for='roleName') Role Name
+      span.text-danger *
+      input#roleName.form-control.py-1(
+        autocomplete='off',
+        type='text',
+        [(ngModel)]='roleName',
+        placeholder='Enter Role Name'
+      )
+    .form-group
+      sbpro-alert(
+        classes='alert-primary text-center',
+        *ngIf='selectedRole === "Admin"'
+      )
+        | Has access to all features excluding Manage Team
+      sbpro-alert(
+        classes='alert-primary text-center',
+        *ngIf='selectedRole === "Finance"'
+      )
+        | Has access to payments-related data like transaction report and passbook
+      sbpro-alert(
+        classes='alert-primary text-center',
+        *ngIf='selectedRole === "Payee"'
+      )
+        | Has Access to all escrows in which Payee is linked
+      sbpro-alert(
+        classes='alert-primary text-center',
+        *ngIf='selectedRole === "Custom"'
+      )
+        h3 Select Features
+        small
+          | Access to selected features will be given
+    .form-group(*ngIf='selectedRole === "Custom"',(change)='checkValues()')
+      .row
+        .col-md-6 
+          h4 Digital Escrow
+          .form-check.pl-5
+            input#selectAll.form-check-input(
+              type='checkbox',
+              [(ngModel)]='selectAllItemsCheckBox',
+              (change)='selectAllItems($event)',
+              [disabled]='!escrowMandatory'
+            )
+            label.form-check-label(for='selectAll')
+              | Select All
+          .form-check.pl-5
+            input#accountList.form-check-input(
+              type='checkbox',
+              [(ngModel)]='features.createAccount',
+              (change)='checkBoxVal($event,"createAccount")',
+              [disabled]='!escrowMandatory || disableAddEscrow'
+            )
+            label.form-check-label(for='createAccount')
+              | Add Escrow 
+          .form-check.pl-5
+            input#accountList.form-check-input(
+              type='checkbox',
+              [(ngModel)]='features.accountList',
+              (change)='checkBoxVal($event,"accountList")',
+              [disabled]='!escrowMandatory'
+            )
+            label.form-check-label(for='accountList')
+              | Escrow List 
+          .form-check.pl-5
+            input#singleTransfer.form-check-input(
+              type='checkbox',
+              [(ngModel)]='features.singleTransfer',
+              (change)='checkBoxVal($event,"singleTransfer")',
+              [disabled]='!escrowMandatory'
+            )
+            label.form-check-label(for='singleTransfer')
+              | Single Transfer
+          .form-check.pl-5
+            input#bulkTransfer.form-check-input(
+              type='checkbox',
+              [(ngModel)]='features.bulkTransfer',
+              (change)='checkBoxVal($event,"bulkTransfer")',
+              [disabled]='!escrowMandatory'
+            )
+            label.form-check-label(for='bulkTransfer')
+              | Bulk Transfer
+          .form-check.pl-5
+            input#myPassbook.form-check-input(
+              type='checkbox',
+              [(ngModel)]='features.myPassbook',
+              (change) = 'checkBoxVal($event,"myPassbook")',
+              [disabled]='!escrowMandatory'
+            )
+            label.form-check-label(for='myPassbook')
+              | My Passbook
+        .col-md-6 
+          h4 Connected Banking
+          .form-check.pl-5
+            input#selectAll.form-check-input(
+              type='checkbox',
+              [(ngModel)]='selectAllConnectedBanking',
+              (change)='selectAllItemsConnectedBanking($event)'
+            )
+            label.form-check-label(for='selectAll')
+              | Select All
+          .form-check.pl-5
+            input#bankAccounts.form-check-input(
+              type='checkbox',
+              [(ngModel)]='featuresConnectedBanking.bankAccounts'
+            )
+            label.form-check-label(for='bankAccounts')
+              | Bank Accounts
+          .form-check.pl-5
+            input#singleTransfer.form-check-input(
+              type='checkbox',
+              [(ngModel)]='featuresConnectedBanking.singleTransfer',
+              (change)='checkBoxVal($event, "cbSingleTransfer")'
+            )
+            label.form-check-label(for='singleTransfer')
+              | Single Transfer
+          .form-check.pl-5
+            input#bulkTransfer.form-check-input(
+              type='checkbox',
+              [(ngModel)]='featuresConnectedBanking.bulkTransfer',
+              (change)='checkBoxVal($event, "cbBulkTransfer")'
+            )
+            label.form-check-label(for='bulkTransfer')
+              | Bulk Transfer
+          .form-check.pl-5
+            input#bankAccountTransfer.form-check-input(
+              type='checkbox',
+              [(ngModel)]='featuresConnectedBanking.bankAccountTransfer',
+              (change) = 'checkBoxVal($event, "bankAccountTransfer")'
+            )
+            label.form-check-label(for='bankAccountTransfer')
+              | Transfers List 
+          .form-check.pl-5
+            input#depositList.form-check-input(
+              type='checkbox',
+              [(ngModel)]='featuresConnectedBanking.depositList'
+            )
+            label.form-check-label(for='depositList')
+              | Deposit List
+        .col-md-6 
+          h4.pt-2 Other Features 
+          .form-check.pl-5
+            input#addPayee.form-check-input(
+              type='checkbox',
+              [(ngModel)]='otherFeatures.addPayee',
+              (change)='checkBoxVal($event,"othersAddPayee")'
+            )
+            label.form-check-label(for='addPayee')
+              | Add Payee
+          .form-check.pl-5
+            input#payeeList.form-check-input(
+              type='checkbox',
+              [(ngModel)]='otherFeatures.payeeList',
+              (change) = 'checkBoxVal($event,"othersPayeeList")'
+            )
+            label.form-check-label(for='payeeList')
+              | Payee List
+  .modal-footer
+    button.btn.btn-light(type='button', (click)='closeModal()') Cancel
+    sbpro-app-button((click)='sendInvite()', text='Invite', [loading]='')
+
+ng-template(#UpdateMemberCbWithVa)
+  .modal-header(style='flex: display; justify-content: center')
+    h4 Update Member
+  .modal-body
+    div(*ngIf='inviteProcessingErrors.length > 0')
+      sbpro-alert(classes='alert-danger', [dismissable]='true')
+        | {{ inviteProcessingErrors[0] }} 
+  .modal-body
+    .alert.alert-danger.alert-dismissible.fade.show(
+      role='alert',
+      *ngIf='errors.length > 0'
+    )
+      | {{ errors[0] }}
+      button.close(
+        type='button',
+        (click)='errors = []',
+        data-dismiss='alert',
+        aria-label='Close'
+      )
+        span(aria-hidden='true') ×
+    .row
+      .col.mr-2
+        .detailsText First Name
+        div {{ selectedFName || "--" }}
+      .col
+        .detailsText Last Name
+        div {{ selectedLName || "--" }}
+      .w-100.mb-3
+      .col.mr-2
+        .detailsText Email Id
+        div {{ selectedEmail || "--" }}
+      .col
+        .detailsText Mobile
+        div {{ selectedPhone || "--" }}
+
+    .row
+      .col-4.mt-3.flex-display
+        label.mt-2(for='role') Role
+        span.text-danger.mr-3.mt-2 *
+      .col-8.mt-3
+        select#role.form-control([(ngModel)]='selectedRole')
+          option(value='') Select Role
+          option(*ngFor='let role of filteredRoles', [ngValue]='role') {{ role }}
+  
+    .form-group(*ngIf='selectedRole === "Custom"')
+      label.small.mb-1(for='accounts') Bank Accounts
+      span.text-danger *
+      angular2-multiselect#bankAccounts(
+        [data]='dropdownListBankAccounts',
+        [(ngModel)]='selectedBankAccounts',
+        [settings]='dropdownSettingsBankAccounts',
+        (onSelect)='onItemSelect($event)',
+        (onDeSelect)='OnItemDeSelect($event)',
+        (onSelectAll)='onSelectAll($event)',
+        (onDeSelectAll)='onDeSelectAll($event)',
+        (onClose) = 'onBlur()',
+      )
+
+    .form-group(*ngIf='selectedRole === "Custom"')
+      label.small.mb-1(for='accounts') Escrows
+      span.text-danger(*ngIf = 'escrowMandatory') *
+      angular2-multiselect#accounts(
+        [data]='dropdownListEscrows',
+        [(ngModel)]='selectedItems',
+        [settings]='dropdownSettingsEscrows',
+        (onSelect)='onItemSelect($event)',
+        (onDeSelect)='OnItemDeSelect($event)',
+        (onSelectAll)='onSelectAll($event)',
+        (onDeSelectAll)='onDeSelectAll($event)'
+      )
+    .form-group(*ngIf='selectedRole === "Custom"')
+      label.small.mb-1(for='roleName') Role Name
+      span.text-danger *
+      input#roleName.form-control.py-1(
+        autocomplete='off',
+        type='text',
+        [(ngModel)]='roleName',
+        placeholder='Enter Role Name'
+      )
+    .form-group
+      sbpro-alert(
+        classes='alert-primary text-center',
+        *ngIf='selectedRole === "Admin"'
+      )
+        | Has access to all features excluding Manage Team
+      sbpro-alert(
+        classes='alert-primary text-center',
+        *ngIf='selectedRole === "Finance"'
+      )
+        | Has access to payments-related data like transaction report and passbook
+      sbpro-alert(
+        classes='alert-primary text-center',
+        *ngIf='selectedRole === "Payee"'
+      )
+        | Has Access to all escrows in which Payee is linked
+      sbpro-alert(
+        classes='alert-primary text-center',
+        *ngIf='selectedRole === "Custom"'
+      )
+        h3 Select Features
+        small
+          | Access to selected features will be given
+    .form-group(*ngIf='selectedRole === "Custom"',(change)='checkValues()')
+      .row
+        .col-md-6 
+          h4 Digital Escrow
+          .form-check.pl-5
+            input#selectAll.form-check-input(
+              type='checkbox',
+              [(ngModel)]='selectAllItemsCheckBox',
+              (change)='selectAllItems($event)',
+              [disabled]='!escrowMandatory'
+            )
+            label.form-check-label(for='selectAll')
+              | Select All
+          .form-check.pl-5
+            input#accountList.form-check-input(
+              type='checkbox',
+              [(ngModel)]='features.createAccount',
+              (change)='checkBoxVal($event,"createAccount")',
+              [disabled]='!escrowMandatory || disableAddEscrow'
+            )
+            label.form-check-label(for='createAccount')
+              | Add Escrow
+          .form-check.pl-5
+            input#accountList.form-check-input(
+              type='checkbox',
+              [(ngModel)]='features.accountList',
+              (change)='checkBoxVal($event,"accountList")',
+              [disabled]='!escrowMandatory'
+            )
+            label.form-check-label(for='accountList')
+              | Escrow List 
+          .form-check.pl-5
+            input#singleTransfer.form-check-input(
+              type='checkbox',
+              [(ngModel)]='features.singleTransfer',
+              (change)='checkBoxVal($event,"singleTransfer")',
+              [disabled]='!escrowMandatory'
+            )
+            label.form-check-label(for='singleTransfer')
+              | Single Transfer
+          .form-check.pl-5
+            input#bulkTransfer.form-check-input(
+              type='checkbox',
+              [(ngModel)]='features.bulkTransfer',
+              (change)='checkBoxVal($event,"bulkTransfer")',
+              [disabled]='!escrowMandatory'
+            )
+            label.form-check-label(for='bulkTransfer')
+              | Bulk Transfer
+          .form-check.pl-5
+            input#myPassbook.form-check-input(
+              type='checkbox',
+              [(ngModel)]='features.myPassbook',
+              (change) = 'checkBoxVal($event,"myPassbook")',
+              [disabled]='!escrowMandatory'
+            )
+            label.form-check-label(for='myPassbook')
+              | My Passbook
+        .col-md-6 
+          h4 Connected Banking
+          .form-check.pl-5
+            input#selectAll.form-check-input(
+              type='checkbox',
+              [(ngModel)]='selectAllConnectedBanking',
+              (change)='selectAllItemsConnectedBanking($event)'
+            )
+            label.form-check-label(for='selectAll')
+              | Select All
+          .form-check.pl-5
+            input#bankAccounts.form-check-input(
+              type='checkbox',
+              [(ngModel)]='featuresConnectedBanking.bankAccounts'
+            )
+            label.form-check-label(for='bankAccounts')
+              | Bank Accounts
+          .form-check.pl-5
+            input#singleTransfer.form-check-input(
+              type='checkbox',
+              [(ngModel)]='featuresConnectedBanking.singleTransfer',
+              (change)='checkBoxVal($event, "cbSingleTransfer")'
+            )
+            label.form-check-label(for='singleTransfer')
+              | Single Transfer
+          .form-check.pl-5
+            input#bulkTransfer.form-check-input(
+              type='checkbox',
+              [(ngModel)]='featuresConnectedBanking.bulkTransfer',
+              (change)='checkBoxVal($event, "cbBulkTransfer")'
+            )
+            label.form-check-label(for='bulkTransfer')
+              | Bulk Transfer
+          .form-check.pl-5
+            input#bankAccountTransfer.form-check-input(
+              type='checkbox',
+              [(ngModel)]='featuresConnectedBanking.bankAccountTransfer',
+              (change) = 'checkBoxVal($event, "bankAccountTransfer")'
+            )
+            label.form-check-label(for='bankAccountTransfer')
+              | Transfers List 
+          .form-check.pl-5
+            input#depositList.form-check-input(
+              type='checkbox',
+              [(ngModel)]='featuresConnectedBanking.depositList'
+            )
+            label.form-check-label(for='depositList')
+              | Deposit List
+        .col-md-6 
+          h4.pt-2 Other Features 
+          .form-check.pl-5
+            input#addPayee.form-check-input(
+              type='checkbox',
+              [(ngModel)]='otherFeatures.addPayee',
+              (change)='checkBoxVal($event,"othersAddPayee")'
+            )
+            label.form-check-label(for='addPayee')
+              | Add Payee
+          .form-check.pl-5
+            input#payeeList.form-check-input(
+              type='checkbox',
+              [(ngModel)]='otherFeatures.payeeList',
+              (change) = 'checkBoxVal($event,"othersPayeeList")'
+            )
+            label.form-check-label(for='payeeList')
+              | Payee List
+  .modal-footer
+    button.btn.btn-light(type='button', (click)='closeModal()') Cancel
+    sbpro-app-button((click)='updateMember()', text='Invite', [loading]='')
+
+ng-template(#ToolTip)
+  .leftAlign Role Name-
+  .leftAlign {{ selectedToolTipData.role == "custom" ? selectedToolTipData.roleName : selectedToolTipData.role }}
+  .mt-2.leftAlign(*ngIf='selectedToolTipData.role == "custom"') Features-
+  ul.leftAlign(*ngFor='let data of selectedToolTipData.roleStringStruct')
+    li {{ data }}

@@ -1,0 +1,44 @@
+li.nav-item.dropdown.d-flex.no-caret.mr-3(
+  ngbDropdown,
+  [placement]='placement',
+  display='dynamic'
+)
+  .merchant_check(*ngIf="!authService.isSuperAdmin()")
+    a#navbarDropdownDocs.nav-link.dropdown-toggle.pointer.pt-3(
+      ngbDropdownToggle,
+      data-cy='docsMenu',
+      role='button',
+      aria-haspopup='true',
+      aria-expanded='false'
+    )
+      .d-inline.d-md-none.font-weight-500.text-dark
+        | Merchants
+      .d-none.d-md-inline.font-weight-500.text-dark
+        | Merchants
+      fa-icon.dropdown-arrow([icon]='["fas", "chevron-right"]')
+    .dropdown-menu.py-0.o-hidden.animated--fade-in-up.ml-n10.ml-sm-0(
+      ngbDropdownMenu,
+      aria-labelledby='navbarDropdownDocs'
+    )
+      span.spinner-border.spinner-border-sm(
+        role='status',
+        aria-hidden='true',
+        *ngIf='(loading$ | async) === true'
+      )
+      div(*ngIf='!(loading$ | async)', style="max-height:500px; overflow:auto;")
+        a.dropdown-item.py-3(
+          *ngFor='let merchantUser of merchantUsers',
+          (click)='switchMerchant(merchantUser.merchantUserId)',
+          target='_blank'
+        )
+          //.icon-stack.bg-primary-soft.text-primary.mr-4
+          //  i-feather(name='book')
+
+          div
+            | {{ merchantUser.merchant.title }}
+            .small.text-gray-500 ID: {{ merchantUser.merchant.merchantId }}
+          span.ml-1.float-right(
+            *ngIf='currentMerchantId === merchantUser.merchant.merchantId'
+          )
+            i-feather.text-success(name='check')
+        .dropdown-divider.m-0
